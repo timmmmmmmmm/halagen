@@ -47,12 +47,15 @@ class LabelMaker {
             'Washer_StartInterior': 'icons/Washer_StartInterior.png'
         };
         
+        this.customIcons = this.loadCustomIcons();
         this.initializeEventListeners();
+        this.initializeDefaultColumns();
         this.updatePreview();
         this.initializeTabs();
         this.loadAvailableIcons();
         this.initializeYamlEditor();
         this.initializeIconPicker();
+        this.initializeIconUpload();
     }
 
     initializeEventListeners() {
@@ -91,6 +94,17 @@ class LabelMaker {
         // Initial setup for text inputs
         this.setupMainTextInputs();
         this.setupSubTextInputs();
+    }
+
+    initializeDefaultColumns() {
+        // Set up event listeners for all pre-existing input fields
+        document.querySelectorAll('.main-text-input').forEach(input => {
+            input.addEventListener('input', () => this.updatePreview());
+        });
+        
+        document.querySelectorAll('.sub-text-input').forEach(input => {
+            input.addEventListener('input', () => this.updatePreview());
+        });
     }
 
     updateColumn(type, action) {
@@ -159,11 +173,13 @@ class LabelMaker {
         const mainTextElement = labelPreview.querySelector('.main-text');
         const subTextElement = labelPreview.querySelector('.sub-text');
 
-        iconContainer.innerHTML = `<img class="icon" src="${this.icons[iconSelect] || this.icons['Screw_Hex']}" alt="${iconSelect}">`;
+        // Get icon path from either built-in icons or custom icons
+        const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['Head_Hex'];
+        iconContainer.innerHTML = `<img class="icon" src="${iconPath}" alt="${iconSelect}">`;
         
         // Update main text with columns
         if (mainTexts.length === 0) {
-            mainTextElement.innerHTML = '<div class="main-text-column">M4 × 12</div>';
+            mainTextElement.innerHTML = '<div class="main-text-column">M3</div><div class="main-text-column">M3</div><div class="main-text-column">M3</div>';
         } else {
             const columnHTML = mainTexts.map(text => `<div class="main-text-column">${text}</div>`).join('');
             mainTextElement.innerHTML = columnHTML;
@@ -171,7 +187,7 @@ class LabelMaker {
         
         // Update sub text with columns
         if (subTexts.length === 0) {
-            subTextElement.innerHTML = '<div class="sub-text-column">DIN 7984</div>';
+            subTextElement.innerHTML = '<div class="sub-text-column">8 mm</div><div class="sub-text-column">10 mm</div><div class="sub-text-column">12 mm</div>';
         } else {
             const subColumnHTML = subTexts.map(text => `<div class="sub-text-column">${text}</div>`).join('');
             subTextElement.innerHTML = subColumnHTML;
@@ -234,7 +250,13 @@ class LabelMaker {
             
             // Handle multiple columns for main text
             if (mainTexts.length === 0) {
-                ctx.fillText('M4 × 12', textX, textY);
+                const defaultTexts = ['M3', 'M3', 'M3'];
+                const columnWidth = textAreaWidth / defaultTexts.length;
+                defaultTexts.forEach((text, index) => {
+                    const columnX = textX + (index * columnWidth);
+                    ctx.textAlign = 'left';
+                    ctx.fillText(text, columnX, textY);
+                });
             } else {
                 const columnWidth = textAreaWidth / mainTexts.length;
                 mainTexts.forEach((text, index) => {
@@ -245,21 +267,25 @@ class LabelMaker {
             }
 
             // Handle multiple columns for sub text
-            if (subTexts.length > 0) {
-                ctx.font = `${subFontSize * mmToPx}px Arial`;
-                ctx.fillStyle = '#666';
-                const subTextY = textY + (mainFontSize * mmToPx * 1.2);
-                
-                if (subTexts.length === 1) {
-                    ctx.fillText(subTexts[0], textX, subTextY);
-                } else {
-                    const columnWidth = textAreaWidth / subTexts.length;
-                    subTexts.forEach((text, index) => {
-                        const columnX = textX + (index * columnWidth);
-                        ctx.textAlign = 'left';
-                        ctx.fillText(text, columnX, subTextY);
-                    });
-                }
+            ctx.font = `${subFontSize * mmToPx}px Arial`;
+            ctx.fillStyle = '#666';
+            const subTextY = textY + (mainFontSize * mmToPx * 1.2);
+            
+            if (subTexts.length === 0) {
+                const defaultSubTexts = ['8 mm', '10 mm', '12 mm'];
+                const columnWidth = textAreaWidth / defaultSubTexts.length;
+                defaultSubTexts.forEach((text, index) => {
+                    const columnX = textX + (index * columnWidth);
+                    ctx.textAlign = 'left';
+                    ctx.fillText(text, columnX, subTextY);
+                });
+            } else {
+                const columnWidth = textAreaWidth / subTexts.length;
+                subTexts.forEach((text, index) => {
+                    const columnX = textX + (index * columnWidth);
+                    ctx.textAlign = 'left';
+                    ctx.fillText(text, columnX, subTextY);
+                });
             }
 
             const link = document.createElement('a');
@@ -284,7 +310,7 @@ class LabelMaker {
     }
 
     async drawIcon(ctx, x, y, size, iconType) {
-        const iconPath = this.icons[iconType] || this.icons['Screw_Hex'];
+        const iconPath = this.icons[iconType] || this.customIcons[iconType] || this.icons['Head_Hex'];
         
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -718,52 +744,196 @@ class LabelMaker {
     }
 
     loadAvailableIcons() {
-        // Use all available icons from the icon picker
-        this.availableIcons = Object.keys(this.icons);
-        this.generatePrompt();
+        // Use all available icons from the icon picker + custom icons
+        this.availableIcons = Object.keys(this.icons).concat(Object.keys(this.customIcons));
+        // Only generate prompt if YAML editor is ready
+        if (this.yamlEditor) {
+            this.generatePrompt();
+        }
+    }
+
+    loadCustomIcons() {
+        try {
+            const stored = localStorage.getItem('customIcons');
+            return stored ? JSON.parse(stored) : {};
+        } catch (error) {
+            console.error('Error loading custom icons:', error);
+            return {};
+        }
+    }
+
+    saveCustomIcons() {
+        try {
+            localStorage.setItem('customIcons', JSON.stringify(this.customIcons));
+        } catch (error) {
+            console.error('Error saving custom icons:', error);
+        }
+    }
+
+    initializeIconUpload() {
+        const uploadBtn = document.getElementById('upload-icon-btn');
+        const fileInput = document.getElementById('icon-upload');
+
+        uploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                this.handleIconUpload(file);
+            }
+        });
+    }
+
+    async handleIconUpload(file) {
+        // Validate file type
+        if (!file.type.startsWith('image/png')) {
+            alert('Please upload a PNG image file.');
+            return;
+        }
+
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('File size must be less than 2MB.');
+            return;
+        }
+
+        try {
+            // Create image element to validate dimensions
+            const img = new Image();
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const imageDataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+
+            await new Promise((resolve, reject) => {
+                img.onload = () => {
+                    // Validate square dimensions
+                    if (img.width !== img.height) {
+                        alert('Please upload a square image (width = height).');
+                        reject(new Error('Not square'));
+                        return;
+                    }
+
+                    // Validate minimum size
+                    if (img.width < 32 || img.height < 32) {
+                        alert('Image must be at least 32x32 pixels.');
+                        reject(new Error('Too small'));
+                        return;
+                    }
+
+                    // Resize to standard size if needed (128x128)
+                    const targetSize = 128;
+                    canvas.width = targetSize;
+                    canvas.height = targetSize;
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, targetSize, targetSize);
+                    ctx.drawImage(img, 0, 0, targetSize, targetSize);
+                    
+                    resolve();
+                };
+                img.onerror = reject;
+                img.src = imageDataUrl;
+            });
+
+            // Get processed image data
+            const processedDataUrl = canvas.toDataURL('image/png');
+            
+            // Generate unique name for the icon
+            const baseName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9]/g, '_');
+            let iconName = `Custom_${baseName}`;
+            let counter = 1;
+            
+            // Ensure unique name
+            while (this.icons[iconName] || this.customIcons[iconName]) {
+                iconName = `Custom_${baseName}_${counter}`;
+                counter++;
+            }
+
+            // Save to custom icons
+            this.customIcons[iconName] = processedDataUrl;
+            this.saveCustomIcons();
+            
+            // Update available icons list
+            this.loadAvailableIcons();
+            
+            // Refresh the icon picker
+            this.populateIconGrid();
+            
+            // Auto-select the new icon
+            this.selectIcon(iconName);
+            
+            alert(`✅ Icon "${iconName}" uploaded successfully!`);
+            
+        } catch (error) {
+            console.error('Error processing uploaded icon:', error);
+            if (error.message !== 'Not square' && error.message !== 'Too small') {
+                alert('Error processing uploaded image. Please try again.');
+            }
+        }
     }
 
     generatePrompt() {
-        const promptText = `Generate a YAML file for batch label generation with the following format:
+        const yamlTemplate = `# Hardware Label Maker - Batch Generation Template
+# 
+# Instructions for AI assistants:
+# Generate a YAML file for batch label generation with the following format.
+# Use this template as a starting point and modify as needed.
+# 
+# Requirements:
+# - title: required for single column (string) OR columns: required for multi-column (array of 1-4 strings)
+# - Cannot use both title and columns in the same label
+# - subtext: optional (string) for single column sub text
+# - subtext_columns: optional (array of 1-4 strings) for multi-column sub text
+# - icon: required (must be one of the available icons listed below)
+# - width_mm: required (number, 20-100)
+# - height_mm: required (number, must be 9, 12, 18, or 24)
+# 
+# Available icons:
+# ${this.availableIcons.join(', ')}
+# 
+# Optional global settings:
+# - long_png: optional (boolean) - generates one continuous PNG strip
+# - cut_marks: optional (boolean) - adds cut marks between labels for trimming
+# 
+# Generate 5-10 labels for various hardware components. 
+# Use multi-column format when labeling drawers with multiple related items.
 
 # Optional global settings
 long_png: true      # Generate one long PNG strip (optional)
 cut_marks: true     # Include cut marks between labels (optional)
 
 labels:
-  # Single column label
+  # Single column label example
   - title: "M4 × 12"
     subtext: "DIN 7984"
     icon: "Head_Hex"
     width_mm: 50
     height_mm: 12
 
-  # Multi-column label (for drawer sections)
+  # Multi-column label example (for drawer sections)
   - columns: ["M2", "M3", "M4"]
     subtext_columns: ["Phillips", "Hex", "Torx"]
     icon: "Screw_Hex"
     width_mm: 60
     height_mm: 12
 
-Available icons:
-${this.availableIcons.join(', ')}
-
-Requirements:
-- title: required for single column (string) OR columns: required for multi-column (array of 1-4 strings)
-- Cannot use both title and columns in the same label
-- subtext: optional (string) for single column sub text
-- subtext_columns: optional (array of 1-4 strings) for multi-column sub text
-- icon: required (must be one of the available icons above)
-- width_mm: required (number, 20-100)
-- height_mm: required (number, must be 9, 12, 18, or 24)
-
-Optional global settings:
-- long_png: optional (boolean) - generates one continuous PNG strip
-- cut_marks: optional (boolean) - adds cut marks between labels for trimming
-
-Generate 5-10 labels for various hardware components. Use multi-column format when labeling drawers with multiple related items.`;
+  # Add your own labels here...
+`;
         
-        document.getElementById('llm-prompt').value = promptText;
+        // Set the template in the YAML editor
+        if (this.yamlEditor) {
+            this.yamlEditor.setValue(yamlTemplate);
+        } else {
+            document.getElementById('yaml-input').value = yamlTemplate;
+        }
     }
 
     initializeYamlEditor() {
@@ -798,6 +968,9 @@ Generate 5-10 labels for various hardware components. Use multi-column format wh
 
         // Update the editor when the tab becomes visible
         this.yamlEditor.refresh();
+        
+        // Load template after editor is ready
+        this.generatePrompt();
     }
 
     initializeIconPicker() {
@@ -886,6 +1059,36 @@ Generate 5-10 labels for various hardware components. Use multi-column format wh
         const grid = document.getElementById('icon-grid');
         grid.innerHTML = '';
 
+        // Add custom icons first if they exist
+        if (Object.keys(this.customIcons).length > 0) {
+            const customCategoryDiv = document.createElement('div');
+            customCategoryDiv.className = 'icon-picker-category custom-icon-category';
+            customCategoryDiv.textContent = 'Custom Icons';
+            grid.appendChild(customCategoryDiv);
+
+            Object.keys(this.customIcons).forEach(iconKey => {
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'icon-picker-item';
+                iconDiv.dataset.icon = iconKey;
+                iconDiv.innerHTML = `
+                    <img src="${this.customIcons[iconKey]}" alt="${iconKey}">
+                    <span>${iconKey.replace('Custom_', '').replace(/_/g, ' ')}</span>
+                    <button class="delete-icon-btn" onclick="event.stopPropagation(); labelMaker.deleteCustomIcon('${iconKey}')">×</button>
+                `;
+
+                iconDiv.addEventListener('click', () => {
+                    this.selectIcon(iconKey);
+                });
+
+                if (iconKey === this.selectedIcon) {
+                    iconDiv.classList.add('selected');
+                }
+
+                grid.appendChild(iconDiv);
+            });
+        }
+
+        // Add built-in icons
         Object.entries(this.iconCategories).forEach(([category, icons]) => {
             // Add category header
             const categoryDiv = document.createElement('div');
@@ -919,18 +1122,22 @@ Generate 5-10 labels for various hardware components. Use multi-column format wh
     selectIcon(iconKey) {
         this.selectedIcon = iconKey;
         
+        // Get icon path and display name
+        const iconPath = this.icons[iconKey] || this.customIcons[iconKey];
+        const displayName = this.iconNames[iconKey] || iconKey.replace('Custom_', '').replace(/_/g, ' ');
+        
         // Update the selected icon display
         const selectedIconDiv = document.querySelector('.selected-icon');
         selectedIconDiv.dataset.icon = iconKey;
         selectedIconDiv.innerHTML = `
-            <img src="${this.icons[iconKey]}" alt="${iconKey}">
-            <span>${this.iconNames[iconKey]}</span>
+            <img src="${iconPath}" alt="${iconKey}">
+            <span>${displayName}</span>
         `;
 
         // Update the hidden select for compatibility
         const selectElement = document.getElementById('icon-select');
         selectElement.value = iconKey;
-        selectElement.innerHTML = `<option value="${iconKey}" selected>${this.iconNames[iconKey]}</option>`;
+        selectElement.innerHTML = `<option value="${iconKey}" selected>${displayName}</option>`;
 
         // Update grid selection
         document.querySelectorAll('.icon-picker-item').forEach(item => {
@@ -975,7 +1182,7 @@ Generate 5-10 labels for various hardware components. Use multi-column format wh
         
         items.forEach(item => {
             const iconKey = item.dataset.icon;
-            const iconName = this.iconNames[iconKey].toLowerCase();
+            const iconName = (this.iconNames[iconKey] || iconKey.replace('Custom_', '').replace(/_/g, ' ')).toLowerCase();
             const matches = iconName.includes(searchTerm) || iconKey.toLowerCase().includes(searchTerm);
             
             item.style.display = matches ? 'flex' : 'none';
@@ -997,21 +1204,25 @@ Generate 5-10 labels for various hardware components. Use multi-column format wh
             category.style.display = hasVisibleItems ? 'block' : 'none';
         });
     }
+
+    deleteCustomIcon(iconKey) {
+        if (confirm(`Are you sure you want to delete the custom icon "${iconKey}"?`)) {
+            delete this.customIcons[iconKey];
+            this.saveCustomIcons();
+            this.loadAvailableIcons();
+            this.populateIconGrid();
+            
+            // If this was the selected icon, switch to default
+            if (this.selectedIcon === iconKey) {
+                this.selectIcon('Head_Hex');
+            }
+        }
+    }
 }
 
-function copyToClipboard() {
-    const promptText = document.querySelector('.llm-prompt');
-    promptText.select();
-    document.execCommand('copy');
-    
-    const button = document.querySelector('.copy-button');
-    const originalText = button.textContent;
-    button.textContent = '✅ Copied!';
-    setTimeout(() => {
-        button.textContent = originalText;
-    }, 2000);
-}
+
+let labelMaker;
 
 document.addEventListener('DOMContentLoaded', () => {
-    new LabelMaker();
+    labelMaker = new LabelMaker();
 });

@@ -40,6 +40,13 @@
                                 <div class="icon-picker-search">
                                     <input type="text" placeholder="Search icons..." id="icon-search">
                                 </div>
+                                <div class="icon-upload-section">
+                                    <input type="file" id="icon-upload" accept="image/png" style="display: none;">
+                                    <button type="button" id="upload-icon-btn" class="upload-icon-btn" title="Upload a custom square PNG icon (black & white recommended)">📁 Upload Custom Icon</button>
+                                    <div class="upload-instructions">
+                                        <small>Upload square PNG icons. <a href="https://github.com/timvanderheide/maker-label-maker" target="_blank">Contribute icons</a> to help everyone!</small>
+                                    </div>
+                                </div>
                                 <div class="icon-picker-grid" id="icon-grid">
                                     <!-- Icons will be populated by JavaScript -->
                                 </div>
@@ -53,31 +60,38 @@
 
                     <div class="control-group">
                         <label>Main Text:</label>
-                        <div class="column-selector">
-                            <button type="button" class="column-btn" data-action="remove">-</button>
-                            <span class="column-count">1</span>
-                            <button type="button" class="column-btn" data-action="add">+</button>
+                        <div class="column-selector" title="Add/remove columns for organizing multi-compartment containers">
+                            <button type="button" class="column-btn" data-action="remove" title="Remove column">-</button>
+                            <span class="column-count">3</span>
+                            <button type="button" class="column-btn" data-action="add" title="Add column (max 4)">+</button>
+                        </div>
+                        <div class="column-help">
+                            <small>💡 Use multiple columns when labeling containers with separate compartments</small>
                         </div>
                         <div class="main-text-inputs" id="main-text-inputs">
-                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M4 × 12">
+                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
+                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
+                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
                         </div>
                     </div>
 
                     <div class="control-group">
                         <label>Sub Text (optional):</label>
-                        <div class="column-selector">
-                            <button type="button" class="sub-column-btn" data-action="remove">-</button>
-                            <span class="sub-column-count">1</span>
-                            <button type="button" class="sub-column-btn" data-action="add">+</button>
+                        <div class="column-selector" title="Add/remove sub-text columns (standards, notes, etc.)">
+                            <button type="button" class="sub-column-btn" data-action="remove" title="Remove sub-text column">-</button>
+                            <span class="sub-column-count">3</span>
+                            <button type="button" class="sub-column-btn" data-action="add" title="Add sub-text column (max 4)">+</button>
                         </div>
                         <div class="sub-text-inputs" id="sub-text-inputs">
-                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="DIN 7984">
+                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="8 mm">
+                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="10 mm">
+                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="12 mm">
                         </div>
                     </div>
                 </div>
 
             <div class="preview-section">
-                <h3>Preview (actual size)</h3>
+                <h3>Preview</h3>
                 <div class="preview-container">
                     <div id="label-preview" class="label">
                         <div class="label-icon">
@@ -85,10 +99,14 @@
                         </div>
                         <div class="label-text">
                             <div class="main-text" id="preview-main-text">
-                                <div class="main-text-column">M4 × 12</div>
+                                <div class="main-text-column">M3</div>
+                                <div class="main-text-column">M3</div>
+                                <div class="main-text-column">M3</div>
                             </div>
                             <div class="sub-text" id="preview-sub-text">
-                                <div class="sub-text-column">DIN 7984</div>
+                                <div class="sub-text-column">8 mm</div>
+                                <div class="sub-text-column">10 mm</div>
+                                <div class="sub-text-column">12 mm</div>
                             </div>
                         </div>
                     </div>
@@ -99,7 +117,7 @@
                     
                     <div class="control-group">
                         <label for="label-height">Label Height:</label>
-                        <select id="label-height">
+                        <select id="label-height" title="Standard label tape heights">
                             <option value="9">9mm</option>
                             <option value="12" selected>12mm</option>
                             <option value="18">18mm</option>
@@ -109,12 +127,12 @@
 
                     <div class="control-group">
                         <label for="label-width">Label Width (mm):</label>
-                        <input type="number" id="label-width" min="20" max="100" value="40">
+                        <input type="number" id="label-width" min="20" max="100" value="50" title="Custom width from 20-100mm">
                     </div>
 
                     <div class="button-group">
-                        <button id="update-preview">Update Preview</button>
-                        <button id="download-png">Download PNG</button>
+                        <button id="update-preview" title="Refresh the preview with current settings">Update Preview</button>
+                        <button id="download-png" title="Download as high-quality PNG for printing">Download PNG</button>
                     </div>
                 </div>
             </div>
@@ -122,29 +140,18 @@
 
             <div class="tab-content" id="batch-tab" style="display: none;">
                 <div class="batch-controls">
-                    <div class="help-section">
-                        <details>
-                            <summary>Need help generating YAML? Use this prompt!</summary>
-                            <div class="help-content">
-                                <p>Copy this prompt to your favorite AI assistant:</p>
-                                <textarea readonly class="llm-prompt" id="llm-prompt">Loading available icons...</textarea>
-                                <button class="copy-button" onclick="copyToClipboard()">📋 Copy to clipboard</button>
-                            </div>
-                        </details>
-                    </div>
-
                     <div class="control-group">
                         <label for="yaml-input">YAML Input:</label>
-                        <textarea id="yaml-input" rows="20" placeholder="Paste your YAML here..."></textarea>
+                        <textarea id="yaml-input" rows="20" placeholder="Loading template..."></textarea>
                     </div>
 
                     <div class="batch-options">
                         <div class="checkbox-group">
-                            <label class="checkbox-label">
+                            <label class="checkbox-label" title="Creates one continuous horizontal strip of all labels">
                                 <input type="checkbox" id="generate-long-png">
                                 Generate long PNG strip
                             </label>
-                            <label class="checkbox-label">
+                            <label class="checkbox-label" title="Adds vertical cut marks between labels for easy trimming">
                                 <input type="checkbox" id="include-cut-marks">
                                 Include cut marks
                             </label>
@@ -152,8 +159,8 @@
                     </div>
 
                     <div class="batch-buttons">
-                        <button id="validate-yaml">Validate YAML</button>
-                        <button id="generate-zip">Generate and Download ZIP</button>
+                        <button id="validate-yaml" title="Check YAML syntax and validate label data">Validate YAML</button>
+                        <button id="generate-zip" title="Generate all labels and download as ZIP file">Generate and Download ZIP</button>
                     </div>
 
                     <div id="validation-result" class="validation-result"></div>
