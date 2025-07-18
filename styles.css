@@ -155,7 +155,7 @@ button:hover {
 }
 
 .main-text {
-    font-size: 8px;
+    font-size: 12x;
     font-weight: bold;
     color: #000;
     line-height: 1.2;
@@ -163,7 +163,7 @@ button:hover {
 }
 
 .sub-text {
-    font-size: 6px;
+    font-size: 8px;
     color: #666;
     line-height: 1.2;
 }

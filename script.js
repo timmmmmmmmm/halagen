@@ -80,67 +80,72 @@ class LabelMaker {
     }
 
     async downloadPNG() {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        const height = parseInt(document.getElementById('label-height').value);
-        const width = parseInt(document.getElementById('label-width').value);
-        const mainText = document.getElementById('main-text').value || 'M4 × 12';
-        const subText = document.getElementById('sub-text').value || '';
-        const iconSelect = document.getElementById('icon-select').value;
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const height = parseInt(document.getElementById('label-height').value);
+            const width = parseInt(document.getElementById('label-width').value);
+            const mainText = document.getElementById('main-text').value || 'M4 × 12';
+            const subText = document.getElementById('sub-text').value || '';
+            const iconSelect = document.getElementById('icon-select').value;
 
-        const dpi = 300;
-        const mmToPx = dpi / 25.4;
-        
-        canvas.width = width * mmToPx;
-        canvas.height = height * mmToPx;
+            const dpi = 300;
+            const mmToPx = dpi / 25.4;
+            
+            canvas.width = width * mmToPx;
+            canvas.height = height * mmToPx;
 
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.strokeStyle = '#ddd';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-        const iconSize = (height - 2) * mmToPx;
-        const iconX = 1 * mmToPx;
-        const iconY = 1 * mmToPx;
+            const iconSize = (height - 2) * mmToPx;
+            const iconX = 1 * mmToPx;
+            const iconY = 1 * mmToPx;
 
-        await this.drawIcon(ctx, iconX, iconY, iconSize, iconSelect);
+            await this.drawIcon(ctx, iconX, iconY, iconSize, iconSelect);
 
-        const textX = iconX + iconSize + (2 * mmToPx);
-        const textAreaWidth = canvas.width - textX - (1 * mmToPx);
+            const textX = iconX + iconSize + (2 * mmToPx);
+            const textAreaWidth = canvas.width - textX - (1 * mmToPx);
 
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
 
-        const mainFontSize = this.calculateFontSize(height);
-        const subFontSize = mainFontSize * 0.75;
+            const mainFontSize = this.calculateFontSize(height);
+            const subFontSize = mainFontSize * 0.75;
 
-        ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
-        const textY = subText ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
-        ctx.fillText(mainText, textX, textY);
+            ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
+            const textY = subText ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
+            ctx.fillText(mainText, textX, textY);
 
-        if (subText) {
-            ctx.font = `${subFontSize * mmToPx}px Arial`;
-            ctx.fillStyle = '#666';
-            ctx.fillText(subText, textX, textY + (mainFontSize * mmToPx * 1.2));
+            if (subText) {
+                ctx.font = `${subFontSize * mmToPx}px Arial`;
+                ctx.fillStyle = '#666';
+                ctx.fillText(subText, textX, textY + (mainFontSize * mmToPx * 1.2));
+            }
+
+            const link = document.createElement('a');
+            link.download = `label-${mainText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        } catch (error) {
+            console.error('PNG download failed:', error);
+            alert('Failed to download PNG. Please try again.');
         }
-
-        const link = document.createElement('a');
-        link.download = `label-${mainText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
     }
 
     calculateFontSize(height) {
         switch(height) {
-            case 9: return 2.5;
-            case 12: return 3;
-            case 18: return 4.5;
-            case 24: return 5.5;
-            default: return 3;
+            case 9: return 3;
+            case 12: return 4;
+            case 18: return 6.5;
+            case 24: return 8;
+            default: return 4;
         }
     }
 
@@ -150,10 +155,17 @@ class LabelMaker {
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = () => {
-                ctx.drawImage(img, x, y, size, size);
-                resolve();
+                try {
+                    ctx.drawImage(img, x, y, size, size);
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
             };
-            img.onerror = reject;
+            img.onerror = (error) => {
+                console.error('Failed to load icon:', iconPath, error);
+                reject(error);
+            };
             img.src = iconPath;
         });
     }
