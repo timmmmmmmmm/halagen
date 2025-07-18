@@ -1,3 +1,7 @@
+# Optional global settings
+long_png: true      # Generate one long PNG strip
+cut_marks: true     # Include cut marks between labels
+
 labels:
   - title: "M4 × 12"
     subtext: "DIN 7984"

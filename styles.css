@@ -35,42 +35,68 @@ header p {
 main {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 0;
 }
 
 .tab-container {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    overflow: hidden;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    margin-bottom: 0;
 }
 
 .tab-buttons {
     display: flex;
-    border-bottom: 1px solid #e0e0e0;
+    background: transparent;
+    border-bottom: none;
+    margin-bottom: -1px;
+    position: relative;
+    z-index: 1;
 }
 
 .tab-button {
     flex: 1;
     background: #f8f9fa;
     color: #666;
-    border: none;
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
     padding: 15px 20px;
     font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s;
-    border-bottom: 3px solid transparent;
+    border-radius: 8px 8px 0 0;
+    margin-right: 2px;
+    position: relative;
+    margin-bottom: 0;
+}
+
+.tab-button:last-child {
+    margin-right: 0;
 }
 
 .tab-button:hover {
     background: #e9ecef;
-    color: #333;
+    color: #3498db;
 }
 
 .tab-button.active {
     background: white;
     color: #3498db;
-    border-bottom-color: #3498db;
+    border-color: #e0e0e0;
+    z-index: 2;
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: -1px;
+    right: -1px;
+    height: 1px;
+    background: white;
+    z-index: 1;
 }
 
 .tab-content {
@@ -79,18 +105,30 @@ main {
     gap: 30px;
     align-items: start;
     padding: 30px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 0;
 }
 
 #batch-tab {
     display: block;
     padding: 30px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 0;
 }
 
 .controls {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .controls h3 {
@@ -103,8 +141,8 @@ main {
 }
 
 .label-settings {
-    margin-top: 30px;
-    padding: 20px;
+    margin-top: 0;
+    padding: 25px;
     background: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e9ecef;
@@ -195,6 +233,40 @@ main {
     border-color: #3498db;
 }
 
+/* Show fallback textarea if CodeMirror fails to load */
+.codemirror-loaded #yaml-input {
+    display: none;
+}
+
+.batch-options {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #2c3e50;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
 .batch-buttons {
     display: flex;
     gap: 10px;
@@ -232,57 +304,66 @@ main {
 
 .control-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: 600;
     color: #2c3e50;
+    font-size: 14px;
 }
 
 .control-group input,
 .control-group select {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 2px solid #e0e0e0;
-    border-radius: 4px;
-    font-size: 16px;
-    transition: border-color 0.3s;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: all 0.3s;
+    background: white;
 }
 
 .control-group input:focus,
 .control-group select:focus {
     outline: none;
     border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 button {
     background-color: #3498db;
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 4px;
-    font-size: 16px;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
     cursor: pointer;
     margin-right: 10px;
     margin-bottom: 10px;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
 }
 
 button:hover {
     background-color: #2980b9;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    transform: translateY(-1px);
 }
 
 #download-png {
     background-color: #27ae60;
+    box-shadow: 0 2px 4px rgba(39, 174, 96, 0.2);
 }
 
 #download-png:hover {
     background-color: #219a52;
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
 }
 
 .preview-section {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .preview-section h3 {
@@ -300,8 +381,10 @@ button:hover {
     align-items: center;
     min-height: 200px;
     background: #f8f9fa;
-    border-radius: 4px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 30px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 30px;
 }
 
 .label {
@@ -410,6 +493,7 @@ button:hover {
 @media (max-width: 768px) {
     .tab-content {
         grid-template-columns: 1fr;
+        padding: 20px;
     }
     
     .container {
@@ -417,16 +501,250 @@ button:hover {
     }
     
     .tab-buttons {
-        flex-direction: column;
+        flex-direction: row;
     }
     
     .tab-button {
-        border-bottom: 1px solid #e0e0e0;
-        border-right: 3px solid transparent;
+        padding: 12px 16px;
+        font-size: 14px;
     }
     
-    .tab-button.active {
-        border-bottom-color: #e0e0e0;
-        border-right-color: #3498db;
+    .preview-container {
+        padding: 20px;
+        min-height: 150px;
     }
+    
+    .label-settings {
+        padding: 20px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .button-group button {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+/* CodeMirror YAML Editor Styling */
+.CodeMirror {
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-family: 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    background: white;
+    transition: border-color 0.3s;
+}
+
+.CodeMirror-focused {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.CodeMirror-gutters {
+    background: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+}
+
+.CodeMirror-linenumber {
+    color: #6c757d;
+    font-size: 12px;
+}
+
+.CodeMirror-cursor {
+    border-left: 2px solid #3498db;
+}
+
+/* YAML Syntax Highlighting */
+.cm-comment {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.cm-string {
+    color: #28a745;
+}
+
+.cm-number {
+    color: #dc3545;
+}
+
+.cm-keyword {
+    color: #6f42c1;
+    font-weight: bold;
+}
+
+.cm-atom {
+    color: #fd7e14;
+}
+
+.cm-def {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.cm-variable {
+    color: #495057;
+}
+
+.cm-punctuation {
+    color: #6c757d;
+}
+
+/* Hide original textarea when CodeMirror is active */
+#yaml-input {
+    display: none;
+}
+
+/* Icon Picker Styles */
+.icon-picker {
+    position: relative;
+}
+
+.icon-picker-selected {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.icon-picker-selected:hover {
+    border-color: #3498db;
+}
+
+.icon-picker-selected.active {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.selected-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.selected-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.selected-icon span {
+    font-size: 14px;
+    color: #495057;
+}
+
+.icon-picker-button {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.icon-picker-button:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.icon-picker-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #3498db;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 400px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.icon-picker-search {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.icon-picker-search input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+    margin: 0;
+}
+
+.icon-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    padding: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.icon-picker-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #f8f9fa;
+    text-align: center;
+}
+
+.icon-picker-item:hover {
+    background: #e9ecef;
+    border-color: #3498db;
+}
+
+.icon-picker-item.selected {
+    background: #e3f2fd;
+    border-color: #3498db;
+}
+
+.icon-picker-item img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-bottom: 4px;
+}
+
+.icon-picker-item span {
+    font-size: 11px;
+    color: #495057;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+.icon-picker-category {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.icon-picker-category:first-child {
+    margin-top: 0;
 }

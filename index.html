@@ -36,55 +36,27 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="icon-select">Icon:</label>
-                        <select id="icon-select">
-                            <optgroup label="Electrical">
-                                <option value="Elec_WagoLogo">Wago Logo</option>
-                                <option value="Elec_Wago_Alt1">Wago Alt 1</option>
-                                <option value="Elec_Wago_Alt2">Wago Alt 2</option>
-                                <option value="Elec_WireNut">Wire Nut</option>
-                                <option value="Electrical_Generic">Generic Electrical</option>
-                            </optgroup>
-                            <optgroup label="Screw Heads">
-                                <option value="Head_Flat">Flat Head</option>
-                                <option value="Head_Hex" selected>Hex Head</option>
-                                <option value="Head_Phillips">Phillips Head</option>
-                                <option value="Head_Robinson">Robinson Head</option>
-                                <option value="Head_SlottedPhillips">Slotted Phillips</option>
-                                <option value="Head_Torx">Torx Head</option>
-                            </optgroup>
-                            <optgroup label="Inserts">
-                                <option value="Insert_Heat">Heat Insert</option>
-                                <option value="Insert_Wood">Wood Insert</option>
-                            </optgroup>
-                            <optgroup label="Nuts">
-                                <option value="Nut_CapNut">Cap Nut</option>
-                                <option value="Nut_LockNut">Lock Nut</option>
-                                <option value="Nut_Standard">Standard Nut</option>
-                            </optgroup>
-                            <optgroup label="Screws">
-                                <option value="Screw Round">Round Screw</option>
-                                <option value="Screw Tbolt">T-Bolt</option>
-                                <option value="Screw Truss">Truss Screw</option>
-                                <option value="Screw TrussModified">Truss Modified</option>
-                                <option value="Screw Wafer">Wafer Screw</option>
-                                <option value="Screw_Bugle">Bugle Screw</option>
-                                <option value="Screw_Fillister">Fillister Screw</option>
-                                <option value="Screw_Flat">Flat Screw</option>
-                                <option value="Screw_Hex">Hex Screw</option>
-                                <option value="Screw_Oval">Oval Screw</option>
-                                <option value="Screw_Pan">Pan Screw</option>
-                                <option value="Screw_ThumbKnurled">Thumb Knurled</option>
-                                <option value="Screw_Trim">Trim Screw</option>
-                                <option value="ThumbScrew">Thumb Screw</option>
-                            </optgroup>
-                            <optgroup label="Washers">
-                                <option value="Washer_Fender">Fender Washer</option>
-                                <option value="Washer_Flat">Flat Washer</option>
-                                <option value="Washer_Split">Split Washer</option>
-                                <option value="Washer_StarExterior">Star Exterior</option>
-                                <option value="Washer_StartInterior">Star Interior</option>
-                            </optgroup>
+                        <label for="icon-picker">Icon:</label>
+                        <div id="icon-picker" class="icon-picker">
+                            <div class="icon-picker-selected">
+                                <div class="selected-icon" data-icon="Head_Hex">
+                                    <img src="icons/Head_Hex.png" alt="Head_Hex">
+                                    <span>Hex Head</span>
+                                </div>
+                                <button type="button" class="icon-picker-button">Choose Icon</button>
+                            </div>
+                            <div class="icon-picker-dropdown" style="display: none;">
+                                <div class="icon-picker-search">
+                                    <input type="text" placeholder="Search icons..." id="icon-search">
+                                </div>
+                                <div class="icon-picker-grid" id="icon-grid">
+                                    <!-- Icons will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Hidden select for compatibility -->
+                        <select id="icon-select" style="display: none;">
+                            <option value="Head_Hex" selected>Hex Head</option>
                         </select>
                     </div>
 
@@ -157,6 +129,19 @@
                         <textarea id="yaml-input" rows="20" placeholder="Paste your YAML here..."></textarea>
                     </div>
 
+                    <div class="batch-options">
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="generate-long-png">
+                                Generate long PNG strip
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="include-cut-marks">
+                                Include cut marks
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="batch-buttons">
                         <button id="validate-yaml">Validate YAML</button>
                         <button id="generate-zip">Generate and Download ZIP</button>
@@ -169,6 +154,10 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/yaml/yaml.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/default.min.css">
     <script src="script.js"></script>
 </body>
 </html>
