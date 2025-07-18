@@ -9,22 +9,54 @@
 <body>
     <div class="container">
         <header>
-            <h1>Hardware Label Maker</h1>
-            <p>Generate printable labels for screws, bolts, washers, and nuts</p>
+            <div class="header-preview">
+                <div id="header-label-preview" class="label">
+                    <div class="label-icon">
+                        <img class="icon" src="icons/Head_Hex.png" alt="Head_Hex">
+                    </div>
+                    <div class="label-text">
+                        <div class="main-text">
+                            <div class="main-text-column">M3</div>
+                            <div class="main-text-column">M3</div>
+                            <div class="main-text-column">M3</div>
+                        </div>
+                        <div class="sub-text">
+                            <div class="sub-text-column">8 mm</div>
+                            <div class="sub-text-column">10 mm</div>
+                            <div class="sub-text-column">12 mm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <main>
             <div class="tab-container">
                 <div class="tab-buttons">
-                    <button class="tab-button active" data-tab="single">Single Label</button>
-                    <button class="tab-button" data-tab="batch">Batch Labels</button>
+                    <button class="tab-button active" data-tab="single">Single</button>
+                    <button class="tab-button" data-tab="batch">Batch</button>
                 </div>
             </div>
 
             <div class="tab-content" id="single-tab">
                 <div class="controls">
-                    <h3>Label Content</h3>
-                    
+                    <div class="control-group label-dimensions">
+                        <div class="dimension-row">
+                            <div class="dimension-item">
+                                <label for="label-height">Height: <span class="tooltip-icon" title="Standard label tape heights for compatibility with label makers">?</span></label>
+                                <select id="label-height" title="Standard label tape heights">
+                                    <option value="9">9mm</option>
+                                    <option value="12" selected>12mm</option>
+                                    <option value="18">18mm</option>
+                                    <option value="24">24mm</option>
+                                </select>
+                            </div>
+                            <div class="dimension-item">
+                                <label for="label-width">Width (mm): <span class="tooltip-icon" title="Custom width from 20-100mm to fit your container size">?</span></label>
+                                <input type="number" id="label-width" min="20" max="100" value="50" title="Custom width from 20-100mm">
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="control-group">
                         <label for="icon-picker">Icon: <span class="tooltip-icon" title="Icon displayed on the left side of the label. Choose from built-in icons or upload custom icons (any aspect ratio supported)">?</span></label>
@@ -87,54 +119,12 @@
                             <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="12 mm">
                         </div>
                     </div>
-                </div>
-
-            <div class="preview-section">
-                <h3>Preview</h3>
-                <div class="preview-container">
-                    <div id="label-preview" class="label">
-                        <div class="label-icon">
-                            <img class="icon" src="icons/Head_Hex.png" alt="Head_Hex">
-                        </div>
-                        <div class="label-text">
-                            <div class="main-text" id="preview-main-text">
-                                <div class="main-text-column">M3</div>
-                                <div class="main-text-column">M3</div>
-                                <div class="main-text-column">M3</div>
-                            </div>
-                            <div class="sub-text" id="preview-sub-text">
-                                <div class="sub-text-column">8 mm</div>
-                                <div class="sub-text-column">10 mm</div>
-                                <div class="sub-text-column">12 mm</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="label-settings">
-                    <h3>Label Settings</h3>
-                    
-                    <div class="control-group">
-                        <label for="label-height">Label Height: <span class="tooltip-icon" title="Standard label tape heights for compatibility with label makers">?</span></label>
-                        <select id="label-height" title="Standard label tape heights">
-                            <option value="9">9mm</option>
-                            <option value="12" selected>12mm</option>
-                            <option value="18">18mm</option>
-                            <option value="24">24mm</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="label-width">Label Width (mm): <span class="tooltip-icon" title="Custom width from 20-100mm to fit your container size">?</span></label>
-                        <input type="number" id="label-width" min="20" max="100" value="50" title="Custom width from 20-100mm">
-                    </div>
 
                     <div class="button-group">
-                        <button id="update-preview" title="Refresh the preview with current settings">Update Preview</button>
                         <button id="download-png" title="Download as high-quality PNG for printing">Download PNG</button>
                     </div>
                 </div>
-            </div>
+
             </div>
 
             <div class="tab-content" id="batch-tab" style="display: none;">
@@ -144,18 +134,6 @@
                         <textarea id="yaml-input" rows="20" placeholder="Loading template..."></textarea>
                     </div>
 
-                    <div class="batch-options">
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="generate-long-png">
-                                Generate long PNG strip <span class="tooltip-icon" title="Creates one continuous horizontal strip of all labels instead of individual files">?</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="include-cut-marks">
-                                Include cut marks <span class="tooltip-icon" title="Adds vertical cut marks between labels for easy trimming with scissors">?</span>
-                            </label>
-                        </div>
-                    </div>
 
                     <div class="batch-buttons">
                         <button id="validate-yaml" title="Check YAML syntax and validate label data">Validate YAML</button>
@@ -169,6 +147,7 @@
         
         <footer>
             <div class="attribution">
+                <p>Hardware label generator by <a href="https://www.timvanderheide.com" target="_blank">Tim van der Heide</a></p>
                 <p>Icons by <a href="https://www.printables.com/model/621771-gridfinity-bin-label-icons" target="_blank">3dprintbunny</a> 
                    - Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></p>
             </div>

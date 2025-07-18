@@ -63,7 +63,6 @@ class LabelMaker {
         const iconSelect = document.getElementById('icon-select');
         const labelHeight = document.getElementById('label-height');
         const labelWidth = document.getElementById('label-width');
-        const updatePreview = document.getElementById('update-preview');
         const downloadPng = document.getElementById('download-png');
         const validateYaml = document.getElementById('validate-yaml');
         const generateZip = document.getElementById('generate-zip');
@@ -71,7 +70,6 @@ class LabelMaker {
         if (iconSelect) iconSelect.addEventListener('change', () => this.updatePreview());
         if (labelHeight) labelHeight.addEventListener('change', () => this.updatePreview());
         if (labelWidth) labelWidth.addEventListener('input', () => this.updatePreview());
-        if (updatePreview) updatePreview.addEventListener('click', () => this.updatePreview());
         if (downloadPng) downloadPng.addEventListener('click', () => this.downloadPNG());
         if (validateYaml) validateYaml.addEventListener('click', () => this.validateYAML());
         if (generateZip) generateZip.addEventListener('click', () => this.generateZIP());
@@ -91,16 +89,6 @@ class LabelMaker {
             });
         });
         
-        // Checkbox sync event listeners
-        const generateLongPng = document.getElementById('generate-long-png');
-        const includeCutMarks = document.getElementById('include-cut-marks');
-        
-        if (generateLongPng) {
-            generateLongPng.addEventListener('change', () => this.updateYamlFromCheckboxes());
-        }
-        if (includeCutMarks) {
-            includeCutMarks.addEventListener('change', () => this.updateYamlFromCheckboxes());
-        }
         
         // Initial setup for text inputs
         this.setupMainTextInputs();
@@ -177,7 +165,7 @@ class LabelMaker {
         const height = document.getElementById('label-height').value;
         const width = document.getElementById('label-width').value;
 
-        const labelPreview = document.getElementById('label-preview');
+        const labelPreview = document.getElementById('header-label-preview');
         const iconContainer = labelPreview.querySelector('.label-icon');
         const mainTextElement = labelPreview.querySelector('.main-text');
         const subTextElement = labelPreview.querySelector('.sub-text');
@@ -233,10 +221,6 @@ class LabelMaker {
 
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.strokeStyle = '#ddd';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
             const iconSize = (height - 2) * mmToPx;
             const iconX = 1 * mmToPx;
@@ -351,13 +335,12 @@ class LabelMaker {
                 tabContents.forEach(content => content.style.display = 'none');
                 
                 button.classList.add('active');
-                document.getElementById(`${targetTab}-tab`).style.display = targetTab === 'batch' ? 'block' : 'grid';
+                document.getElementById(`${targetTab}-tab`).style.display = 'block';
                 
                 // Refresh CodeMirror editor when batch tab becomes visible
                 if (targetTab === 'batch' && this.yamlEditor) {
                     setTimeout(() => {
                         this.yamlEditor.refresh();
-                        this.updateCheckboxesFromYaml();
                     }, 100);
                 }
             });
@@ -409,9 +392,9 @@ class LabelMaker {
             const labels = parsed.labels;
             const zip = new JSZip();
             
-            // Check for long PNG options (YAML settings or UI checkboxes)
-            const generateLongPng = parsed.long_png || document.getElementById('generate-long-png').checked;
-            const includeCutMarks = parsed.cut_marks || document.getElementById('include-cut-marks').checked;
+            // Check for long PNG options from YAML settings
+            const generateLongPng = parsed.long_png || false;
+            const includeCutMarks = parsed.cut_marks || false;
             
             // Generate individual labels
             for (let i = 0; i < labels.length; i++) {
@@ -428,10 +411,8 @@ class LabelMaker {
                 const longPngCanvas = await this.generateLongPngStrip(labels, includeCutMarks);
                 const longPngData = longPngCanvas.toDataURL().split(',')[1];
                 
-                // Calculate total strip length
-                const totalLength = labels.reduce((sum, label) => sum + label.width_mm, 0);
-                const cutMarkSpaces = includeCutMarks ? (labels.length - 1) * 2 : 0; // 2mm per cut mark
-                const totalStripLength = totalLength + cutMarkSpaces;
+                // Calculate total strip length - no extra space for cut marks
+                const totalStripLength = labels.reduce((sum, label) => sum + label.width_mm, 0);
                 
                 const longPngFilename = `labels_strip_${totalStripLength}mm.png`;
                 
@@ -461,8 +442,11 @@ class LabelMaker {
         const result = { labels: [] };
         let currentLabel = null;
         let inLabels = false;
+        let currentArray = null;
+        let currentArrayKey = null;
 
         for (let line of lines) {
+            const originalLine = line;
             line = line.trim();
             if (!line || line.startsWith('#')) continue;
 
@@ -472,27 +456,64 @@ class LabelMaker {
             }
 
             if (inLabels) {
-                if (line.startsWith('- ')) {
+                if (line.startsWith('- ') && originalLine.match(/^  - /)) {
+                    // New label item (starts with exactly 2 spaces + dash)
                     if (currentLabel) {
-                        result.labels.push(currentLabel);
+                        // Finish any pending array
+                        if (currentArray && currentArrayKey && currentArray.length > 0) {
+                            currentLabel[currentArrayKey] = currentArray;
+                        }
+                        if (Object.keys(currentLabel).length > 0) {
+                            result.labels.push(currentLabel);
+                        }
                     }
                     currentLabel = {};
+                    currentArray = null;
+                    currentArrayKey = null;
                     
                     const keyValue = line.substring(2).trim();
                     if (keyValue.includes(':')) {
                         const [key, value] = keyValue.split(':', 2);
-                        currentLabel[key.trim()] = this.parseValue(value.trim());
+                        const trimmedKey = key.trim();
+                        const trimmedValue = value.trim();
+                        if (trimmedKey && trimmedValue) {
+                            currentLabel[trimmedKey] = this.parseValue(trimmedValue);
+                        }
                     }
+                } else if (line.startsWith('- ') && originalLine.match(/^      - /) && currentArray) {
+                    // Array item (starts with exactly 6 spaces + dash)
+                    const value = line.substring(2).trim();
+                    currentArray.push(this.parseValue(value));
                 } else if (line.includes(':') && currentLabel) {
+                    // Finish previous array if exists
+                    if (currentArray && currentArrayKey && currentArray.length > 0) {
+                        currentLabel[currentArrayKey] = currentArray;
+                    }
+                    
                     const [key, value] = line.split(':', 2);
-                    currentLabel[key.trim()] = this.parseValue(value.trim());
+                    const trimmedKey = key.trim();
+                    const trimmedValue = value.trim();
+                    if (trimmedKey) {
+                        // Check if the value is just a comment (starts with #)
+                        const parsedValue = this.parseValue(trimmedValue);
+                        if (trimmedValue && !trimmedValue.startsWith('#') && parsedValue !== '') {
+                            // Has real value on same line
+                            currentLabel[trimmedKey] = parsedValue;
+                            currentArray = null;
+                            currentArrayKey = null;
+                        } else {
+                            // Start of array - prepare to collect items (empty value or comment only)
+                            currentArray = [];
+                            currentArrayKey = trimmedKey;
+                        }
+                    }
                 }
             } else {
                 // Handle global options outside of labels
                 if (line.includes(':')) {
                     const [key, value] = line.split(':', 2);
                     const trimmedKey = key.trim();
-                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks') {
+                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks' || trimmedKey === 'width_mm' || trimmedKey === 'height_mm') {
                         result[trimmedKey] = this.parseValue(value.trim());
                     }
                 }
@@ -500,13 +521,25 @@ class LabelMaker {
         }
 
         if (currentLabel) {
-            result.labels.push(currentLabel);
+            // Finish any pending array
+            if (currentArray && currentArrayKey && currentArray.length > 0) {
+                currentLabel[currentArrayKey] = currentArray;
+            }
+            if (Object.keys(currentLabel).length > 0) {
+                result.labels.push(currentLabel);
+            }
         }
 
         return result;
     }
 
     parseValue(value) {
+        // Remove inline comments
+        const commentIndex = value.indexOf('#');
+        if (commentIndex !== -1) {
+            value = value.substring(0, commentIndex).trim();
+        }
+        
         if (value.startsWith('"') && value.endsWith('"')) {
             return value.slice(1, -1);
         }
@@ -519,7 +552,7 @@ class LabelMaker {
         if (value === 'false') {
             return false;
         }
-        if (!isNaN(value)) {
+        if (!isNaN(value) && value !== '') {
             return Number(value);
         }
         return value;
@@ -548,20 +581,42 @@ class LabelMaker {
             errors.push('Invalid cut_marks setting. Must be true or false if provided');
         }
 
+        // Validate global width_mm and height_mm
+        if (parsed.width_mm !== undefined && (typeof parsed.width_mm !== 'number' || parsed.width_mm < 20 || parsed.width_mm > 100)) {
+            errors.push('Invalid global width_mm. Must be a number between 20 and 100 if provided');
+        }
+        
+        if (parsed.height_mm !== undefined && (typeof parsed.height_mm !== 'number' || !validHeights.includes(parsed.height_mm))) {
+            errors.push(`Invalid global height_mm. Must be one of: ${validHeights.join(', ')} if provided`);
+        }
+
         parsed.labels.forEach((label, index) => {
             const labelNum = index + 1;
             
+            // Normalize maintext_columns to columns for backwards compatibility
+            if (label.maintext_columns && !label.columns) {
+                label.columns = label.maintext_columns;
+            }
+            
+            // Apply global defaults
+            if (!label.width_mm && parsed.width_mm) {
+                label.width_mm = parsed.width_mm;
+            }
+            if (!label.height_mm && parsed.height_mm) {
+                label.height_mm = parsed.height_mm;
+            }
+            
             // Check for either title (single column) or columns (multi-column)
             if (!label.title && !label.columns) {
-                errors.push(`Label ${labelNum}: Missing title or columns`);
+                errors.push(`Label ${labelNum}: Missing title or columns (or maintext_columns)`);
             } else if (label.title && label.columns) {
-                errors.push(`Label ${labelNum}: Cannot have both title and columns. Use either title for single column or columns for multi-column`);
+                errors.push(`Label ${labelNum}: Cannot have both title and columns. Use either title for single column or columns/maintext_columns for multi-column`);
             } else if (label.title && typeof label.title !== 'string') {
                 errors.push(`Label ${labelNum}: Invalid title. Must be a string`);
             } else if (label.columns && (!Array.isArray(label.columns) || label.columns.length === 0 || label.columns.length > 4)) {
-                errors.push(`Label ${labelNum}: Invalid columns. Must be an array with 1-4 string elements`);
+                errors.push(`Label ${labelNum}: Invalid columns/maintext_columns. Must be an array with 1-4 string elements`);
             } else if (label.columns && label.columns.some(col => typeof col !== 'string')) {
-                errors.push(`Label ${labelNum}: Invalid columns. All column values must be strings`);
+                errors.push(`Label ${labelNum}: Invalid columns/maintext_columns. All column values must be strings`);
             }
             
             if (!label.icon || typeof label.icon !== 'string') {
@@ -600,6 +655,11 @@ class LabelMaker {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
+        // Normalize maintext_columns to columns for backwards compatibility
+        if (label.maintext_columns && !label.columns) {
+            label.columns = label.maintext_columns;
+        }
+        
         const height = label.height_mm;
         const width = label.width_mm;
         const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
@@ -614,10 +674,6 @@ class LabelMaker {
 
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.strokeStyle = '#ddd';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
         const iconSize = (height - 2) * mmToPx;
         const iconX = 1 * mmToPx;
@@ -678,7 +734,6 @@ class LabelMaker {
         // Calculate dimensions - horizontal strip
         const firstLabel = labels[0];
         const labelHeight = firstLabel.height_mm * mmToPx;
-        const cutMarkWidth = includeCutMarks ? 2 * mmToPx : 0; // 2mm cut marks
         
         let totalWidth = 0;
         const labelCanvases = [];
@@ -688,11 +743,7 @@ class LabelMaker {
             const canvas = await this.generateLabelCanvas(label);
             labelCanvases.push(canvas);
             totalWidth += canvas.width;
-            
-            // Add cut mark space between labels (except after the last one)
-            if (labels.indexOf(label) < labels.length - 1 && includeCutMarks) {
-                totalWidth += cutMarkWidth;
-            }
+            // No extra space for cut marks - they're just visual lines
         }
         
         // Create the horizontal strip canvas
@@ -716,35 +767,34 @@ class LabelMaker {
             stripCtx.drawImage(labelCanvas, currentX, 0);
             currentX += labelCanvas.width;
             
-            // Draw cut marks between labels (except after the last one)
+            // Draw cut marks between labels (except after the last one) - no space taken
             if (i < labelCanvases.length - 1 && includeCutMarks) {
-                this.drawCutMarks(stripCtx, currentX, labelHeight, cutMarkWidth);
-                currentX += cutMarkWidth;
+                this.drawCutMarks(stripCtx, currentX, labelHeight);
             }
         }
         
         return stripCanvas;
     }
     
-    drawCutMarks(ctx, x, labelHeight, cutMarkWidth) {
+    drawCutMarks(ctx, x, labelHeight) {
         const cutMarkLength = labelHeight * 0.1; // 10% of label height
         const cutMarkThickness = 1;
         
         ctx.strokeStyle = '#666';
         ctx.lineWidth = cutMarkThickness;
         
-        const centerX = x + cutMarkWidth / 2;
+        // Draw cut mark at the exact boundary between labels
         
         // Top cut mark
         ctx.beginPath();
-        ctx.moveTo(centerX, 0);
-        ctx.lineTo(centerX, cutMarkLength);
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, cutMarkLength);
         ctx.stroke();
         
         // Bottom cut mark
         ctx.beginPath();
-        ctx.moveTo(centerX, labelHeight - cutMarkLength);
-        ctx.lineTo(centerX, labelHeight);
+        ctx.moveTo(x, labelHeight - cutMarkLength);
+        ctx.lineTo(x, labelHeight);
         ctx.stroke();
     }
 
@@ -896,113 +946,52 @@ class LabelMaker {
         }
     }
     
-    updateYamlFromCheckboxes() {
-        if (this.yamlEditor) {
-            const yamlContent = this.yamlEditor.getValue();
-            const generateLongPng = document.getElementById('generate-long-png').checked;
-            const includeCutMarks = document.getElementById('include-cut-marks').checked;
-            
-            let updatedYaml = yamlContent;
-            
-            // Update long_png setting
-            if (updatedYaml.includes('long_png:')) {
-                updatedYaml = updatedYaml.replace(/long_png:\s*(true|false)/g, `long_png: ${generateLongPng}`);
-            } else {
-                // Add long_png at the beginning if it doesn't exist
-                const lines = updatedYaml.split('\n');
-                let insertIndex = 0;
-                // Find the first non-comment line
-                while (insertIndex < lines.length && (lines[insertIndex].trim().startsWith('#') || lines[insertIndex].trim() === '')) {
-                    insertIndex++;
-                }
-                lines.splice(insertIndex, 0, `long_png: ${generateLongPng}`);
-                updatedYaml = lines.join('\n');
-            }
-            
-            // Update cut_marks setting
-            if (updatedYaml.includes('cut_marks:')) {
-                updatedYaml = updatedYaml.replace(/cut_marks:\s*(true|false)/g, `cut_marks: ${includeCutMarks}`);
-            } else {
-                // Add cut_marks at the beginning if it doesn't exist
-                const lines = updatedYaml.split('\n');
-                let insertIndex = 0;
-                // Find the first non-comment line
-                while (insertIndex < lines.length && (lines[insertIndex].trim().startsWith('#') || lines[insertIndex].trim() === '')) {
-                    insertIndex++;
-                }
-                lines.splice(insertIndex, 0, `cut_marks: ${includeCutMarks}`);
-                updatedYaml = lines.join('\n');
-            }
-            
-            this.yamlEditor.setValue(updatedYaml);
-        }
-    }
     
-    updateCheckboxesFromYaml() {
-        if (this.yamlEditor) {
-            try {
-                const yamlContent = this.yamlEditor.getValue();
-                const parsed = this.parseYAML(yamlContent);
-                
-                // Update checkboxes based on YAML content
-                if (parsed.long_png !== undefined) {
-                    document.getElementById('generate-long-png').checked = parsed.long_png;
-                }
-                if (parsed.cut_marks !== undefined) {
-                    document.getElementById('include-cut-marks').checked = parsed.cut_marks;
-                }
-            } catch (error) {
-                // Ignore parsing errors for syncing
-            }
-        }
-    }
 
     generatePrompt() {
-        const yamlTemplate = `# Hardware Label Maker - Batch Generation Template
-# 
-# Instructions for AI assistants:
-# Generate a YAML file for batch label generation with the following format.
-# Use this template as a starting point and modify as needed.
-# 
-# Requirements:
-# - title: required for single column (string) OR columns: required for multi-column (array of 1-4 strings)
-# - Cannot use both title and columns in the same label
-# - subtext: optional (string) for single column sub text
-# - subtext_columns: optional (array of 1-4 strings) for multi-column sub text
-# - icon: required (must be one of the available icons listed below)
-# - width_mm: required (number, 20-100)
-# - height_mm: required (number, must be 9, 12, 18, or 24)
-# 
-# Available icons:
-# ${this.availableIcons.join(', ')}
-# 
-# Optional global settings:
-# - long_png: optional (boolean) - generates one continuous PNG strip
-# - cut_marks: optional (boolean) - adds cut marks between labels for trimming
-# 
-# Generate 5-10 labels for various hardware components. 
-# Use multi-column format when labeling drawers with multiple related items.
+        const yamlTemplate = `# Hardware Label Generator - Batch YAML Template
+#
+# 💡 TIP: Copy this template to your favorite LLM tool (ChatGPT, Claude, etc.) 
+#         and ask it to generate labels for your specific hardware collection!
+#         Example prompt: "Generate 20 labels for my M3-M8 bolt collection with various lengths"
+#
+# Available icons: ${this.availableIcons.join(', ')}
 
-# Optional global settings
-long_png: true      # Generate one long PNG strip (optional)
-cut_marks: true     # Include cut marks between labels (optional)
+# Global settings (optional - applied to all labels unless overridden)
+long_png: true        # Generate one continuous PNG strip of all labels
+cut_marks: true       # Add cut marks between labels for easy trimming  
+width_mm: 50          # Default width for all labels (20-100mm)
+height_mm: 12         # Default height for all labels (9, 12, 18, or 24mm)
 
 labels:
-  # Single column label example
-  - title: "M4 × 12"
-    subtext: "DIN 7984"
-    icon: "Head_Hex"
-    width_mm: 50
-    height_mm: 12
+  # Multi-column label example (great for drawer compartments)
+  - icon: "Head_Hex"                    # Icon to display on the left
+    maintext_columns:                   # Main text columns (1-4 columns max)
+      - "M3"
+      - "M3" 
+      - "M3"
+    subtext_columns:                    # Optional sub-text columns
+      - "8 mm"
+      - "10 mm"
+      - "12 mm"
 
-  # Multi-column label example (for drawer sections)
-  - columns: ["M2", "M3", "M4"]
-    subtext_columns: ["Phillips", "Hex", "Torx"]
-    icon: "Screw_Hex"
-    width_mm: 60
-    height_mm: 12
+  # Another multi-column example
+  - icon: "Head_Hex"
+    maintext_columns:
+      - "M4"
+      - "M4"
+      - "M4"
+    subtext_columns:
+      - "14 mm"
+      - "16 mm"
+      - "18 mm"
 
-  # Add your own labels here...
+# Single column alternatives (if you prefer):
+# - title: "M5 × 20"                   # Single main text
+#   subtext: "DIN 7984"                # Optional single sub-text  
+#   icon: "Screw_Hex"
+#   width_mm: 45                       # Override global width
+#   height_mm: 18                      # Override global height
 `;
         
         // Set the template in the YAML editor
@@ -1049,11 +1038,6 @@ labels:
         // Load template after editor is ready
         this.generatePrompt();
         
-        // Initial sync when editor loads
-        this.updateCheckboxesFromYaml();
-        
-        // Add manual sync button or just let users manually sync by switching tabs
-        // Remove automatic sync to prevent circular updates
     }
 
     initializeIconPicker() {

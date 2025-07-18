@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 600px;
     margin: 0 auto;
     padding: 15px;
 }
@@ -22,14 +22,17 @@ header {
     margin-bottom: 20px;
 }
 
-header h1 {
-    color: #2c3e50;
+.header-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
     margin-bottom: 10px;
 }
 
-header p {
-    color: #7f8c8d;
-    font-size: 1.1em;
+#header-label-preview {
+    transform: scale(2);
+    margin: 20px;
 }
 
 main {
@@ -108,10 +111,7 @@ main {
 }
 
 .tab-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
+    display: block;
     padding: 20px;
     background: white;
     border: 1px solid #e0e0e0;
@@ -137,14 +137,6 @@ main {
     box-shadow: none;
 }
 
-.controls h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #2c3e50;
-    font-size: 1.2em;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 8px;
-}
 
 .label-settings {
     margin-top: 0;
@@ -152,6 +144,47 @@ main {
     background: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e9ecef;
+}
+
+.label-dimensions {
+    margin-bottom: 20px;
+}
+
+.dimension-row {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+}
+
+.dimension-item {
+    flex: 1;
+    min-width: 0;
+}
+
+.dimension-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.dimension-item select,
+.dimension-item input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: all 0.3s;
+    background: white;
+}
+
+.dimension-item select:focus,
+.dimension-item input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 .label-settings h3 {
@@ -365,33 +398,6 @@ button:hover {
     box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
 }
 
-.preview-section {
-    background: transparent;
-    padding: 0;
-    border-radius: 0;
-    box-shadow: none;
-}
-
-.preview-section h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #2c3e50;
-    font-size: 1.2em;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 8px;
-}
-
-.preview-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 150px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    padding: 20px;
-    border: 1px solid #e9ecef;
-    margin-bottom: 20px;
-}
 
 .label {
     display: flex;
