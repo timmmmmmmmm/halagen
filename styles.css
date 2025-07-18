@@ -419,6 +419,9 @@ button:hover {
     flex: 1;
     padding: 1mm;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .main-text {
@@ -427,12 +430,22 @@ button:hover {
     color: #000;
     line-height: 1.2;
     margin-bottom: 1px;
+    display: flex;
+    gap: 2px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .sub-text {
     font-size: 8px;
     color: #666;
     line-height: 1.2;
+    display: flex;
+    gap: 2px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .label[data-height="9"] {
@@ -770,4 +783,105 @@ footer {
 
 .attribution a:hover {
     text-decoration: underline;
+}
+
+/* Column Selector Styles */
+.column-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.column-btn {
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.column-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.column-btn.active {
+    background: #3498db;
+    border-color: #3498db;
+    color: white;
+}
+
+.main-text-inputs {
+    display: flex;
+    gap: 8px;
+}
+
+.main-text-input,
+.sub-text-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: white;
+    transition: border-color 0.3s;
+}
+
+.main-text-input:focus,
+.sub-text-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.sub-text-inputs {
+    display: flex;
+    gap: 8px;
+}
+
+.sub-column-btn {
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.sub-column-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.sub-column-btn.active {
+    background: #3498db;
+    border-color: #3498db;
+    color: white;
+}
+
+.main-text-column {
+    flex: 1;
+    text-align: left;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    line-height: inherit;
+    padding-right: 4px;
+}
+
+.sub-text-column {
+    flex: 1;
+    text-align: left;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    line-height: inherit;
+    padding-right: 4px;
 }

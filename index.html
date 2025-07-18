@@ -61,13 +61,27 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="main-text">Main Text:</label>
-                        <input type="text" id="main-text" placeholder="e.g. M4 × 12" value="M4 × 12">
+                        <label>Main Text:</label>
+                        <div class="column-selector">
+                            <button type="button" class="column-btn" data-action="remove">-</button>
+                            <span class="column-count">1</span>
+                            <button type="button" class="column-btn" data-action="add">+</button>
+                        </div>
+                        <div class="main-text-inputs" id="main-text-inputs">
+                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M4 × 12">
+                        </div>
                     </div>
 
                     <div class="control-group">
-                        <label for="sub-text">Sub Text (optional):</label>
-                        <input type="text" id="sub-text" placeholder="e.g. DIN 7984" value="DIN 7984">
+                        <label>Sub Text (optional):</label>
+                        <div class="column-selector">
+                            <button type="button" class="sub-column-btn" data-action="remove">-</button>
+                            <span class="sub-column-count">1</span>
+                            <button type="button" class="sub-column-btn" data-action="add">+</button>
+                        </div>
+                        <div class="sub-text-inputs" id="sub-text-inputs">
+                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="DIN 7984">
+                        </div>
                     </div>
                 </div>
 
@@ -79,8 +93,12 @@
                             <img class="icon" src="icons/Head_Hex.png" alt="Head_Hex">
                         </div>
                         <div class="label-text">
-                            <div class="main-text">M4 × 12</div>
-                            <div class="sub-text">DIN 7984</div>
+                            <div class="main-text" id="preview-main-text">
+                                <div class="main-text-column">M4 × 12</div>
+                            </div>
+                            <div class="sub-text" id="preview-sub-text">
+                                <div class="sub-text-column">DIN 7984</div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -56,23 +56,103 @@ class LabelMaker {
     }
 
     initializeEventListeners() {
-        document.getElementById('component-type').addEventListener('change', () => this.updatePreview());
-        document.getElementById('icon-select').addEventListener('change', () => this.updatePreview());
-        document.getElementById('main-text').addEventListener('input', () => this.updatePreview());
-        document.getElementById('sub-text').addEventListener('input', () => this.updatePreview());
-        document.getElementById('label-height').addEventListener('change', () => this.updatePreview());
-        document.getElementById('label-width').addEventListener('input', () => this.updatePreview());
-        document.getElementById('update-preview').addEventListener('click', () => this.updatePreview());
-        document.getElementById('download-png').addEventListener('click', () => this.downloadPNG());
+        // Basic form elements
+        const componentType = document.getElementById('component-type');
+        const iconSelect = document.getElementById('icon-select');
+        const labelHeight = document.getElementById('label-height');
+        const labelWidth = document.getElementById('label-width');
+        const updatePreview = document.getElementById('update-preview');
+        const downloadPng = document.getElementById('download-png');
+        const validateYaml = document.getElementById('validate-yaml');
+        const generateZip = document.getElementById('generate-zip');
         
-        document.getElementById('validate-yaml').addEventListener('click', () => this.validateYAML());
-        document.getElementById('generate-zip').addEventListener('click', () => this.generateZIP());
+        if (componentType) componentType.addEventListener('change', () => this.updatePreview());
+        if (iconSelect) iconSelect.addEventListener('change', () => this.updatePreview());
+        if (labelHeight) labelHeight.addEventListener('change', () => this.updatePreview());
+        if (labelWidth) labelWidth.addEventListener('input', () => this.updatePreview());
+        if (updatePreview) updatePreview.addEventListener('click', () => this.updatePreview());
+        if (downloadPng) downloadPng.addEventListener('click', () => this.downloadPNG());
+        if (validateYaml) validateYaml.addEventListener('click', () => this.validateYAML());
+        if (generateZip) generateZip.addEventListener('click', () => this.generateZIP());
+        
+        // Column selector event listeners
+        document.querySelectorAll('.column-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const action = e.target.dataset.action;
+                this.updateColumn('main', action);
+            });
+        });
+        
+        document.querySelectorAll('.sub-column-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const action = e.target.dataset.action;
+                this.updateColumn('sub', action);
+            });
+        });
+        
+        // Initial setup for text inputs
+        this.setupMainTextInputs();
+        this.setupSubTextInputs();
+    }
+
+    updateColumn(type, action) {
+        const isMain = type === 'main';
+        const container = document.getElementById(isMain ? 'main-text-inputs' : 'sub-text-inputs');
+        const countElement = document.querySelector(isMain ? '.column-count' : '.sub-column-count');
+        const inputClass = isMain ? 'main-text-input' : 'sub-text-input';
+        
+        let currentCount = container.querySelectorAll(`.${inputClass}`).length;
+        
+        if (action === 'add' && currentCount < 4) {
+            currentCount++;
+        } else if (action === 'remove' && currentCount > 1) {
+            currentCount--;
+        }
+        
+        this.updateTextInputs(container, inputClass, currentCount, isMain);
+        countElement.textContent = currentCount;
+        this.updatePreview();
+    }
+
+    updateTextInputs(container, inputClass, columnCount, isMain) {
+        const currentInputs = container.querySelectorAll(`.${inputClass}`);
+        const currentValues = Array.from(currentInputs).map(input => input.value);
+
+        // Clear existing inputs
+        container.innerHTML = '';
+
+        // Create new inputs
+        for (let i = 0; i < columnCount; i++) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = inputClass;
+            input.placeholder = isMain ? `Column ${i + 1}` : `Sub Column ${i + 1}`;
+            input.value = currentValues[i] || '';
+            input.addEventListener('input', () => this.updatePreview());
+            container.appendChild(input);
+        }
+    }
+
+    setupMainTextInputs() {
+        // Add event listeners to existing inputs
+        document.querySelectorAll('.main-text-input').forEach(input => {
+            input.addEventListener('input', () => this.updatePreview());
+        });
+    }
+    
+    setupSubTextInputs() {
+        // Add event listeners to existing inputs
+        document.querySelectorAll('.sub-text-input').forEach(input => {
+            input.addEventListener('input', () => this.updatePreview());
+        });
     }
 
     updatePreview() {
         const iconSelect = document.getElementById('icon-select').value;
-        const mainText = document.getElementById('main-text').value;
-        const subText = document.getElementById('sub-text').value;
+        const mainTextInputs = document.querySelectorAll('.main-text-input');
+        const mainTexts = Array.from(mainTextInputs).map(input => input.value.trim()).filter(text => text);
+        const subTextInputs = document.querySelectorAll('.sub-text-input');
+        const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
         const height = document.getElementById('label-height').value;
         const width = document.getElementById('label-width').value;
 
@@ -82,13 +162,27 @@ class LabelMaker {
         const subTextElement = labelPreview.querySelector('.sub-text');
 
         iconContainer.innerHTML = `<img class="icon" src="${this.icons[iconSelect] || this.icons['Screw_Hex']}" alt="${iconSelect}">`;
-        mainTextElement.textContent = mainText || 'M4 × 12';
-        subTextElement.textContent = subText || '';
+        
+        // Update main text with columns
+        if (mainTexts.length === 0) {
+            mainTextElement.innerHTML = '<div class="main-text-column">M4 × 12</div>';
+        } else {
+            const columnHTML = mainTexts.map(text => `<div class="main-text-column">${text}</div>`).join('');
+            mainTextElement.innerHTML = columnHTML;
+        }
+        
+        // Update sub text with columns
+        if (subTexts.length === 0) {
+            subTextElement.innerHTML = '<div class="sub-text-column">DIN 7984</div>';
+        } else {
+            const subColumnHTML = subTexts.map(text => `<div class="sub-text-column">${text}</div>`).join('');
+            subTextElement.innerHTML = subColumnHTML;
+        }
 
         labelPreview.setAttribute('data-height', height);
         labelPreview.style.width = `${width}mm`;
 
-        if (!subText) {
+        if (subTexts.length === 0) {
             subTextElement.style.display = 'none';
         } else {
             subTextElement.style.display = 'block';
@@ -102,8 +196,10 @@ class LabelMaker {
             
             const height = parseInt(document.getElementById('label-height').value);
             const width = parseInt(document.getElementById('label-width').value);
-            const mainText = document.getElementById('main-text').value || 'M4 × 12';
-            const subText = document.getElementById('sub-text').value || '';
+            const mainTextInputs = document.querySelectorAll('.main-text-input');
+            const mainTexts = Array.from(mainTextInputs).map(input => input.value.trim()).filter(text => text);
+            const subTextInputs = document.querySelectorAll('.sub-text-input');
+            const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
 
             const dpi = 300;
@@ -136,17 +232,41 @@ class LabelMaker {
             const subFontSize = mainFontSize * 0.75;
 
             ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
-            const textY = subText ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
-            ctx.fillText(mainText, textX, textY);
+            const textY = subTexts.length > 0 ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
+            
+            // Handle multiple columns for main text
+            if (mainTexts.length === 0) {
+                ctx.fillText('M4 × 12', textX, textY);
+            } else {
+                const columnWidth = textAreaWidth / mainTexts.length;
+                mainTexts.forEach((text, index) => {
+                    const columnX = textX + (index * columnWidth);
+                    ctx.textAlign = 'left';
+                    ctx.fillText(text, columnX, textY);
+                });
+            }
 
-            if (subText) {
+            // Handle multiple columns for sub text
+            if (subTexts.length > 0) {
                 ctx.font = `${subFontSize * mmToPx}px Arial`;
                 ctx.fillStyle = '#666';
-                ctx.fillText(subText, textX, textY + (mainFontSize * mmToPx * 1.2));
+                const subTextY = textY + (mainFontSize * mmToPx * 1.2);
+                
+                if (subTexts.length === 1) {
+                    ctx.fillText(subTexts[0], textX, subTextY);
+                } else {
+                    const columnWidth = textAreaWidth / subTexts.length;
+                    subTexts.forEach((text, index) => {
+                        const columnX = textX + (index * columnWidth);
+                        ctx.textAlign = 'left';
+                        ctx.fillText(text, columnX, subTextY);
+                    });
+                }
             }
 
             const link = document.createElement('a');
-            link.download = `label-${mainText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+            const labelName = mainTexts.length > 0 ? mainTexts.join('_') : 'label';
+            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
             link.href = canvas.toDataURL();
             link.click();
         } catch (error) {
@@ -262,7 +382,8 @@ class LabelMaker {
                 const label = labels[i];
                 const canvas = await this.generateLabelCanvas(label);
                 const imageData = canvas.toDataURL().split(',')[1];
-                const filename = `label_${i + 1}_${label.title.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+                const titleText = label.title || (label.columns ? label.columns.join('_') : 'label');
+                const filename = `label_${i + 1}_${titleText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
                 zip.file(filename, imageData, { base64: true });
             }
             
@@ -394,8 +515,17 @@ class LabelMaker {
         parsed.labels.forEach((label, index) => {
             const labelNum = index + 1;
             
-            if (!label.title || typeof label.title !== 'string') {
-                errors.push(`Label ${labelNum}: Missing or invalid title`);
+            // Check for either title (single column) or columns (multi-column)
+            if (!label.title && !label.columns) {
+                errors.push(`Label ${labelNum}: Missing title or columns`);
+            } else if (label.title && label.columns) {
+                errors.push(`Label ${labelNum}: Cannot have both title and columns. Use either title for single column or columns for multi-column`);
+            } else if (label.title && typeof label.title !== 'string') {
+                errors.push(`Label ${labelNum}: Invalid title. Must be a string`);
+            } else if (label.columns && (!Array.isArray(label.columns) || label.columns.length === 0 || label.columns.length > 4)) {
+                errors.push(`Label ${labelNum}: Invalid columns. Must be an array with 1-4 string elements`);
+            } else if (label.columns && label.columns.some(col => typeof col !== 'string')) {
+                errors.push(`Label ${labelNum}: Invalid columns. All column values must be strings`);
             }
             
             if (!label.icon || typeof label.icon !== 'string') {
@@ -415,6 +545,12 @@ class LabelMaker {
             if (label.subtext && typeof label.subtext !== 'string') {
                 errors.push(`Label ${labelNum}: Invalid subtext. Must be a string if provided`);
             }
+            
+            if (label.subtext_columns && (!Array.isArray(label.subtext_columns) || label.subtext_columns.length === 0 || label.subtext_columns.length > 4)) {
+                errors.push(`Label ${labelNum}: Invalid subtext_columns. Must be an array with 1-4 string elements if provided`);
+            } else if (label.subtext_columns && label.subtext_columns.some(col => typeof col !== 'string')) {
+                errors.push(`Label ${labelNum}: Invalid subtext_columns. All column values must be strings`);
+            }
         });
 
         return {
@@ -430,8 +566,8 @@ class LabelMaker {
         
         const height = label.height_mm;
         const width = label.width_mm;
-        const mainText = label.title;
-        const subText = label.subtext || '';
+        const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
+        const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
         const iconSelect = label.icon;
 
         const dpi = 300;
@@ -464,13 +600,36 @@ class LabelMaker {
         const subFontSize = mainFontSize * 0.75;
 
         ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
-        const textY = subText ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
-        ctx.fillText(mainText, textX, textY);
+        const textY = subTexts.length > 0 ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
+        
+        // Handle multiple columns for main text
+        if (mainTexts.length === 1) {
+            ctx.fillText(mainTexts[0], textX, textY);
+        } else {
+            const columnWidth = textAreaWidth / mainTexts.length;
+            mainTexts.forEach((text, index) => {
+                const columnX = textX + (index * columnWidth);
+                ctx.textAlign = 'left';
+                ctx.fillText(text, columnX, textY);
+            });
+        }
 
-        if (subText) {
+        // Handle multiple columns for sub text
+        if (subTexts.length > 0) {
             ctx.font = `${subFontSize * mmToPx}px Arial`;
             ctx.fillStyle = '#666';
-            ctx.fillText(subText, textX, textY + (mainFontSize * mmToPx * 1.2));
+            const subTextY = textY + (mainFontSize * mmToPx * 1.2);
+            
+            if (subTexts.length === 1) {
+                ctx.fillText(subTexts[0], textX, subTextY);
+            } else {
+                const columnWidth = textAreaWidth / subTexts.length;
+                subTexts.forEach((text, index) => {
+                    const columnX = textX + (index * columnWidth);
+                    ctx.textAlign = 'left';
+                    ctx.fillText(text, columnX, subTextY);
+                });
+            }
         }
 
         return canvas;
@@ -574,18 +733,28 @@ long_png: true      # Generate one long PNG strip (optional)
 cut_marks: true     # Include cut marks between labels (optional)
 
 labels:
+  # Single column label
   - title: "M4 × 12"
     subtext: "DIN 7984"
     icon: "Head_Hex"
     width_mm: 50
     height_mm: 12
 
+  # Multi-column label (for drawer sections)
+  - columns: ["M2", "M3", "M4"]
+    subtext_columns: ["Phillips", "Hex", "Torx"]
+    icon: "Screw_Hex"
+    width_mm: 60
+    height_mm: 12
+
 Available icons:
 ${this.availableIcons.join(', ')}
 
 Requirements:
-- title: required (string)
-- subtext: optional (string)
+- title: required for single column (string) OR columns: required for multi-column (array of 1-4 strings)
+- Cannot use both title and columns in the same label
+- subtext: optional (string) for single column sub text
+- subtext_columns: optional (array of 1-4 strings) for multi-column sub text
 - icon: required (must be one of the available icons above)
 - width_mm: required (number, 20-100)
 - height_mm: required (number, must be 9, 12, 18, or 24)
@@ -594,7 +763,7 @@ Optional global settings:
 - long_png: optional (boolean) - generates one continuous PNG strip
 - cut_marks: optional (boolean) - adds cut marks between labels for trimming
 
-Generate 5-10 labels for various hardware components.`;
+Generate 5-10 labels for various hardware components. Use multi-column format when labeling drawers with multiple related items.`;
         
         document.getElementById('llm-prompt').value = promptText;
     }
@@ -639,7 +808,7 @@ Generate 5-10 labels for various hardware components.`;
             'Screw Heads': ['Head_Flat', 'Head_Hex', 'Head_Phillips', 'Head_Robinson', 'Head_SlottedPhillips', 'Head_Torx'],
             'Inserts': ['Insert_Heat', 'Insert_Wood'],
             'Nuts': ['Nut_CapNut', 'Nut_LockNut', 'Nut_Standard'],
-            'Screws': ['Screw Round', 'Screw Tbolt', 'Screw Truss', 'Screw TrussModified', 'Screw Wafer', 'Screw_Bugle', 'Screw_Fillister', 'Screw_Flat', 'Screw_Hex', 'Screw_Oval', 'Screw_Pan', 'Screw_ThumbKnurled', 'Screw_Trim', 'ThumbScrew'],
+            'Screws': ['Screw_Round', 'Screw_Tbolt', 'Screw Truss', 'Screw TrussModified', 'Screw Wafer', 'Screw_Bugle', 'Screw_Fillister', 'Screw_Flat', 'Screw_Hex', 'Screw_Oval', 'Screw_Pan', 'Screw_ThumbKnurled', 'Screw_Trim', 'Thumb_Screw'],
             'Washers': ['Washer_Fender', 'Washer_Flat', 'Washer_Split', 'Washer_StarExterior', 'Washer_StartInterior']
         };
 
