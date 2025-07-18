@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardware Label Maker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hardware Label Maker</h1>
+            <p>Generate printable labels for screws, bolts, washers, and nuts</p>
+        </header>
+
+        <main>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="component-type">Component Type:</label>
+                    <select id="component-type">
+                        <option value="bolt">Bolt</option>
+                        <option value="screw">Screw</option>
+                        <option value="nut">Nut</option>
+                        <option value="washer">Washer</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="icon-select">Icon:</label>
+                    <select id="icon-select">
+                        <optgroup label="Electrical">
+                            <option value="Elec_WagoLogo">Wago Logo</option>
+                            <option value="Elec_Wago_Alt1">Wago Alt 1</option>
+                            <option value="Elec_Wago_Alt2">Wago Alt 2</option>
+                            <option value="Elec_WireNut">Wire Nut</option>
+                            <option value="Electrical_Generic">Generic Electrical</option>
+                        </optgroup>
+                        <optgroup label="Screw Heads">
+                            <option value="Head_Flat">Flat Head</option>
+                            <option value="Head_Hex" selected>Hex Head</option>
+                            <option value="Head_Phillips">Phillips Head</option>
+                            <option value="Head_Robinson">Robinson Head</option>
+                            <option value="Head_SlottedPhillips">Slotted Phillips</option>
+                            <option value="Head_Torx">Torx Head</option>
+                        </optgroup>
+                        <optgroup label="Inserts">
+                            <option value="Insert_Heat">Heat Insert</option>
+                            <option value="Insert_Wood">Wood Insert</option>
+                        </optgroup>
+                        <optgroup label="Nuts">
+                            <option value="Nut_CapNut">Cap Nut</option>
+                            <option value="Nut_LockNut">Lock Nut</option>
+                            <option value="Nut_Standard">Standard Nut</option>
+                        </optgroup>
+                        <optgroup label="Screws">
+                            <option value="Screw Round">Round Screw</option>
+                            <option value="Screw Tbolt">T-Bolt</option>
+                            <option value="Screw Truss">Truss Screw</option>
+                            <option value="Screw TrussModified">Truss Modified</option>
+                            <option value="Screw Wafer">Wafer Screw</option>
+                            <option value="Screw_Bugle">Bugle Screw</option>
+                            <option value="Screw_Fillister">Fillister Screw</option>
+                            <option value="Screw_Flat">Flat Screw</option>
+                            <option value="Screw_Hex">Hex Screw</option>
+                            <option value="Screw_Oval">Oval Screw</option>
+                            <option value="Screw_Pan">Pan Screw</option>
+                            <option value="Screw_ThumbKnurled">Thumb Knurled</option>
+                            <option value="Screw_Trim">Trim Screw</option>
+                            <option value="ThumbScrew">Thumb Screw</option>
+                        </optgroup>
+                        <optgroup label="Washers">
+                            <option value="Washer_Fender">Fender Washer</option>
+                            <option value="Washer_Flat">Flat Washer</option>
+                            <option value="Washer_Split">Split Washer</option>
+                            <option value="Washer_StarExterior">Star Exterior</option>
+                            <option value="Washer_StartInterior">Star Interior</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="main-text">Main Text:</label>
+                    <input type="text" id="main-text" placeholder="e.g. M4 × 12" value="M4 × 12">
+                </div>
+
+                <div class="control-group">
+                    <label for="sub-text">Sub Text (optional):</label>
+                    <input type="text" id="sub-text" placeholder="e.g. DIN 7984" value="DIN 7984">
+                </div>
+
+                <div class="control-group">
+                    <label for="label-height">Label Height:</label>
+                    <select id="label-height">
+                        <option value="9">9mm</option>
+                        <option value="12" selected>12mm</option>
+                        <option value="18">18mm</option>
+                        <option value="24">24mm</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="label-width">Label Width (mm):</label>
+                    <input type="number" id="label-width" min="20" max="100" value="40">
+                </div>
+
+                <button id="update-preview">Update Preview</button>
+                <button id="download-png">Download PNG</button>
+            </div>
+
+            <div class="preview-section">
+                <h3>Preview (actual size)</h3>
+                <div class="preview-container">
+                    <div id="label-preview" class="label">
+                        <div class="label-icon">
+                            <img class="icon" src="icons/Head_Hex.png" alt="Head_Hex">
+                        </div>
+                        <div class="label-text">
+                            <div class="main-text">M4 × 12</div>
+                            <div class="sub-text">DIN 7984</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
