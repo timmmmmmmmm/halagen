@@ -2,7 +2,11 @@
 
 A browser-based label generator for hardware components including screws, bolts, washers, nuts, and electrical components. Generate printable PNG labels with customizable dimensions and icons. Ideally to be used in label-print editors like Brother's P-touch Editor.
 
-[![HaLaGen Interface](img/screenshot_halagen.png)](https://timmmmmmmmm.github.io/halagen)
+<div align="center">
+  <a href="https://timmmmmmmmm.github.io/halagen">
+    <img src="img/screenshot_halagen.png" alt="HaLaGen Interface" width="570px">
+  </a>
+</div>
 
 ## Features
 
@@ -19,11 +23,20 @@ A browser-based label generator for hardware components including screws, bolts,
 ## Example Output
 
 Here are some examples of labels generated with HaLaGen:
-
-| | | |
-|---|---|---|
-| ![M3 Label](img/label-M3.png) | ![M3 Heat Insert](img/label-M3_heat_insert.png) | ![M4 Label](img/label-M4.png) |
-| ![M6 Label](img/label-M6.png) | ![TX20 Screws](img/label-TX20_screws.png) | ![Wago 221](img/label-Wago_221.png) |
+<div align="center">
+<table>
+  <tr>
+    <td><img src="img/label-M3.png" alt="M3 Label" width="200px"></td>
+    <td><img src="img/label-M3_heat_insert.png" alt="M3 Heat Insert" width="200px"></td>
+    <td><img src="img/label-M4.png" alt="M4 Label" width="200px"></td>
+  </tr>
+  <tr>
+    <td><img src="img/label-M6.png" alt="M6 Label" width="200px"></td>
+    <td><img src="img/label-TX20_screws.png" alt="TX20 Screws" width="200px"></td>
+    <td><img src="img/label-Wago_221.png" alt="Wago 221" width="200px"></td>
+  </tr>
+</table>
+</div>
 
 ## Online Access
 
@@ -59,7 +72,9 @@ HaLaGen includes a powerful YAML batch processor that allows you to generate mul
 
 **AI/LLM Integration**: The YAML format is designed to work seamlessly with AI assistants and Large Language Models (LLMs). Simply take fore example a screenshot of your hardware shopping basket or current organizer, and ask an AI to generate the YAML configuration for all the parts it can identify. This makes organizing large quantities of hardware components incredibly efficient.
 
-![YAML Batch Processor](img/screenshot_batch_yaml.png)
+<div align="center">
+<img src="img/screenshot_batch_yaml.png" alt="YAML Batch Processor" width="570px">
+</div>
 
 Example YAML format:
 ```yaml
