@@ -78,14 +78,15 @@ main {
 
 .tab-button:hover {
     background: #e9ecef;
-    color: #3498db;
+    color: #2c3e50;
 }
 
 .tab-button.active {
     background: white;
-    color: #3498db;
+    color: #2c3e50;
     border-color: #e0e0e0;
     z-index: 2;
+    font-weight: 600;
 }
 
 .tab-button.active::after {
@@ -434,7 +435,7 @@ button:hover {
     gap: 2px;
     width: 100%;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .sub-text {
@@ -445,7 +446,7 @@ button:hover {
     gap: 2px;
     width: 100%;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .label[data-height="9"] {

@@ -57,7 +57,6 @@ class LabelMaker {
 
     initializeEventListeners() {
         // Basic form elements
-        const componentType = document.getElementById('component-type');
         const iconSelect = document.getElementById('icon-select');
         const labelHeight = document.getElementById('label-height');
         const labelWidth = document.getElementById('label-width');
@@ -66,7 +65,6 @@ class LabelMaker {
         const validateYaml = document.getElementById('validate-yaml');
         const generateZip = document.getElementById('generate-zip');
         
-        if (componentType) componentType.addEventListener('change', () => this.updatePreview());
         if (iconSelect) iconSelect.addEventListener('change', () => this.updatePreview());
         if (labelHeight) labelHeight.addEventListener('change', () => this.updatePreview());
         if (labelWidth) labelWidth.addEventListener('input', () => this.updatePreview());
@@ -185,7 +183,7 @@ class LabelMaker {
         if (subTexts.length === 0) {
             subTextElement.style.display = 'none';
         } else {
-            subTextElement.style.display = 'block';
+            subTextElement.style.display = 'flex';
         }
     }
 
