@@ -79,7 +79,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## Icon attribution
 
-All icons in this project are based on designs by **3dprintbunny**, available at: https://www.printables.com/model/621771-gridfinity-bin-label-icons
+The current icon set in this project is based on designs by **Joe Jankowiak**, available at: https://www.printables.com/model/621771-gridfinity-bin-label-icons
 
 Used under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
 https://creativecommons.org/licenses/by/4.0/
