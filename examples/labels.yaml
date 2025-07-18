@@ -1,0 +1,60 @@
+labels:
+  - title: "M4 × 12"
+    subtext: "DIN 7984"
+    icon: "Head_Hex"
+    width_mm: 50
+    height_mm: 12
+
+  - title: "M6 × 20"
+    subtext: "Socket Head"
+    icon: "Screw_Hex"
+    width_mm: 55
+    height_mm: 18
+
+  - title: "M3 × 8"
+    subtext: "Phillips"
+    icon: "Head_Phillips"
+    width_mm: 45
+    height_mm: 9
+
+  - title: "M5 Nut"
+    subtext: "Standard"
+    icon: "Nut_Standard"
+    width_mm: 40
+    height_mm: 12
+
+  - title: "M4 Washer"
+    subtext: "Flat"
+    icon: "Washer_Flat"
+    width_mm: 35
+    height_mm: 9
+
+  - title: "M8 × 25"
+    subtext: "Hex Head"
+    icon: "Head_Hex"
+    width_mm: 60
+    height_mm: 24
+
+  - title: "Heat Insert"
+    subtext: "M4 × 6"
+    icon: "Insert_Heat"
+    width_mm: 45
+    height_mm: 12
+
+  - title: "Wire Connector"
+    subtext: "2-Way"
+    icon: "Elec_WireNut"
+    width_mm: 50
+    height_mm: 18
+
+  - title: "M5 × 16"
+    subtext: "Torx T25"
+    icon: "Head_Torx"
+    width_mm: 52
+    height_mm: 18
+
+  - title: "Split Washer"
+    subtext: "M6"
+    icon: "Washer_Split"
+    width_mm: 38
+    height_mm: 9

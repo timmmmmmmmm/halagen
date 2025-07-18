@@ -14,7 +14,15 @@
         </header>
 
         <main>
-            <div class="controls">
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="single">Single Label</button>
+                    <button class="tab-button" data-tab="batch">Batch Labels</button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="single-tab">
+                <div class="controls">
                 <div class="control-group">
                     <label for="component-type">Component Type:</label>
                     <select id="component-type">
@@ -121,9 +129,57 @@
                     </div>
                 </div>
             </div>
+            </div>
+
+            <div class="tab-content" id="batch-tab" style="display: none;">
+                <div class="batch-controls">
+                    <div class="help-section">
+                        <details>
+                            <summary>Need help generating YAML? Use this prompt!</summary>
+                            <div class="help-content">
+                                <p>Copy this prompt to your favorite AI assistant:</p>
+                                <textarea readonly class="llm-prompt">Generate a YAML file for batch label generation with the following format:
+
+labels:
+  - title: "M4 × 12"
+    subtext: "DIN 7984"
+    icon: "Head_Hex"
+    width_mm: 50
+    height_mm: 12
+
+Available icons:
+Elec_WagoLogo, Elec_Wago_Alt1, Elec_Wago_Alt2, Elec_WireNut, Electrical_Generic, Head_Flat, Head_Hex, Head_Phillips, Head_Robinson, Head_SlottedPhillips, Head_Torx, Insert_Heat, Insert_Wood, Nut_CapNut, Nut_LockNut, Nut_Standard, Screw Round, Screw Tbolt, Screw Truss, Screw TrussModified, Screw Wafer, Screw_Bugle, Screw_Fillister, Screw_Flat, Screw_Hex, Screw_Oval, Screw_Pan, Screw_ThumbKnurled, Screw_Trim, ThumbScrew, Washer_Fender, Washer_Flat, Washer_Split, Washer_StarExterior, Washer_StartInterior
+
+Requirements:
+- title: required (string)
+- subtext: optional (string)
+- icon: required (must be one of the available icons above)
+- width_mm: required (number, 20-100)
+- height_mm: required (number, must be 9, 12, 18, or 24)
+
+Generate 5-10 labels for various hardware components.</textarea>
+                                <button class="copy-button" onclick="copyToClipboard()">📋 Copy to clipboard</button>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="yaml-input">YAML Input:</label>
+                        <textarea id="yaml-input" rows="20" placeholder="Paste your YAML here..."></textarea>
+                    </div>
+
+                    <div class="batch-buttons">
+                        <button id="validate-yaml">Validate YAML</button>
+                        <button id="generate-zip">Generate and Download ZIP</button>
+                    </div>
+
+                    <div id="validation-result" class="validation-result"></div>
+                </div>
+            </div>
         </main>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

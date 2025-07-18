@@ -33,10 +33,57 @@ header p {
 }
 
 main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tab-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.tab-buttons {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-button {
+    flex: 1;
+    background: #f8f9fa;
+    color: #666;
+    border: none;
+    padding: 15px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-button:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+.tab-button.active {
+    background: white;
+    color: #3498db;
+    border-bottom-color: #3498db;
+}
+
+.tab-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     align-items: start;
+    padding: 30px;
+}
+
+#batch-tab {
+    display: block;
+    padding: 30px;
 }
 
 .controls {
@@ -44,6 +91,104 @@ main {
     padding: 25px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.batch-controls {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.help-section {
+    margin-bottom: 30px;
+}
+
+.help-section details {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+}
+
+.help-section summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.help-content {
+    margin-top: 15px;
+}
+
+.llm-prompt {
+    width: 100%;
+    min-height: 200px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 15px;
+    resize: vertical;
+    line-height: 1.4;
+}
+
+.copy-button {
+    background-color: #17a2b8;
+    margin-top: 10px;
+}
+
+.copy-button:hover {
+    background-color: #138496;
+}
+
+#yaml-input {
+    width: 100%;
+    min-height: 300px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 15px;
+    resize: vertical;
+    line-height: 1.4;
+}
+
+#yaml-input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.batch-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.validation-result {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 4px;
+    display: none;
+}
+
+.validation-result.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.validation-result.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.validation-result.warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
 }
 
 .control-group {
@@ -224,11 +369,25 @@ button:hover {
 }
 
 @media (max-width: 768px) {
-    main {
+    .tab-content {
         grid-template-columns: 1fr;
     }
     
     .container {
         padding: 10px;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+    }
+    
+    .tab-button {
+        border-bottom: 1px solid #e0e0e0;
+        border-right: 3px solid transparent;
+    }
+    
+    .tab-button.active {
+        border-bottom-color: #e0e0e0;
+        border-right-color: #3498db;
     }
 }
