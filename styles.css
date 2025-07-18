@@ -872,35 +872,48 @@ footer {
     text-decoration: underline;
 }
 
-/* Column Selector Styles */
-.column-selector {
+/* Label with Controls Styles */
+.label-with-controls {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
     margin-bottom: 8px;
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 8px 12px;
-    width: fit-content;
 }
 
-.column-help {
-    margin-bottom: 12px;
+.inline-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.column-help small {
-    color: #6c757d;
-    font-style: italic;
-}
-
-.column-btn {
-    background: white;
-    border: 2px solid #dee2e6;
+/* Tooltip Icon Styles */
+.tooltip-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: #6c757d;
+    color: white;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 16px;
+    cursor: help;
+    margin-left: 6px;
+    transition: background-color 0.3s;
+}
+
+.tooltip-icon:hover {
+    background: #495057;
+}
+
+.small-column-btn, .small-sub-column-btn {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
     font-weight: bold;
     color: #6c757d;
     cursor: pointer;
@@ -909,19 +922,23 @@ footer {
     align-items: center;
     justify-content: center;
     padding: 0;
+    box-shadow: none;
+    transform: none;
 }
 
-.column-btn:hover {
+.small-column-btn:hover, .small-sub-column-btn:hover {
     background: #e9ecef;
     border-color: #adb5bd;
-    transform: scale(1.05);
+    box-shadow: none;
+    transform: none;
 }
 
-.column-btn:active {
+.small-column-btn:active, .small-sub-column-btn:active {
     background: #3498db;
     border-color: #3498db;
     color: white;
-    transform: scale(0.95);
+    box-shadow: none;
+    transform: none;
 }
 
 .main-text-inputs {
@@ -954,35 +971,7 @@ footer {
     gap: 8px;
 }
 
-.sub-column-btn {
-    background: white;
-    border: 2px solid #dee2e6;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #6c757d;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-}
-
-.sub-column-btn:hover {
-    background: #e9ecef;
-    border-color: #adb5bd;
-    transform: scale(1.05);
-}
-
-.sub-column-btn:active {
-    background: #3498db;
-    border-color: #3498db;
-    color: white;
-    transform: scale(0.95);
-}
+/* Old sub-column-btn styles removed - now using .small-sub-column-btn above */
 
 .main-text-column {
     flex: 1;
@@ -1004,15 +993,4 @@ footer {
     padding-right: 4px;
 }
 
-.column-count, .sub-column-count {
-    font-size: 14px;
-    font-weight: 600;
-    color: #495057;
-    margin: 0 4px;
-    min-width: 20px;
-    text-align: center;
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    padding: 4px 8px;
-}
+/* Column count displays removed */

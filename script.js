@@ -77,19 +77,30 @@ class LabelMaker {
         if (generateZip) generateZip.addEventListener('click', () => this.generateZIP());
         
         // Column selector event listeners
-        document.querySelectorAll('.column-btn').forEach(btn => {
+        document.querySelectorAll('.small-column-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const action = e.target.dataset.action;
                 this.updateColumn('main', action);
             });
         });
         
-        document.querySelectorAll('.sub-column-btn').forEach(btn => {
+        document.querySelectorAll('.small-sub-column-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const action = e.target.dataset.action;
                 this.updateColumn('sub', action);
             });
         });
+        
+        // Checkbox sync event listeners
+        const generateLongPng = document.getElementById('generate-long-png');
+        const includeCutMarks = document.getElementById('include-cut-marks');
+        
+        if (generateLongPng) {
+            generateLongPng.addEventListener('change', () => this.updateYamlFromCheckboxes());
+        }
+        if (includeCutMarks) {
+            includeCutMarks.addEventListener('change', () => this.updateYamlFromCheckboxes());
+        }
         
         // Initial setup for text inputs
         this.setupMainTextInputs();
@@ -110,7 +121,6 @@ class LabelMaker {
     updateColumn(type, action) {
         const isMain = type === 'main';
         const container = document.getElementById(isMain ? 'main-text-inputs' : 'sub-text-inputs');
-        const countElement = document.querySelector(isMain ? '.column-count' : '.sub-column-count');
         const inputClass = isMain ? 'main-text-input' : 'sub-text-input';
         
         let currentCount = container.querySelectorAll(`.${inputClass}`).length;
@@ -122,7 +132,6 @@ class LabelMaker {
         }
         
         this.updateTextInputs(container, inputClass, currentCount, isMain);
-        countElement.textContent = currentCount;
         this.updatePreview();
     }
 
@@ -346,7 +355,10 @@ class LabelMaker {
                 
                 // Refresh CodeMirror editor when batch tab becomes visible
                 if (targetTab === 'batch' && this.yamlEditor) {
-                    setTimeout(() => this.yamlEditor.refresh(), 100);
+                    setTimeout(() => {
+                        this.yamlEditor.refresh();
+                        this.updateCheckboxesFromYaml();
+                    }, 100);
                 }
             });
         });
@@ -814,13 +826,6 @@ class LabelMaker {
 
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    // Validate square dimensions
-                    if (img.width !== img.height) {
-                        alert('Please upload a square image (width = height).');
-                        reject(new Error('Not square'));
-                        return;
-                    }
-
                     // Validate minimum size
                     if (img.width < 32 || img.height < 32) {
                         alert('Image must be at least 32x32 pixels.');
@@ -828,14 +833,25 @@ class LabelMaker {
                         return;
                     }
 
-                    // Resize to standard size if needed (128x128)
+                    // Resize to standard size, maintaining aspect ratio and centering
                     const targetSize = 128;
                     canvas.width = targetSize;
                     canvas.height = targetSize;
                     
+                    // Fill with white background
                     ctx.fillStyle = 'white';
                     ctx.fillRect(0, 0, targetSize, targetSize);
-                    ctx.drawImage(img, 0, 0, targetSize, targetSize);
+                    
+                    // Calculate scaling to fit within target size while maintaining aspect ratio
+                    const scale = Math.min(targetSize / img.width, targetSize / img.height);
+                    const scaledWidth = img.width * scale;
+                    const scaledHeight = img.height * scale;
+                    
+                    // Center the image
+                    const offsetX = (targetSize - scaledWidth) / 2;
+                    const offsetY = (targetSize - scaledHeight) / 2;
+                    
+                    ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
                     
                     resolve();
                 };
@@ -874,8 +890,69 @@ class LabelMaker {
             
         } catch (error) {
             console.error('Error processing uploaded icon:', error);
-            if (error.message !== 'Not square' && error.message !== 'Too small') {
+            if (error.message !== 'Too small') {
                 alert('Error processing uploaded image. Please try again.');
+            }
+        }
+    }
+    
+    updateYamlFromCheckboxes() {
+        if (this.yamlEditor) {
+            const yamlContent = this.yamlEditor.getValue();
+            const generateLongPng = document.getElementById('generate-long-png').checked;
+            const includeCutMarks = document.getElementById('include-cut-marks').checked;
+            
+            let updatedYaml = yamlContent;
+            
+            // Update long_png setting
+            if (updatedYaml.includes('long_png:')) {
+                updatedYaml = updatedYaml.replace(/long_png:\s*(true|false)/g, `long_png: ${generateLongPng}`);
+            } else {
+                // Add long_png at the beginning if it doesn't exist
+                const lines = updatedYaml.split('\n');
+                let insertIndex = 0;
+                // Find the first non-comment line
+                while (insertIndex < lines.length && (lines[insertIndex].trim().startsWith('#') || lines[insertIndex].trim() === '')) {
+                    insertIndex++;
+                }
+                lines.splice(insertIndex, 0, `long_png: ${generateLongPng}`);
+                updatedYaml = lines.join('\n');
+            }
+            
+            // Update cut_marks setting
+            if (updatedYaml.includes('cut_marks:')) {
+                updatedYaml = updatedYaml.replace(/cut_marks:\s*(true|false)/g, `cut_marks: ${includeCutMarks}`);
+            } else {
+                // Add cut_marks at the beginning if it doesn't exist
+                const lines = updatedYaml.split('\n');
+                let insertIndex = 0;
+                // Find the first non-comment line
+                while (insertIndex < lines.length && (lines[insertIndex].trim().startsWith('#') || lines[insertIndex].trim() === '')) {
+                    insertIndex++;
+                }
+                lines.splice(insertIndex, 0, `cut_marks: ${includeCutMarks}`);
+                updatedYaml = lines.join('\n');
+            }
+            
+            this.yamlEditor.setValue(updatedYaml);
+        }
+    }
+    
+    updateCheckboxesFromYaml() {
+        if (this.yamlEditor) {
+            try {
+                const yamlContent = this.yamlEditor.getValue();
+                const parsed = this.parseYAML(yamlContent);
+                
+                // Update checkboxes based on YAML content
+                if (parsed.long_png !== undefined) {
+                    document.getElementById('generate-long-png').checked = parsed.long_png;
+                }
+                if (parsed.cut_marks !== undefined) {
+                    document.getElementById('include-cut-marks').checked = parsed.cut_marks;
+                }
+            } catch (error) {
+                // Ignore parsing errors for syncing
             }
         }
     }
@@ -971,6 +1048,12 @@ labels:
         
         // Load template after editor is ready
         this.generatePrompt();
+        
+        // Initial sync when editor loads
+        this.updateCheckboxesFromYaml();
+        
+        // Add manual sync button or just let users manually sync by switching tabs
+        // Remove automatic sync to prevent circular updates
     }
 
     initializeIconPicker() {

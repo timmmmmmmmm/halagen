@@ -27,7 +27,7 @@
                     
 
                     <div class="control-group">
-                        <label for="icon-picker">Icon:</label>
+                        <label for="icon-picker">Icon: <span class="tooltip-icon" title="Icon displayed on the left side of the label. Choose from built-in icons or upload custom icons (any aspect ratio supported)">?</span></label>
                         <div id="icon-picker" class="icon-picker">
                             <div class="icon-picker-selected">
                                 <div class="selected-icon" data-icon="Head_Hex">
@@ -42,9 +42,9 @@
                                 </div>
                                 <div class="icon-upload-section">
                                     <input type="file" id="icon-upload" accept="image/png" style="display: none;">
-                                    <button type="button" id="upload-icon-btn" class="upload-icon-btn" title="Upload a custom square PNG icon (black & white recommended)">📁 Upload Custom Icon</button>
+                                    <button type="button" id="upload-icon-btn" class="upload-icon-btn" title="Upload a custom PNG icon (any aspect ratio, black & white recommended)">📁 Upload Custom Icon</button>
                                     <div class="upload-instructions">
-                                        <small>Upload square PNG icons. <a href="https://github.com/timvanderheide/maker-label-maker" target="_blank">Contribute icons</a> to help everyone!</small>
+                                        <small>Upload PNG icons (any aspect ratio). <a href="https://github.com/timvanderheide/maker-label-maker" target="_blank">Contribute icons</a> to help everyone!</small>
                                     </div>
                                 </div>
                                 <div class="icon-picker-grid" id="icon-grid">
@@ -59,14 +59,12 @@
                     </div>
 
                     <div class="control-group">
-                        <label>Main Text:</label>
-                        <div class="column-selector" title="Add/remove columns for organizing multi-compartment containers">
-                            <button type="button" class="column-btn" data-action="remove" title="Remove column">-</button>
-                            <span class="column-count">3</span>
-                            <button type="button" class="column-btn" data-action="add" title="Add column (max 4)">+</button>
-                        </div>
-                        <div class="column-help">
-                            <small>💡 Use multiple columns when labeling containers with separate compartments</small>
+                        <div class="label-with-controls">
+                            <label>Main Text:</label>
+                            <div class="inline-controls">
+                                <button type="button" class="small-column-btn" data-action="remove" title="Remove column">-</button>
+                                <button type="button" class="small-column-btn" data-action="add" title="Add column (max 4)">+</button>
+                            </div>
                         </div>
                         <div class="main-text-inputs" id="main-text-inputs">
                             <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
@@ -76,11 +74,12 @@
                     </div>
 
                     <div class="control-group">
-                        <label>Sub Text (optional):</label>
-                        <div class="column-selector" title="Add/remove sub-text columns (standards, notes, etc.)">
-                            <button type="button" class="sub-column-btn" data-action="remove" title="Remove sub-text column">-</button>
-                            <span class="sub-column-count">3</span>
-                            <button type="button" class="sub-column-btn" data-action="add" title="Add sub-text column (max 4)">+</button>
+                        <div class="label-with-controls">
+                            <label>Sub Text (optional): <span class="tooltip-icon" title="Use multiple columns when labeling containers with separate compartments">?</span></label>
+                            <div class="inline-controls">
+                                <button type="button" class="small-sub-column-btn" data-action="remove" title="Remove sub-text column">-</button>
+                                <button type="button" class="small-sub-column-btn" data-action="add" title="Add sub-text column (max 4)">+</button>
+                            </div>
                         </div>
                         <div class="sub-text-inputs" id="sub-text-inputs">
                             <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="8 mm">
@@ -116,7 +115,7 @@
                     <h3>Label Settings</h3>
                     
                     <div class="control-group">
-                        <label for="label-height">Label Height:</label>
+                        <label for="label-height">Label Height: <span class="tooltip-icon" title="Standard label tape heights for compatibility with label makers">?</span></label>
                         <select id="label-height" title="Standard label tape heights">
                             <option value="9">9mm</option>
                             <option value="12" selected>12mm</option>
@@ -126,7 +125,7 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="label-width">Label Width (mm):</label>
+                        <label for="label-width">Label Width (mm): <span class="tooltip-icon" title="Custom width from 20-100mm to fit your container size">?</span></label>
                         <input type="number" id="label-width" min="20" max="100" value="50" title="Custom width from 20-100mm">
                     </div>
 
@@ -147,13 +146,13 @@
 
                     <div class="batch-options">
                         <div class="checkbox-group">
-                            <label class="checkbox-label" title="Creates one continuous horizontal strip of all labels">
+                            <label class="checkbox-label">
                                 <input type="checkbox" id="generate-long-png">
-                                Generate long PNG strip
+                                Generate long PNG strip <span class="tooltip-icon" title="Creates one continuous horizontal strip of all labels instead of individual files">?</span>
                             </label>
-                            <label class="checkbox-label" title="Adds vertical cut marks between labels for easy trimming">
+                            <label class="checkbox-label">
                                 <input type="checkbox" id="include-cut-marks">
-                                Include cut marks
+                                Include cut marks <span class="tooltip-icon" title="Adds vertical cut marks between labels for easy trimming with scissors">?</span>
                             </label>
                         </div>
                     </div>
