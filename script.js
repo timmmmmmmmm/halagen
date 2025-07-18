@@ -4,9 +4,9 @@ class LabelMaker {
             'Elec_WagoLogo', 'Elec_Wago_Alt1', 'Elec_Wago_Alt2', 'Elec_WireNut', 'Electrical_Generic',
             'Head_Flat', 'Head_Hex', 'Head_Phillips', 'Head_Robinson', 'Head_SlottedPhillips', 'Head_Torx',
             'Insert_Heat', 'Insert_Wood', 'Nut_CapNut', 'Nut_LockNut', 'Nut_Standard',
-            'Screw Round', 'Screw Tbolt', 'Screw Truss', 'Screw TrussModified', 'Screw Wafer',
+            'Screw_Round', 'Screw_Tbolt', 'Screw Truss', 'Screw TrussModified', 'Screw Wafer',
             'Screw_Bugle', 'Screw_Fillister', 'Screw_Flat', 'Screw_Hex', 'Screw_Oval', 'Screw_Pan',
-            'Screw_ThumbKnurled', 'Screw_Trim', 'ThumbScrew', 'Washer_Fender', 'Washer_Flat',
+            'Screw_ThumbKnurled', 'Screw_Trim', 'Thumb_Screw', 'Washer_Fender', 'Washer_Flat',
             'Washer_Split', 'Washer_StarExterior', 'Washer_StartInterior'
         ];
         this.icons = {
@@ -26,8 +26,8 @@ class LabelMaker {
             'Nut_CapNut': 'icons/Nut_CapNut.png',
             'Nut_LockNut': 'icons/Nut_LockNut.png',
             'Nut_Standard': 'icons/Nut_Standard.png',
-            'Screw Round': 'icons/Screw Round.png',
-            'Screw Tbolt': 'icons/Screw Tbolt.png',
+            'Screw_Round': 'icons/Screw_Round.png',
+            'Screw_Tbolt': 'icons/Screw_Tbolt.png',
             'Screw Truss': 'icons/Screw Truss.png',
             'Screw TrussModified': 'icons/Screw TrussModified.png',
             'Screw Wafer': 'icons/Screw Wafer.png',
@@ -39,7 +39,7 @@ class LabelMaker {
             'Screw_Pan': 'icons/Screw_Pan.png',
             'Screw_ThumbKnurled': 'icons/Screw_ThumbKnurled.png',
             'Screw_Trim': 'icons/Screw_Trim.png',
-            'ThumbScrew': 'icons/ThumbScrew.png',
+            'Thumb_Screw': 'icons/Thumb_Screw.png',
             'Washer_Fender': 'icons/Washer_Fender.png',
             'Washer_Flat': 'icons/Washer_Flat.png',
             'Washer_Split': 'icons/Washer_Split.png',

@@ -422,7 +422,7 @@ button:hover {
 }
 
 .main-text {
-    font-size: 12x;
+    font-size: 12px;
     font-weight: bold;
     color: #000;
     line-height: 1.2;
@@ -747,4 +747,27 @@ button:hover {
 
 .icon-picker-category:first-child {
     margin-top: 0;
+}
+
+/* Footer Styles */
+footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    border-top: 1px solid #e0e0e0;
+    background: #f8f9fa;
+}
+
+.attribution {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+}
+
+.attribution a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.attribution a:hover {
+    text-decoration: underline;
 }
