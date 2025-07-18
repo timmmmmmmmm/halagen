@@ -50,6 +50,7 @@ class LabelMaker {
         this.initializeEventListeners();
         this.updatePreview();
         this.initializeTabs();
+        this.loadAvailableIcons();
     }
 
     initializeEventListeners() {
@@ -424,6 +425,39 @@ class LabelMaker {
         resultDiv.className = `validation-result ${type}`;
         resultDiv.innerHTML = message.replace(/\n/g, '<br>');
         resultDiv.style.display = 'block';
+    }
+
+    loadAvailableIcons() {
+        const iconSelect = document.getElementById('icon-select');
+        const iconOptions = iconSelect.querySelectorAll('option');
+        
+        this.availableIcons = Array.from(iconOptions).map(option => option.value);
+        this.generatePrompt();
+    }
+
+    generatePrompt() {
+        const promptText = `Generate a YAML file for batch label generation with the following format:
+
+labels:
+  - title: "M4 × 12"
+    subtext: "DIN 7984"
+    icon: "Head_Hex"
+    width_mm: 50
+    height_mm: 12
+
+Available icons:
+${this.availableIcons.join(', ')}
+
+Requirements:
+- title: required (string)
+- subtext: optional (string)
+- icon: required (must be one of the available icons above)
+- width_mm: required (number, 20-100)
+- height_mm: required (number, must be 9, 12, 18, or 24)
+
+Generate 5-10 labels for various hardware components.`;
+        
+        document.getElementById('llm-prompt').value = promptText;
     }
 }
 
