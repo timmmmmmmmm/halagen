@@ -5,7 +5,7 @@ class LabelMaker {
             'Head_Flat', 'Head_Hex', 'Head_Phillips', 'Head_Robinson', 'Head_SlottedPhillips', 'Head_Torx',
             'Insert_Heat', 'Insert_Wood', 'Nut_CapNut', 'Nut_LockNut', 'Nut_Standard',
             'Screw_Round', 'Screw_Tbolt', 'Screw Truss', 'Screw TrussModified', 'Screw Wafer',
-            'Screw_Bugle', 'Screw_Fillister', 'Screw_Flat', 'Screw_Hex', 'Screw_Oval', 'Screw_Pan',
+            'Screw_Bugle', 'Screw_Fillister', 'Screw_Flat', 'Screw_Hex', 'Screw_Oval', 'Screw_Pan', 'Screw_PanHex',
             'Screw_ThumbKnurled', 'Screw_Trim', 'Thumb_Screw', 'Washer_Fender', 'Washer_Flat',
             'Washer_Split', 'Washer_StarExterior', 'Washer_StartInterior'
         ];
@@ -37,6 +37,7 @@ class LabelMaker {
             'Screw_Hex': 'icons/Screw_Hex.png',
             'Screw_Oval': 'icons/Screw_Oval.png',
             'Screw_Pan': 'icons/Screw_Pan.png',
+            'Screw_PanHex': 'icons/Screw_PanHex.png',
             'Screw_ThumbKnurled': 'icons/Screw_ThumbKnurled.png',
             'Screw_Trim': 'icons/Screw_Trim.png',
             'Thumb_Screw': 'icons/Thumb_Screw.png',
@@ -1046,7 +1047,7 @@ labels:
             'Screw Heads': ['Head_Flat', 'Head_Hex', 'Head_Phillips', 'Head_Robinson', 'Head_SlottedPhillips', 'Head_Torx'],
             'Inserts': ['Insert_Heat', 'Insert_Wood'],
             'Nuts': ['Nut_CapNut', 'Nut_LockNut', 'Nut_Standard'],
-            'Screws': ['Screw_Round', 'Screw_Tbolt', 'Screw Truss', 'Screw TrussModified', 'Screw Wafer', 'Screw_Bugle', 'Screw_Fillister', 'Screw_Flat', 'Screw_Hex', 'Screw_Oval', 'Screw_Pan', 'Screw_ThumbKnurled', 'Screw_Trim', 'Thumb_Screw'],
+            'Screws': ['Screw_Round', 'Screw_Tbolt', 'Screw Truss', 'Screw TrussModified', 'Screw Wafer', 'Screw_Bugle', 'Screw_Fillister', 'Screw_Flat', 'Screw_Hex', 'Screw_Oval', 'Screw_Pan', 'Screw_PanHex', 'Screw_ThumbKnurled', 'Screw_Trim', 'Thumb_Screw'],
             'Washers': ['Washer_Fender', 'Washer_Flat', 'Washer_Split', 'Washer_StarExterior', 'Washer_StartInterior']
         };
 
@@ -1078,6 +1079,7 @@ labels:
             'Screw_Hex': 'Hex Screw',
             'Screw_Oval': 'Oval Screw',
             'Screw_Pan': 'Pan Screw',
+            'Screw_PanHex': 'Pan Hex Screw',
             'Screw_ThumbKnurled': 'Thumb Knurled',
             'Screw_Trim': 'Trim Screw',
             'ThumbScrew': 'Thumb Screw',
