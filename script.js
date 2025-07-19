@@ -1099,7 +1099,6 @@ labels:
 
         // Event listeners
         const pickerSelected = document.querySelector('.icon-picker-selected');
-        const pickerDropdown = document.querySelector('.icon-picker-dropdown');
         const searchInput = document.getElementById('icon-search');
 
         pickerSelected.addEventListener('click', () => {
