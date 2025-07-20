@@ -374,9 +374,9 @@ class LabelMaker {
         const textX = iconX + iconSize + 2;
         const textAreaWidth = width - textX - 1;
 
-        // Match PNG font sizing exactly: use same calculation as canvas
-        const dpi = 300;
-        const mmToPx = dpi / 25.4; // ~11.81
+        // Use 96 PPI for SVG (Inkscape standard)
+        const dpi = 96;
+        const mmToPx = dpi / 25.4; // ~3.78
         const baseFontSize = this.calculateFontSize(height);
         const mainFontSizePx = baseFontSize * mmToPx;
         const subFontSizePx = mainFontSizePx * 0.75;
