@@ -11,19 +11,19 @@
         <header>
             <div class="header-preview">
                 <div id="header-label-preview" class="label">
-                    <div class="label-icon">
+                    <div class="label-icon clickable-icon" title="Click to change icon">
                         <img class="icon" src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
                     </div>
                     <div class="label-text">
                         <div class="main-text">
-                            <div class="main-text-column">M3</div>
-                            <div class="main-text-column">M3</div>
-                            <div class="main-text-column">M3</div>
+                            <div class="main-text-column editable-text" contenteditable="true">M3</div>
+                            <div class="main-text-column editable-text" contenteditable="true">M3</div>
+                            <div class="main-text-column editable-text" contenteditable="true">M3</div>
                         </div>
                         <div class="sub-text">
-                            <div class="sub-text-column">8 mm</div>
-                            <div class="sub-text-column">10 mm</div>
-                            <div class="sub-text-column">12 mm</div>
+                            <div class="sub-text-column editable-text" contenteditable="true">8 mm</div>
+                            <div class="sub-text-column editable-text" contenteditable="true">10 mm</div>
+                            <div class="sub-text-column editable-text" contenteditable="true">12 mm</div>
                         </div>
                     </div>
                 </div>
@@ -53,65 +53,70 @@
                         </div>
                     </div>
 
-                    <div class="control-group">
-                        <label for="icon-picker">Icon <span class="tooltip-icon" title="Icon displayed on the left side of the label. Choose from built-in icons or upload custom icons (any aspect ratio supported)">?</span></label>
-                        <div id="icon-picker" class="icon-picker">
-                            <div class="icon-picker-selected">
-                                <div class="selected-icon" data-icon="heads_hex_socket">
-                                    <img src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
-                                    <span>Hex Socket</span>
-                                </div>
-                                <button type="button" class="icon-picker-button">Choose Icon</button>
-                            </div>
-                            <div class="icon-picker-dropdown" style="display: none;">
-                                <div class="icon-picker-search">
-                                    <input type="text" placeholder="Search icons..." id="icon-search">
-                                </div>
-                                <div class="icon-upload-section">
-                                    <input type="file" id="icon-upload" accept="image/png" style="display: none;">
-                                    <button type="button" id="upload-icon-btn" class="upload-icon-btn" title="Upload a custom PNG icon (any aspect ratio, black & white recommended)">📁 Upload Custom Icon</button>
-                                    <div class="upload-instructions">
-                                        <small>Upload PNG icons (any aspect ratio). <a href="https://github.com/timmmmmmmmm/halagen/" target="_blank">Contribute icons</a> to help everyone!</small>
-                                    </div>
-                                </div>
-                                <div class="icon-picker-grid" id="icon-grid">
-                                    <!-- Icons will be populated by JavaScript -->
-                                </div>
+                    <!-- Hidden icon picker modal -->
+                    <div id="icon-picker" class="icon-picker" style="display: none;">
+                        <div class="icon-picker-header">
+                            <h3>Choose Icon</h3>
+                            <button type="button" class="icon-picker-close" onclick="labelMaker.closeIconPicker()">×</button>
+                        </div>
+                        <div class="icon-picker-search">
+                            <input type="text" placeholder="Search icons..." id="icon-search">
+                        </div>
+                        <div class="icon-upload-section">
+                            <input type="file" id="icon-upload" accept="image/png" style="display: none;">
+                            <button type="button" id="upload-icon-btn" class="upload-icon-btn" title="Upload a custom PNG icon (any aspect ratio, black & white recommended)">📁 Upload Custom Icon</button>
+                            <div class="upload-instructions">
+                                <small>Upload PNG icons (any aspect ratio). <a href="https://github.com/timmmmmmmmm/halagen/" target="_blank">Contribute icons</a> to help everyone!</small>
                             </div>
                         </div>
-                        <!-- Hidden select for compatibility -->
-                        <select id="icon-select" style="display: none;">
-                            <option value="heads_hex_socket" selected>Hex Socket</option>
-                        </select>
+                        <div class="icon-picker-grid" id="icon-grid">
+                            <!-- Icons will be populated by JavaScript -->
+                        </div>
+                        
+                        <!-- Hidden elements for compatibility -->
+                        <div class="icon-picker-selected" style="display: none;">
+                            <div class="selected-icon" data-icon="heads_hex_socket">
+                                <img src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
+                                <span>Hex Socket</span>
+                            </div>
+                            <button type="button" class="icon-picker-button">Choose Icon</button>
+                        </div>
+                    </div>
+                    <select id="icon-select" style="display: none;">
+                        <option value="heads_hex_socket" selected>Hex Socket</option>
+                    </select>
+
+                    <!-- Hidden text inputs for compatibility -->
+                    <div id="main-text-inputs" style="display: none;">
+                        <input type="text" class="main-text-input" value="M3">
+                        <input type="text" class="main-text-input" value="M3">
+                        <input type="text" class="main-text-input" value="M3">
+                    </div>
+                    <div id="sub-text-inputs" style="display: none;">
+                        <input type="text" class="sub-text-input" value="8 mm">
+                        <input type="text" class="sub-text-input" value="10 mm">
+                        <input type="text" class="sub-text-input" value="12 mm">
                     </div>
 
                     <div class="control-group">
-                        <div class="label-with-controls">
-                            <label>Main Text</label>
-                            <div class="inline-controls">
-                                <button type="button" class="small-column-btn" data-action="remove" title="Remove column">-</button>
-                                <button type="button" class="small-column-btn" data-action="add" title="Add column (max 4)">+</button>
+                        <label>Columns</label>
+                        <div class="column-controls">
+                            <div class="column-control-row">
+                                <span>Main text columns:</span>
+                                <div class="column-buttons">
+                                    <button type="button" class="column-btn" data-action="remove" data-type="main" title="Remove column">-</button>
+                                    <span class="column-count" id="main-column-count">3</span>
+                                    <button type="button" class="column-btn" data-action="add" data-type="main" title="Add column (max 4)">+</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="main-text-inputs" id="main-text-inputs">
-                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
-                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
-                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="label-with-controls">
-                            <label>Sub Text (optional) <span class="tooltip-icon" title="Use multiple columns when labeling containers with separate compartments">?</span></label>
-                            <div class="inline-controls">
-                                <button type="button" class="small-sub-column-btn" data-action="remove" title="Remove sub-text column">-</button>
-                                <button type="button" class="small-sub-column-btn" data-action="add" title="Add sub-text column (max 4)">+</button>
+                            <div class="column-control-row">
+                                <span>Sub text columns:</span>
+                                <div class="column-buttons">
+                                    <button type="button" class="column-btn" data-action="remove" data-type="sub" title="Remove sub-text column">-</button>
+                                    <span class="column-count" id="sub-column-count">3</span>
+                                    <button type="button" class="column-btn" data-action="add" data-type="sub" title="Add sub-text column (max 4)">+</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="sub-text-inputs" id="sub-text-inputs">
-                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="8 mm">
-                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="10 mm">
-                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="12 mm">
                         </div>
                     </div>
 

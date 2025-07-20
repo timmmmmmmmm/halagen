@@ -123,25 +123,95 @@ class LabelMaker {
         if (validateYaml) validateYaml.addEventListener('click', () => this.validateYAML());
         if (generateZip) generateZip.addEventListener('click', () => this.generateZIP());
         
-        // Column selector event listeners
-        document.querySelectorAll('.small-column-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const action = e.target.dataset.action;
-                this.updateColumn('main', action);
-            });
-        });
-        
-        document.querySelectorAll('.small-sub-column-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const action = e.target.dataset.action;
-                this.updateColumn('sub', action);
-            });
-        });
-        
+        // WYSIWYG preview interactions
+        this.setupPreviewInteractions();
         
         // Initial setup for text inputs
         this.setupMainTextInputs();
         this.setupSubTextInputs();
+    }
+
+    setupPreviewInteractions() {
+        // Create overlay for icon picker if it doesn't exist
+        if (!document.querySelector('.icon-picker-overlay')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'icon-picker-overlay';
+            document.body.appendChild(overlay);
+            
+            overlay.addEventListener('click', () => {
+                this.closeIconPicker();
+            });
+        }
+
+        // Click handler for preview icon to open icon picker
+        const previewIcon = document.querySelector('.clickable-icon');
+        if (previewIcon) {
+            previewIcon.addEventListener('click', () => {
+                this.openIconPicker();
+            });
+        }
+
+        // Content editable text change handlers
+        document.querySelectorAll('.editable-text').forEach(element => {
+            element.addEventListener('input', () => {
+                this.syncEditableTextToInputs();
+            });
+            
+            element.addEventListener('blur', () => {
+                this.syncEditableTextToInputs();
+            });
+        });
+
+        // Column control buttons in form
+        document.querySelectorAll('.column-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const action = e.target.dataset.action;
+                const type = e.target.dataset.type;
+                this.updateColumn(type, action);
+            });
+        });
+    }
+
+    syncEditableTextToInputs() {
+        // Sync main text
+        const mainTextColumns = document.querySelectorAll('.main-text-column');
+        const mainTextInputs = document.querySelectorAll('.main-text-input');
+        
+        mainTextColumns.forEach((column, index) => {
+            if (mainTextInputs[index]) {
+                mainTextInputs[index].value = column.textContent.trim();
+            }
+        });
+
+        // Sync sub text
+        const subTextColumns = document.querySelectorAll('.sub-text-column');
+        const subTextInputs = document.querySelectorAll('.sub-text-input');
+        
+        subTextColumns.forEach((column, index) => {
+            if (subTextInputs[index]) {
+                subTextInputs[index].value = column.textContent.trim();
+            }
+        });
+    }
+
+
+    addHiddenInput(isMain, value = '') {
+        const container = document.getElementById(isMain ? 'main-text-inputs' : 'sub-text-inputs');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = isMain ? 'main-text-input' : 'sub-text-input';
+        input.value = value;
+        input.addEventListener('input', () => this.updatePreview());
+        container.appendChild(input);
+    }
+
+    removeHiddenInput(isMain) {
+        const container = document.getElementById(isMain ? 'main-text-inputs' : 'sub-text-inputs');
+        const inputs = container.querySelectorAll(isMain ? '.main-text-input' : '.sub-text-input');
+        if (inputs.length > 1) {
+            const lastInput = inputs[inputs.length - 1];
+            lastInput.remove();
+        }
     }
 
     initializeDefaultColumns() {
@@ -169,6 +239,61 @@ class LabelMaker {
         }
         
         this.updateTextInputs(container, inputClass, currentCount, isMain);
+        this.updateColumnDisplay(type, currentCount);
+        this.updatePreviewFromInputs();
+    }
+
+    updateColumnDisplay(type, count) {
+        const countElement = document.getElementById(type === 'main' ? 'main-column-count' : 'sub-column-count');
+        if (countElement) {
+            countElement.textContent = count;
+        }
+    }
+
+    updatePreviewFromInputs() {
+        // Update the preview based on hidden inputs, then sync to editable elements
+        const mainInputs = document.querySelectorAll('.main-text-input');
+        const subInputs = document.querySelectorAll('.sub-text-input');
+        
+        // Update main text columns
+        const mainContainer = document.querySelector('.main-text');
+        mainContainer.innerHTML = '';
+        Array.from(mainInputs).forEach((input, index) => {
+            const column = document.createElement('div');
+            column.className = 'main-text-column editable-text';
+            column.contentEditable = true;
+            column.textContent = input.value.trim() || `New ${index + 1}`;
+            
+            column.addEventListener('input', () => {
+                this.syncEditableTextToInputs();
+            });
+            column.addEventListener('blur', () => {
+                this.syncEditableTextToInputs();
+            });
+            
+            mainContainer.appendChild(column);
+        });
+        
+        // Update sub text columns
+        const subContainer = document.querySelector('.sub-text');
+        subContainer.innerHTML = '';
+        Array.from(subInputs).forEach((input, index) => {
+            const column = document.createElement('div');
+            column.className = 'sub-text-column editable-text';
+            column.contentEditable = true;
+            column.textContent = input.value.trim() || `Sub ${index + 1}`;
+            
+            column.addEventListener('input', () => {
+                this.syncEditableTextToInputs();
+            });
+            column.addEventListener('blur', () => {
+                this.syncEditableTextToInputs();
+            });
+            
+            subContainer.appendChild(column);
+        });
+        
+        // Update other preview elements
         this.updatePreview();
     }
 
@@ -207,45 +332,31 @@ class LabelMaker {
 
     updatePreview() {
         const iconSelect = document.getElementById('icon-select').value;
-        const mainTextInputs = document.querySelectorAll('.main-text-input');
-        const mainTexts = Array.from(mainTextInputs).map(input => input.value.trim()).filter(text => text);
-        const subTextInputs = document.querySelectorAll('.sub-text-input');
-        const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
         const height = document.getElementById('label-height').value;
         const width = document.getElementById('label-width').value;
 
         const labelPreview = document.getElementById('header-label-preview');
-        const iconContainer = labelPreview.querySelector('.label-icon');
-        const mainTextElement = labelPreview.querySelector('.main-text');
-        const subTextElement = labelPreview.querySelector('.sub-text');
+        const iconContainer = labelPreview.querySelector('.label-icon img');
 
         // Get icon path from either built-in icons or custom icons
         const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
-        iconContainer.innerHTML = `<img class="icon" src="${iconPath}" alt="${iconSelect}">`;
-        
-        // Update main text with columns
-        if (mainTexts.length === 0) {
-            mainTextElement.innerHTML = '<div class="main-text-column">M3</div><div class="main-text-column">M3</div><div class="main-text-column">M3</div>';
-        } else {
-            const columnHTML = mainTexts.map(text => `<div class="main-text-column">${text}</div>`).join('');
-            mainTextElement.innerHTML = columnHTML;
-        }
-        
-        // Update sub text with columns
-        if (subTexts.length === 0) {
-            subTextElement.innerHTML = '<div class="sub-text-column">8 mm</div><div class="sub-text-column">10 mm</div><div class="sub-text-column">12 mm</div>';
-        } else {
-            const subColumnHTML = subTexts.map(text => `<div class="sub-text-column">${text}</div>`).join('');
-            subTextElement.innerHTML = subColumnHTML;
+        if (iconContainer) {
+            iconContainer.src = iconPath;
+            iconContainer.alt = iconSelect;
         }
 
         labelPreview.setAttribute('data-height', height);
         labelPreview.style.width = `${width}mm`;
 
-        if (subTexts.length === 0) {
-            subTextElement.style.display = 'none';
+        // Check if sub text has any non-empty columns
+        const subTextColumns = document.querySelectorAll('.sub-text-column');
+        const hasSubText = Array.from(subTextColumns).some(col => col.textContent.trim());
+        const subTextContainer = document.querySelector('.sub-text-container');
+        
+        if (!hasSubText) {
+            subTextContainer.style.display = 'none';
         } else {
-            subTextElement.style.display = 'flex';
+            subTextContainer.style.display = 'flex';
         }
     }
 
@@ -1370,30 +1481,13 @@ labels:
         // Populate the icon grid
         this.populateIconGrid();
 
-        // Event listeners
-        const pickerSelected = document.querySelector('.icon-picker-selected');
-        const searchInput = document.getElementById('icon-search');
-
-        pickerSelected.addEventListener('click', () => {
-            const isActive = pickerSelected.classList.contains('active');
-            if (isActive) {
-                this.closeIconPicker();
-            } else {
-                this.openIconPicker();
-            }
-        });
-
-        // Close picker when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!document.getElementById('icon-picker').contains(e.target)) {
-                this.closeIconPicker();
-            }
-        });
-
         // Search functionality
-        searchInput.addEventListener('input', (e) => {
-            this.filterIcons(e.target.value);
-        });
+        const searchInput = document.getElementById('icon-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.filterIcons(e.target.value);
+            });
+        }
     }
 
     populateIconGrid() {
@@ -1491,28 +1585,38 @@ labels:
     }
 
     openIconPicker() {
-        const pickerSelected = document.querySelector('.icon-picker-selected');
-        const pickerDropdown = document.querySelector('.icon-picker-dropdown');
+        const iconPicker = document.getElementById('icon-picker');
+        const overlay = document.querySelector('.icon-picker-overlay');
         
-        pickerSelected.classList.add('active');
-        pickerDropdown.style.display = 'block';
-        
-        // Focus search input
-        setTimeout(() => {
-            document.getElementById('icon-search').focus();
-        }, 100);
+        if (iconPicker && overlay) {
+            iconPicker.style.display = 'block';
+            overlay.classList.add('active');
+            
+            // Focus search input
+            setTimeout(() => {
+                const searchInput = document.getElementById('icon-search');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }, 100);
+        }
     }
 
     closeIconPicker() {
-        const pickerSelected = document.querySelector('.icon-picker-selected');
-        const pickerDropdown = document.querySelector('.icon-picker-dropdown');
+        const iconPicker = document.getElementById('icon-picker');
+        const overlay = document.querySelector('.icon-picker-overlay');
         
-        pickerSelected.classList.remove('active');
-        pickerDropdown.style.display = 'none';
-        
-        // Clear search
-        document.getElementById('icon-search').value = '';
-        this.filterIcons('');
+        if (iconPicker && overlay) {
+            iconPicker.style.display = 'none';
+            overlay.classList.remove('active');
+            
+            // Clear search
+            const searchInput = document.getElementById('icon-search');
+            if (searchInput) {
+                searchInput.value = '';
+                this.filterIcons('');
+            }
+        }
     }
 
     filterIcons(searchTerm) {
