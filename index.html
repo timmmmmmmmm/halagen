@@ -43,13 +43,8 @@
                     <div class="control-group label-dimensions">
                         <div class="dimension-row">
                             <div class="dimension-item">
-                                <label for="label-height">Height: <span class="tooltip-icon" title="Standard label tape heights for compatibility with label makers">?</span></label>
-                                <select id="label-height" title="Standard label tape heights">
-                                    <option value="9">9mm</option>
-                                    <option value="12" selected>12mm</option>
-                                    <option value="18">18mm</option>
-                                    <option value="24">24mm</option>
-                                </select>
+                                <label for="label-height">Height (mm): <span class="tooltip-icon" title="Standard label tape heights for compatibility with label makers">?</span></label>
+                                <input type="number" id="label-height" min="9" max="50" value="12" title="Label height in millimeters">
                             </div>
                             <div class="dimension-item">
                                 <label for="label-width">Width (mm): <span class="tooltip-icon" title="Custom width from 20-100mm to fit your container size">?</span></label>
