@@ -839,11 +839,11 @@ button:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000;
+    z-index: 9999;
     background: white;
     border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    max-width: 500px;
+    max-width: 600px;
     width: 90vw;
 }
 
@@ -854,7 +854,7 @@ button:hover {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    z-index: 9998;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -980,10 +980,10 @@ button:hover {
 
 .icon-picker-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 8px;
-    padding: 12px;
-    max-height: 300px;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 4px;
+    padding: 8px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -991,9 +991,9 @@ button:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 8px;
+    padding: 4px;
     border: 2px solid transparent;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s;
     background: #f8f9fa;
@@ -1011,16 +1011,16 @@ button:hover {
 }
 
 .icon-picker-item img {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .icon-picker-item span {
-    font-size: 11px;
+    font-size: 9px;
     color: #495057;
-    line-height: 1.2;
+    line-height: 1.1;
     word-break: break-word;
 }
 

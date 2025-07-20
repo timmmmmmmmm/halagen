@@ -167,12 +167,9 @@ class LabelMaker {
     }
 
     setupPreviewInteractions() {
-        // Create overlay for icon picker if it doesn't exist
-        if (!document.querySelector('.icon-picker-overlay')) {
-            const overlay = document.createElement('div');
-            overlay.className = 'icon-picker-overlay';
-            document.body.appendChild(overlay);
-            
+        // Add click handler to existing overlay
+        const overlay = document.querySelector('.icon-picker-overlay');
+        if (overlay) {
             overlay.addEventListener('click', () => {
                 this.closeIconPicker();
             });

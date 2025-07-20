@@ -91,36 +91,6 @@
                 </div>
                 
                 <div class="controls">
-
-                    <!-- Hidden icon picker modal -->
-                    <div id="icon-picker" class="icon-picker" style="display: none;">
-                        <div class="icon-picker-header">
-                            <h3>Choose Icon</h3>
-                            <button type="button" class="icon-picker-close" onclick="labelMaker.closeIconPicker()">×</button>
-                        </div>
-                        <div class="icon-picker-search">
-                            <input type="text" placeholder="Search icons..." id="icon-search">
-                        </div>
-                        <div class="icon-upload-section">
-                            <input type="file" id="icon-upload" accept="image/png" style="display: none;">
-                            <button type="button" id="upload-icon-btn" class="upload-icon-btn" title="Upload a custom PNG icon (any aspect ratio, black & white recommended)">📁 Upload Custom Icon</button>
-                            <div class="upload-instructions">
-                                <small>Upload PNG icons (any aspect ratio). <a href="https://github.com/timmmmmmmmm/halagen/" target="_blank">Contribute icons</a> to help everyone!</small>
-                            </div>
-                        </div>
-                        <div class="icon-picker-grid" id="icon-grid">
-                            <!-- Icons will be populated by JavaScript -->
-                        </div>
-                        
-                        <!-- Hidden elements for compatibility -->
-                        <div class="icon-picker-selected" style="display: none;">
-                            <div class="selected-icon" data-icon="heads_hex_socket">
-                                <img src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
-                                <span>Hex Socket</span>
-                            </div>
-                            <button type="button" class="icon-picker-button">Choose Icon</button>
-                        </div>
-                    </div>
                     <select id="icon-select" style="display: none;">
                         <option value="heads_hex_socket" selected>Hex Socket</option>
                     </select>
@@ -191,6 +161,39 @@
                    - Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></p>
             </div>
         </footer>
+    </div>
+
+    <!-- Icon picker overlay - moved to body level -->
+    <div class="icon-picker-overlay"></div>
+
+    <!-- Icon picker modal - moved to body level -->
+    <div id="icon-picker" class="icon-picker" style="display: none;">
+        <div class="icon-picker-header">
+            <h3>Choose Icon</h3>
+            <button type="button" class="icon-picker-close" onclick="labelMaker.closeIconPicker()">×</button>
+        </div>
+        <div class="icon-picker-search">
+            <input type="text" placeholder="Search icons..." id="icon-search">
+        </div>
+        <div class="icon-upload-section">
+            <input type="file" id="icon-upload" accept="image/png" style="display: none;">
+            <button type="button" id="upload-icon-btn" class="upload-icon-btn" title="Upload a custom PNG icon (any aspect ratio, black & white recommended)">📁 Upload Custom Icon</button>
+            <div class="upload-instructions">
+                <small>Upload PNG icons (any aspect ratio). <a href="https://github.com/timmmmmmmmm/halagen/" target="_blank">Contribute icons</a> to help everyone!</small>
+            </div>
+        </div>
+        <div class="icon-picker-grid" id="icon-grid">
+            <!-- Icons will be populated by JavaScript -->
+        </div>
+        
+        <!-- Hidden elements for compatibility -->
+        <div class="icon-picker-selected" style="display: none;">
+            <div class="selected-icon" data-icon="heads_hex_socket">
+                <img src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
+                <span>Hex Socket</span>
+            </div>
+            <button type="button" class="icon-picker-button">Choose Icon</button>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
