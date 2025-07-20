@@ -43,18 +43,18 @@
                     <div class="control-group label-dimensions">
                         <div class="dimension-row">
                             <div class="dimension-item">
-                                <label for="label-height">Height (mm): <span class="tooltip-icon" title="Standard label tape heights for compatibility with label makers">?</span></label>
+                                <label for="label-height">Height (mm) <span class="tooltip-icon" title="Standard label tape heights for compatibility with label makers">?</span></label>
                                 <input type="number" id="label-height" min="9" max="50" value="12" title="Label height in millimeters">
                             </div>
                             <div class="dimension-item">
-                                <label for="label-width">Width (mm): <span class="tooltip-icon" title="Custom width from 20-100mm to fit your container size">?</span></label>
+                                <label for="label-width">Width (mm) <span class="tooltip-icon" title="Custom width from 20-100mm to fit your container size">?</span></label>
                                 <input type="number" id="label-width" min="20" max="100" value="50" title="Custom width from 20-100mm">
                             </div>
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <label for="icon-picker">Icon: <span class="tooltip-icon" title="Icon displayed on the left side of the label. Choose from built-in icons or upload custom icons (any aspect ratio supported)">?</span></label>
+                        <label for="icon-picker">Icon <span class="tooltip-icon" title="Icon displayed on the left side of the label. Choose from built-in icons or upload custom icons (any aspect ratio supported)">?</span></label>
                         <div id="icon-picker" class="icon-picker">
                             <div class="icon-picker-selected">
                                 <div class="selected-icon" data-icon="heads_hex_socket">
@@ -87,7 +87,7 @@
 
                     <div class="control-group">
                         <div class="label-with-controls">
-                            <label>Main Text:</label>
+                            <label>Main Text</label>
                             <div class="inline-controls">
                                 <button type="button" class="small-column-btn" data-action="remove" title="Remove column">-</button>
                                 <button type="button" class="small-column-btn" data-action="add" title="Add column (max 4)">+</button>
@@ -102,7 +102,7 @@
 
                     <div class="control-group">
                         <div class="label-with-controls">
-                            <label>Sub Text (optional): <span class="tooltip-icon" title="Use multiple columns when labeling containers with separate compartments">?</span></label>
+                            <label>Sub Text (optional) <span class="tooltip-icon" title="Use multiple columns when labeling containers with separate compartments">?</span></label>
                             <div class="inline-controls">
                                 <button type="button" class="small-sub-column-btn" data-action="remove" title="Remove sub-text column">-</button>
                                 <button type="button" class="small-sub-column-btn" data-action="add" title="Add sub-text column (max 4)">+</button>
@@ -118,14 +118,14 @@
                     <div class="export-section">
                         <div class="export-column">
                             <div class="control-group">
-                                <label for="png-dpi">PNG Export DPI:</label>
-                                <div class="dpi-controls">
-                                    <input type="number" id="png-dpi" min="50" max="1200" value="96" title="Dots per inch for PNG export (50-1200)">
-                                    <div class="dpi-presets">
+                                <div class="label-with-controls">
+                                    <label for="png-dpi">PNG Export DPI</label>
+                                    <div class="inline-controls">
                                         <button type="button" class="dpi-preset-btn" data-dpi="96">Default</button>
                                         <button type="button" class="dpi-preset-btn" data-dpi="203">NIIMBOT</button>
                                     </div>
                                 </div>
+                                <input type="number" id="png-dpi" min="50" max="1200" value="96" title="Dots per inch for PNG export (50-1200)">
                                 <div class="png-options">
                                     <label class="checkbox-label">
                                         <input type="checkbox" id="png-rotate">
@@ -148,7 +148,7 @@
             <div class="tab-content" id="batch-tab" style="display: none;">
                 <div class="batch-controls">
                     <div class="control-group">
-                        <label for="yaml-input">YAML Input:</label>
+                        <label for="yaml-input">YAML Input</label>
                         <textarea id="yaml-input" rows="20" placeholder="Loading template..."></textarea>
                     </div>
 
