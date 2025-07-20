@@ -11,6 +11,7 @@ class LabelMaker {
         this.initializeYamlEditor();
         this.initializeIconPicker();
         this.initializeIconUpload();
+        this.loadDPISettings();
     }
 
     loadIconsFromStructure() {
@@ -108,6 +109,14 @@ class LabelMaker {
         if (labelHeight) labelHeight.addEventListener('change', () => this.updatePreview());
         if (labelWidth) labelWidth.addEventListener('input', () => this.updatePreview());
         if (downloadPng) downloadPng.addEventListener('click', () => this.downloadPNG());
+        
+        // DPI preset buttons
+        document.querySelectorAll('.dpi-preset-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const dpi = e.target.dataset.dpi;
+                document.getElementById('png-dpi').value = dpi;
+            });
+        });
         
         const downloadSvg = document.getElementById('download-svg');
         if (downloadSvg) downloadSvg.addEventListener('click', () => this.downloadSVG());
@@ -252,9 +261,11 @@ class LabelMaker {
             const subTextInputs = document.querySelectorAll('.sub-text-input');
             const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
-            const dpi = 300;
+            const dpi = this.validateDPI(parseInt(document.getElementById('png-dpi').value) || 96);
+            const shouldRotate = document.getElementById('png-rotate').checked;
             const mmToPx = dpi / 25.4;
             
+            // Always set canvas to normal dimensions first (we'll rotate after drawing)
             canvas.width = width * mmToPx;
             canvas.height = height * mmToPx;
 
@@ -319,10 +330,20 @@ class LabelMaker {
                 });
             }
 
+            // Apply rotation if requested
+            let finalCanvas = canvas;
+            if (shouldRotate) {
+                finalCanvas = this.rotateCanvas(canvas, 90);
+            }
+            
+            // Save DPI setting to localStorage
+            this.saveDPISettings();
+            
             const link = document.createElement('a');
             const labelName = mainTexts.length > 0 ? mainTexts.join('_') : 'label';
-            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
-            link.href = canvas.toDataURL();
+            const rotation = shouldRotate ? '_rotated' : '';
+            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}-${dpi}dpi${rotation}.png`;
+            link.href = finalCanvas.toDataURL();
             link.click();
         } catch (error) {
             console.error('PNG download failed:', error);
@@ -339,7 +360,6 @@ class LabelMaker {
             const subTextInputs = document.querySelectorAll('.sub-text-input');
             const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
-
             const svg = await this.generateLabelSVG({
                 height_mm: height,
                 width_mm: width,
@@ -347,6 +367,9 @@ class LabelMaker {
                 subtext_columns: subTexts.length > 0 ? subTexts : ['8 mm', '10 mm', '12 mm'],
                 icon: iconSelect
             });
+            
+            // Save DPI setting to localStorage
+            this.saveDPISettings();
 
             const blob = new Blob([svg], { type: 'image/svg+xml' });
             const link = document.createElement('a');
@@ -367,6 +390,7 @@ class LabelMaker {
         const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
         const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
         const iconSelect = label.icon;
+        const svgDpi = 96; // Fixed SVG DPI
 
         const iconSize = height - 2;
         const iconX = 1;
@@ -386,7 +410,15 @@ class LabelMaker {
         const viewBoxHeight = height * mmToPx;
         const scale = mmToPx; // For converting mm coordinates to px
 
-        let svgContent = `<svg width="${width}mm" height="${height}mm" viewBox="0 0 ${viewBoxWidth} ${viewBoxHeight}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">`;
+        let svgContent = `<svg width="${width}mm" height="${height}mm" viewBox="0 0 ${viewBoxWidth} ${viewBoxHeight}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <metadata>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description>
+        <dpi>${svgDpi}</dpi>
+        <print-dpi>${svgDpi}</print-dpi>
+      </rdf:Description>
+    </rdf:RDF>
+  </metadata>`;
 
         // Add icon - convert coordinates to pixel space
         const iconXPx = iconX * scale;
@@ -1525,6 +1557,64 @@ labels:
             if (this.selectedIcon === iconKey) {
                 this.selectIcon('heads_hex_socket');
             }
+        }
+    }
+
+    validateDPI(dpi) {
+        // Validate DPI is within acceptable range
+        if (isNaN(dpi) || dpi < 50 || dpi > 1200) {
+            return 96; // Default fallback
+        }
+        return dpi;
+    }
+
+    rotateCanvas(canvas, degrees) {
+        const rotatedCanvas = document.createElement('canvas');
+        const rotatedCtx = rotatedCanvas.getContext('2d');
+        
+        // For 90 degree rotation, swap width and height
+        if (degrees === 90) {
+            rotatedCanvas.width = canvas.height;
+            rotatedCanvas.height = canvas.width;
+            
+            // Translate and rotate
+            rotatedCtx.translate(canvas.height, 0);
+            rotatedCtx.rotate(Math.PI / 2);
+        }
+        
+        // Draw the original canvas onto the rotated canvas
+        rotatedCtx.drawImage(canvas, 0, 0);
+        
+        return rotatedCanvas;
+    }
+
+    loadDPISettings() {
+        try {
+            const settings = localStorage.getItem('dpiSettings');
+            if (settings) {
+                const parsed = JSON.parse(settings);
+                if (parsed.pngDpi) {
+                    document.getElementById('png-dpi').value = this.validateDPI(parsed.pngDpi);
+                }
+                // SVG DPI removed - using fixed 96 DPI
+                if (parsed.pngRotate !== undefined) {
+                    document.getElementById('png-rotate').checked = parsed.pngRotate;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading DPI settings:', error);
+        }
+    }
+
+    saveDPISettings() {
+        try {
+            const settings = {
+                pngDpi: parseInt(document.getElementById('png-dpi').value),
+                pngRotate: document.getElementById('png-rotate').checked
+            };
+            localStorage.setItem('dpiSettings', JSON.stringify(settings));
+        } catch (error) {
+            console.error('Error saving DPI settings:', error);
         }
     }
 }

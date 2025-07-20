@@ -115,9 +115,31 @@
                         </div>
                     </div>
 
-                    <div class="button-group">
-                        <button id="download-png" title="Download as high-quality PNG with transparent background">Download PNG</button>
-                        <button id="download-svg" title="Download as vector SVG (scalable and editable)">Download SVG</button>
+                    <div class="export-section">
+                        <div class="export-column">
+                            <div class="control-group">
+                                <label for="png-dpi">PNG Export DPI:</label>
+                                <div class="dpi-controls">
+                                    <input type="number" id="png-dpi" min="50" max="1200" value="96" title="Dots per inch for PNG export (50-1200)">
+                                    <div class="dpi-presets">
+                                        <button type="button" class="dpi-preset-btn" data-dpi="96">Default</button>
+                                        <button type="button" class="dpi-preset-btn" data-dpi="203">NIIMBOT</button>
+                                    </div>
+                                </div>
+                                <div class="png-options">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="png-rotate">
+                                        <span class="checkmark"></span>
+                                        Rotate 90° (vertical layout)
+                                    </label>
+                                </div>
+                            </div>
+                            <button id="download-png" title="Download as high-quality PNG with transparent background">Download PNG</button>
+                        </div>
+
+                        <div class="export-column">
+                            <button id="download-svg" title="Download as vector SVG (scalable and editable)">Download SVG</button>
+                        </div>
                     </div>
                 </div>
 

@@ -205,6 +205,117 @@ main {
     margin: 0;
 }
 
+/* DPI Controls */
+.dpi-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dpi-controls input {
+    width: 100%;
+}
+
+.dpi-presets {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.dpi-preset-btn {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: none;
+    transform: none;
+}
+
+.dpi-preset-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    box-shadow: none;
+    transform: none;
+}
+
+.dpi-preset-btn:active {
+    background: #3498db;
+    border-color: #3498db;
+    color: white;
+    box-shadow: none;
+    transform: none;
+}
+
+.png-options {
+    margin-top: 10px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.checkmark {
+    /* Custom checkbox styling can be added here if needed */
+}
+
+/* Export Section Layout */
+.export-section {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.export-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.export-column .control-group {
+    margin-bottom: 15px;
+}
+
+.export-column button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
+    margin-top: auto;
+}
+
+.export-column button:hover {
+    background-color: #2980b9;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+    .export-section {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
 .batch-controls {
     max-width: 800px;
     margin: 0 auto;
