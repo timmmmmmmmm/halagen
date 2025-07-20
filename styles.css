@@ -72,6 +72,8 @@ header {
     border-radius: 2px;
     transition: all 0.2s ease;
     padding: 1px 2px;
+    text-align: left !important;
+    direction: ltr !important;
 }
 
 .editable-text:hover {
@@ -1261,6 +1263,17 @@ footer {
     color: inherit;
     line-height: inherit;
     padding-right: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
+    direction: ltr;
+    text-overflow: clip;
+    text-align: left !important;
+    scroll-behavior: auto;
+}
+
+.main-text-column::-webkit-scrollbar {
+    display: none;
 }
 
 .sub-text-column {
@@ -1271,6 +1284,17 @@ footer {
     color: inherit;
     line-height: inherit;
     padding-right: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
+    direction: ltr;
+    text-overflow: clip;
+    text-align: left !important;
+    scroll-behavior: auto;
+}
+
+.sub-text-column::-webkit-scrollbar {
+    display: none;
 }
 
 /* Column count displays removed */

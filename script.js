@@ -96,6 +96,41 @@ class LabelMaker {
         return icons;
     }
 
+    setupEditableTextHandlers(element) {
+        const resetScroll = () => {
+            element.scrollLeft = 0;
+            // Force selection to start if text is focused
+            if (document.activeElement === element) {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if (range.endOffset > element.textContent.length || element.scrollLeft > 0) {
+                        element.scrollLeft = 0;
+                    }
+                }
+            }
+        };
+
+        element.addEventListener('input', () => {
+            this.syncEditableTextToInputs();
+            // Force scroll to beginning to show start of text
+            setTimeout(resetScroll, 0);
+        });
+        
+        element.addEventListener('blur', () => {
+            this.syncEditableTextToInputs();
+            resetScroll();
+        });
+
+        element.addEventListener('focus', () => {
+            resetScroll();
+        });
+
+        element.addEventListener('keyup', () => {
+            resetScroll();
+        });
+    }
+
     initializeEventListeners() {
         // Basic form elements
         const iconSelect = document.getElementById('icon-select');
@@ -153,14 +188,9 @@ class LabelMaker {
 
         // Content editable text change handlers
         document.querySelectorAll('.editable-text').forEach(element => {
-            element.addEventListener('input', () => {
-                this.syncEditableTextToInputs();
-            });
-            
-            element.addEventListener('blur', () => {
-                this.syncEditableTextToInputs();
-            });
+            this.setupEditableTextHandlers(element);
         });
+
 
         // Column control buttons in form
         document.querySelectorAll('.column-btn').forEach(btn => {
@@ -264,12 +294,7 @@ class LabelMaker {
             column.contentEditable = true;
             column.textContent = input.value.trim() || `New ${index + 1}`;
             
-            column.addEventListener('input', () => {
-                this.syncEditableTextToInputs();
-            });
-            column.addEventListener('blur', () => {
-                this.syncEditableTextToInputs();
-            });
+            this.setupEditableTextHandlers(column);
             
             mainContainer.appendChild(column);
         });
@@ -283,18 +308,14 @@ class LabelMaker {
             column.contentEditable = true;
             column.textContent = input.value.trim() || `Sub ${index + 1}`;
             
-            column.addEventListener('input', () => {
-                this.syncEditableTextToInputs();
-            });
-            column.addEventListener('blur', () => {
-                this.syncEditableTextToInputs();
-            });
+            this.setupEditableTextHandlers(column);
             
             subContainer.appendChild(column);
         });
         
         // Update other preview elements
         this.updatePreview();
+        
     }
 
     updateTextInputs(container, inputClass, columnCount, isMain) {
@@ -351,13 +372,14 @@ class LabelMaker {
         // Check if sub text has any non-empty columns
         const subTextColumns = document.querySelectorAll('.sub-text-column');
         const hasSubText = Array.from(subTextColumns).some(col => col.textContent.trim());
-        const subTextContainer = document.querySelector('.sub-text-container');
+        const subTextContainer = document.querySelector('.sub-text');
         
         if (!hasSubText) {
             subTextContainer.style.display = 'none';
         } else {
             subTextContainer.style.display = 'flex';
         }
+        
     }
 
     async downloadPNG() {
