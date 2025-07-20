@@ -193,7 +193,7 @@ class LabelMaker {
 
 
         // Column control buttons in form
-        document.querySelectorAll('.column-btn').forEach(btn => {
+        document.querySelectorAll('.column-btn, .column-btn-small').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const action = e.target.dataset.action;
                 const type = e.target.dataset.type;
@@ -368,6 +368,9 @@ class LabelMaker {
 
         labelPreview.setAttribute('data-height', height);
         labelPreview.style.width = `${width}mm`;
+        
+        // Update CSS custom property for control positioning
+        document.documentElement.style.setProperty('--label-width', `${width}mm`);
 
         // Check if sub text has any non-empty columns
         const subTextColumns = document.querySelectorAll('.sub-text-column');
