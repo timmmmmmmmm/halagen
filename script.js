@@ -1,52 +1,6 @@
 class LabelMaker {
     constructor() {
-        this.availableIcons = [
-            'Elec_WagoLogo', 'Elec_Wago_Alt1', 'Elec_Wago_Alt2', 'Elec_WireNut', 'Electrical_Generic',
-            'Head_Flat', 'Head_Hex', 'Head_Phillips', 'Head_Robinson', 'Head_SlottedPhillips', 'Head_Torx',
-            'Insert_Heat', 'Insert_Wood', 'Nut_CapNut', 'Nut_LockNut', 'Nut_Standard',
-            'Screw_Round', 'Screw_Tbolt', 'Screw Truss', 'Screw TrussModified', 'Screw Wafer',
-            'Screw_Bugle', 'Screw_Fillister', 'Screw_Flat', 'Screw_Hex', 'Screw_Oval', 'Screw_Pan', 'Screw_PanHex',
-            'Screw_ThumbKnurled', 'Screw_Trim', 'Thumb_Screw', 'Washer_Fender', 'Washer_Flat',
-            'Washer_Split', 'Washer_StarExterior', 'Washer_StartInterior'
-        ];
-        this.icons = {
-            'Elec_WagoLogo': 'icons/Elec_WagoLogo.png',
-            'Elec_Wago_Alt1': 'icons/Elec_Wago_Alt1.png',
-            'Elec_Wago_Alt2': 'icons/Elec_Wago_Alt2.png',
-            'Elec_WireNut': 'icons/Elec_WireNut.png',
-            'Electrical_Generic': 'icons/Electrical_Generic.png',
-            'Head_Flat': 'icons/Head_Flat.png',
-            'Head_Hex': 'icons/Head_Hex.png',
-            'Head_Phillips': 'icons/Head_Phillips.png',
-            'Head_Robinson': 'icons/Head_Robinson.png',
-            'Head_SlottedPhillips': 'icons/Head_SlottedPhillips.png',
-            'Head_Torx': 'icons/Head_Torx.png',
-            'Insert_Heat': 'icons/Insert_Heat.png',
-            'Insert_Wood': 'icons/Insert_Wood.png',
-            'Nut_CapNut': 'icons/Nut_CapNut.png',
-            'Nut_LockNut': 'icons/Nut_LockNut.png',
-            'Nut_Standard': 'icons/Nut_Standard.png',
-            'Screw_Round': 'icons/Screw_Round.png',
-            'Screw_Tbolt': 'icons/Screw_Tbolt.png',
-            'Screw Truss': 'icons/Screw Truss.png',
-            'Screw TrussModified': 'icons/Screw TrussModified.png',
-            'Screw Wafer': 'icons/Screw Wafer.png',
-            'Screw_Bugle': 'icons/Screw_Bugle.png',
-            'Screw_Fillister': 'icons/Screw_Fillister.png',
-            'Screw_Flat': 'icons/Screw_Flat.png',
-            'Screw_Hex': 'icons/Screw_Hex.png',
-            'Screw_Oval': 'icons/Screw_Oval.png',
-            'Screw_Pan': 'icons/Screw_Pan.png',
-            'Screw_PanHex': 'icons/Screw_PanHex.png',
-            'Screw_ThumbKnurled': 'icons/Screw_ThumbKnurled.png',
-            'Screw_Trim': 'icons/Screw_Trim.png',
-            'Thumb_Screw': 'icons/Thumb_Screw.png',
-            'Washer_Fender': 'icons/Washer_Fender.png',
-            'Washer_Flat': 'icons/Washer_Flat.png',
-            'Washer_Split': 'icons/Washer_Split.png',
-            'Washer_StarExterior': 'icons/Washer_StarExterior.png',
-            'Washer_StartInterior': 'icons/Washer_StartInterior.png'
-        };
+        this.icons = this.loadIconsFromStructure();
         
         this.customIcons = this.loadCustomIcons();
         this.initializeEventListeners();
@@ -57,6 +11,88 @@ class LabelMaker {
         this.initializeYamlEditor();
         this.initializeIconPicker();
         this.initializeIconUpload();
+    }
+
+    loadIconsFromStructure() {
+        const iconMapping = {
+            'electronics': {
+                'wago-logo': 'Wago Logo',
+                'wago-alt1': 'Wago Alt 1', 
+                'wago-alt2': 'Wago Alt 2',
+                'wire-nut': 'Wire Nut',
+                'generic': 'Generic Electrical'
+            },
+            'heads': {
+                'cross': 'Cross Head',
+                'hex-external': 'Hex External',
+                'hex-socket': 'Hex Socket',
+                'phillips': 'Phillips Head',
+                'pozidrive': 'Pozidrive',
+                'robertson': 'Robertson Head',
+                'slotted': 'Slotted Head',
+                'square-external': 'Square External',
+                'ta': 'TA Head',
+                'torx': 'Torx Head',
+                'torx-tamperproof': 'Torx Tamperproof'
+            },
+            'inserts': {
+                'heat': 'Heat Insert',
+                'wood': 'Wood Insert'
+            },
+            'nuts': {
+                'nut-cap': 'Cap Nut',
+                'nut-lock': 'Lock Nut',
+                'nut-standard': 'Standard Nut'
+            },
+            'fasteners': {
+                'screw-round': 'Round Screw',
+                'screw-tbolt': 'T-Bolt',
+                'screw-truss': 'Truss Screw',
+                'screw-truss-modified': 'Truss Modified',
+                'screw-wafer': 'Wafer Screw',
+                'screw-bugle': 'Bugle Screw',
+                'screw-fillister': 'Fillister Screw',
+                'screw-flat': 'Flat Screw',
+                'screw-hex': 'Hex Screw',
+                'screw-oval': 'Oval Screw',
+                'screw-pan': 'Pan Screw',
+                'screw-pan-hex': 'Pan Hex Screw',
+                'screw-thumb-knurled': 'Thumb Knurled',
+                'screw-trim': 'Trim Screw',
+                'thumb-screw': 'Thumb Screw'
+            },
+            'washers': {
+                'fender': 'Fender Washer',
+                'flat': 'Flat Washer',
+                'split': 'Split Washer',
+                'star-exterior': 'Star Exterior',
+                'star-interior': 'Star Interior'
+            }
+        };
+
+        const icons = {};
+        const availableIcons = [];
+
+        Object.entries(iconMapping).forEach(([category, items]) => {
+            Object.entries(items).forEach(([filename, displayName]) => {
+                const iconKey = `${category}_${filename}`.replace(/-/g, '_');
+                // Determine file extension based on category - heads use SVG, others use PNG
+                const extension = category === 'heads' ? 'svg' : 'png';
+                // For heads, convert filename to match actual file structure
+                let actualFilename = filename;
+                if (category === 'heads') {
+                    actualFilename = `Screw_Head_-_${filename.split('-').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join('_')}`;
+                }
+                const iconPath = `icons/${category}/${actualFilename}.${extension}`;
+                icons[iconKey] = iconPath;
+                availableIcons.push(iconKey);
+            });
+        });
+
+        this.availableIcons = availableIcons;
+        return icons;
     }
 
     initializeEventListeners() {
@@ -72,6 +108,9 @@ class LabelMaker {
         if (labelHeight) labelHeight.addEventListener('change', () => this.updatePreview());
         if (labelWidth) labelWidth.addEventListener('input', () => this.updatePreview());
         if (downloadPng) downloadPng.addEventListener('click', () => this.downloadPNG());
+        
+        const downloadSvg = document.getElementById('download-svg');
+        if (downloadSvg) downloadSvg.addEventListener('click', () => this.downloadSVG());
         if (validateYaml) validateYaml.addEventListener('click', () => this.validateYAML());
         if (generateZip) generateZip.addEventListener('click', () => this.generateZIP());
         
@@ -172,7 +211,7 @@ class LabelMaker {
         const subTextElement = labelPreview.querySelector('.sub-text');
 
         // Get icon path from either built-in icons or custom icons
-        const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['Head_Hex'];
+        const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
         iconContainer.innerHTML = `<img class="icon" src="${iconPath}" alt="${iconSelect}">`;
         
         // Update main text with columns
@@ -213,15 +252,13 @@ class LabelMaker {
             const subTextInputs = document.querySelectorAll('.sub-text-input');
             const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
-
             const dpi = 300;
             const mmToPx = dpi / 25.4;
             
             canvas.width = width * mmToPx;
             canvas.height = height * mmToPx;
 
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Always use transparent background
 
             const iconSize = (height - 2) * mmToPx;
             const iconX = 1 * mmToPx;
@@ -293,6 +330,153 @@ class LabelMaker {
         }
     }
 
+    async downloadSVG() {
+        try {
+            const height = parseInt(document.getElementById('label-height').value);
+            const width = parseInt(document.getElementById('label-width').value);
+            const mainTextInputs = document.querySelectorAll('.main-text-input');
+            const mainTexts = Array.from(mainTextInputs).map(input => input.value.trim()).filter(text => text);
+            const subTextInputs = document.querySelectorAll('.sub-text-input');
+            const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
+            const iconSelect = document.getElementById('icon-select').value;
+
+            const svg = await this.generateLabelSVG({
+                height_mm: height,
+                width_mm: width,
+                columns: mainTexts.length > 0 ? mainTexts : ['M3', 'M3', 'M3'],
+                subtext_columns: subTexts.length > 0 ? subTexts : ['8 mm', '10 mm', '12 mm'],
+                icon: iconSelect
+            });
+
+            const blob = new Blob([svg], { type: 'image/svg+xml' });
+            const link = document.createElement('a');
+            const labelName = mainTexts.length > 0 ? mainTexts.join('_') : 'label';
+            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}.svg`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch (error) {
+            console.error('SVG download failed:', error);
+            alert('Failed to download SVG. Please try again.');
+        }
+    }
+
+    async generateLabelSVG(label) {
+        const height = label.height_mm;
+        const width = label.width_mm;
+        const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
+        const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
+        const iconSelect = label.icon;
+
+        const iconSize = height - 2;
+        const iconX = 1;
+        const iconY = 1;
+        const textX = iconX + iconSize + 2;
+        const textAreaWidth = width - textX - 1;
+
+        // Match PNG font sizing exactly: use same calculation as canvas
+        const dpi = 300;
+        const mmToPx = dpi / 25.4; // ~11.81
+        const baseFontSize = this.calculateFontSize(height);
+        const mainFontSizePx = baseFontSize * mmToPx;
+        const subFontSizePx = mainFontSizePx * 0.75;
+        
+        // Convert to px-based viewBox for consistent sizing with PNG
+        const viewBoxWidth = width * mmToPx;
+        const viewBoxHeight = height * mmToPx;
+        const scale = mmToPx; // For converting mm coordinates to px
+
+        let svgContent = `<svg width="${width}mm" height="${height}mm" viewBox="0 0 ${viewBoxWidth} ${viewBoxHeight}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">`;
+
+        // Add icon - convert coordinates to pixel space
+        const iconXPx = iconX * scale;
+        const iconYPx = iconY * scale;
+        const iconSizePx = iconSize * scale;
+        
+        const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
+        if (iconPath.endsWith('.svg')) {
+            try {
+                const response = await fetch(iconPath);
+                const iconSvg = await response.text();
+                const parser = new DOMParser();
+                const iconDoc = parser.parseFromString(iconSvg, 'image/svg+xml');
+                const iconSvgElement = iconDoc.documentElement;
+                
+                // Get original viewBox or width/height to calculate proper scale
+                const viewBox = iconSvgElement.getAttribute('viewBox');
+                let originalWidth = 100, originalHeight = 100; // fallback
+                
+                if (viewBox) {
+                    const parts = viewBox.split(' ');
+                    if (parts.length === 4) {
+                        originalWidth = parseFloat(parts[2]);
+                        originalHeight = parseFloat(parts[3]);
+                    }
+                } else {
+                    const widthAttr = iconSvgElement.getAttribute('width');
+                    const heightAttr = iconSvgElement.getAttribute('height');
+                    if (widthAttr) originalWidth = parseFloat(widthAttr.replace(/\D/g, ''));
+                    if (heightAttr) originalHeight = parseFloat(heightAttr.replace(/\D/g, ''));
+                }
+                
+                // Calculate scale to fit icon in square
+                const iconScale = iconSizePx / Math.max(originalWidth, originalHeight);
+                
+                // Extract the inner content and scale it properly
+                const iconContent = iconSvgElement.innerHTML;
+                svgContent += `<g transform="translate(${iconXPx},${iconYPx}) scale(${iconScale})">`;
+                svgContent += iconContent;
+                svgContent += '</g>';
+            } catch (error) {
+                console.error('Failed to embed SVG icon:', error);
+            }
+        } else {
+            // For PNG icons, embed as image
+            svgContent += `<image x="${iconXPx}" y="${iconYPx}" width="${iconSizePx}" height="${iconSizePx}" href="${iconPath}"/>`;
+        }
+
+        // Add main text - position so bottom of text is on horizontal centerline
+        const textXPx = textX * scale;
+        const textAreaWidthPx = textAreaWidth * scale;
+        const centerYPx = viewBoxHeight / 2; // Horizontal centerline of label
+        const textYPx = subTexts.length > 0 ? centerYPx : centerYPx;
+        
+        if (mainTexts.length === 1) {
+            svgContent += `<text x="${textXPx}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" dominant-baseline="bottom">${this.escapeXml(mainTexts[0])}</text>`;
+        } else {
+            const columnWidthPx = textAreaWidthPx / mainTexts.length;
+            mainTexts.forEach((text, index) => {
+                const columnXPx = textXPx + (index * columnWidthPx);
+                svgContent += `<text x="${columnXPx}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
+            });
+        }
+
+        // Add sub text - position below main text with same spacing
+        if (subTexts.length > 0) {
+            const subTextYPx = textYPx + (mainFontSizePx * 0.3) + (subFontSizePx * 0.8); // Adjust spacing for new positioning
+            if (subTexts.length === 1) {
+                svgContent += `<text x="${textXPx}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" dominant-baseline="bottom">${this.escapeXml(subTexts[0])}</text>`;
+            } else {
+                const columnWidthPx = textAreaWidthPx / subTexts.length;
+                subTexts.forEach((text, index) => {
+                    const columnXPx = textXPx + (index * columnWidthPx);
+                    svgContent += `<text x="${columnXPx}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
+                });
+            }
+        }
+
+        svgContent += '</svg>';
+        return svgContent;
+    }
+
+    escapeXml(str) {
+        return str.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&apos;');
+    }
+
     calculateFontSize(height) {
         switch(height) {
             case 9: return 3;
@@ -304,23 +488,58 @@ class LabelMaker {
     }
 
     async drawIcon(ctx, x, y, size, iconType) {
-        const iconPath = this.icons[iconType] || this.customIcons[iconType] || this.icons['Head_Hex'];
+        const iconPath = this.icons[iconType] || this.customIcons[iconType] || this.icons['heads_hex_socket'];
         
         return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-                try {
-                    ctx.drawImage(img, x, y, size, size);
-                    resolve();
-                } catch (error) {
+            if (iconPath.endsWith('.svg')) {
+                // Handle SVG icons
+                fetch(iconPath)
+                    .then(response => response.text())
+                    .then(svgText => {
+                        const img = new Image();
+                        const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
+                        const url = URL.createObjectURL(svgBlob);
+                        
+                        img.onload = () => {
+                            try {
+                                ctx.drawImage(img, x, y, size, size);
+                                URL.revokeObjectURL(url);
+                                resolve();
+                            } catch (error) {
+                                URL.revokeObjectURL(url);
+                                reject(error);
+                            }
+                        };
+                        
+                        img.onerror = (error) => {
+                            URL.revokeObjectURL(url);
+                            console.error('Failed to load SVG icon:', iconPath, error);
+                            reject(error);
+                        };
+                        
+                        img.src = url;
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch SVG:', iconPath, error);
+                        reject(error);
+                    });
+            } else {
+                // Handle PNG/JPG icons
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        ctx.drawImage(img, x, y, size, size);
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                img.onerror = (error) => {
+                    console.error('Failed to load icon:', iconPath, error);
                     reject(error);
-                }
-            };
-            img.onerror = (error) => {
-                console.error('Failed to load icon:', iconPath, error);
-                reject(error);
-            };
-            img.src = iconPath;
+                };
+                img.src = iconPath;
+            }
         });
     }
 
@@ -393,18 +612,28 @@ class LabelMaker {
             const labels = parsed.labels;
             const zip = new JSZip();
             
-            // Check for long PNG options from YAML settings
+            // Check for export options from YAML settings
             const generateLongPng = parsed.long_png || false;
             const includeCutMarks = parsed.cut_marks || false;
+            const generateSvg = parsed.export_svg || false;
             
             // Generate individual labels
             for (let i = 0; i < labels.length; i++) {
                 const label = labels[i];
+                const titleText = label.title || (label.columns ? label.columns.join('_') : 'label');
+                
+                // Generate PNG
                 const canvas = await this.generateLabelCanvas(label);
                 const imageData = canvas.toDataURL().split(',')[1];
-                const titleText = label.title || (label.columns ? label.columns.join('_') : 'label');
-                const filename = `label_${i + 1}_${titleText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
-                zip.file(filename, imageData, { base64: true });
+                const pngFilename = `label_${i + 1}_${titleText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+                zip.file(pngFilename, imageData, { base64: true });
+                
+                // Generate SVG if requested
+                if (generateSvg) {
+                    const svgContent = await this.generateLabelSVG(label);
+                    const svgFilename = `label_${i + 1}_${titleText.replace(/[^a-zA-Z0-9]/g, '_')}.svg`;
+                    zip.file(svgFilename, svgContent);
+                }
             }
             
             // Generate long PNG strip if requested
@@ -429,6 +658,9 @@ class LabelMaker {
             let message = `✅ ZIP generated successfully with ${labels.length} labels!`;
             if (generateLongPng) {
                 message += ' Long PNG strip included.';
+            }
+            if (generateSvg) {
+                message += ' SVG files included.';
             }
             
             this.showValidationResult(message, 'success');
@@ -514,7 +746,7 @@ class LabelMaker {
                 if (line.includes(':')) {
                     const [key, value] = line.split(':', 2);
                     const trimmedKey = key.trim();
-                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks' || trimmedKey === 'width_mm' || trimmedKey === 'height_mm') {
+                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks' || trimmedKey === 'export_svg' || trimmedKey === 'width_mm' || trimmedKey === 'height_mm') {
                         result[trimmedKey] = this.parseValue(value.trim());
                     }
                 }
@@ -580,6 +812,10 @@ class LabelMaker {
         
         if (parsed.cut_marks !== undefined && typeof parsed.cut_marks !== 'boolean') {
             errors.push('Invalid cut_marks setting. Must be true or false if provided');
+        }
+        
+        if (parsed.export_svg !== undefined && typeof parsed.export_svg !== 'boolean') {
+            errors.push('Invalid export_svg setting. Must be true or false if provided');
         }
 
         // Validate global width_mm and height_mm
@@ -673,8 +909,7 @@ class LabelMaker {
         canvas.width = width * mmToPx;
         canvas.height = height * mmToPx;
 
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Always use transparent background
 
         const iconSize = (height - 2) * mmToPx;
         const iconX = 1 * mmToPx;
@@ -961,12 +1196,13 @@ class LabelMaker {
 # Global settings (optional - applied to all labels unless overridden)
 long_png: true        # Generate one continuous PNG strip of all labels
 cut_marks: true       # Add cut marks between labels for easy trimming  
+export_svg: true      # Also generate SVG files (vector format, scalable)
 width_mm: 50          # Default width for all labels (20-100mm)
 height_mm: 12         # Default height for all labels (9, 12, 18, or 24mm)
 
 labels:
   # Multi-column label example (great for drawer compartments)
-  - icon: "Head_Hex"                    # Icon to display on the left
+  - icon: "heads_hex_socket"            # Icon to display on the left
     maintext_columns:                   # Main text columns (1-4 columns max)
       - "M3"
       - "M3" 
@@ -977,7 +1213,7 @@ labels:
       - "12 mm"
 
   # Another multi-column example
-  - icon: "Head_Hex"
+  - icon: "heads_hex_socket"
     maintext_columns:
       - "M4"
       - "M4"
@@ -990,7 +1226,7 @@ labels:
 # Single column alternatives (if you prefer):
 # - title: "M5 × 20"                   # Single main text
 #   subtext: "DIN 7984"                # Optional single sub-text  
-#   icon: "Screw_Hex"
+#   icon: "fasteners_screw_hex"
 #   width_mm: 45                       # Override global width
 #   height_mm: 18                      # Override global height
 `;
@@ -1043,56 +1279,61 @@ labels:
 
     initializeIconPicker() {
         const iconCategories = {
-            'Electrical': ['Elec_WagoLogo', 'Elec_Wago_Alt1', 'Elec_Wago_Alt2', 'Elec_WireNut', 'Electrical_Generic'],
-            'Screw Heads': ['Head_Flat', 'Head_Hex', 'Head_Phillips', 'Head_Robinson', 'Head_SlottedPhillips', 'Head_Torx'],
-            'Inserts': ['Insert_Heat', 'Insert_Wood'],
-            'Nuts': ['Nut_CapNut', 'Nut_LockNut', 'Nut_Standard'],
-            'Screws': ['Screw_Round', 'Screw_Tbolt', 'Screw Truss', 'Screw TrussModified', 'Screw Wafer', 'Screw_Bugle', 'Screw_Fillister', 'Screw_Flat', 'Screw_Hex', 'Screw_Oval', 'Screw_Pan', 'Screw_PanHex', 'Screw_ThumbKnurled', 'Screw_Trim', 'Thumb_Screw'],
-            'Washers': ['Washer_Fender', 'Washer_Flat', 'Washer_Split', 'Washer_StarExterior', 'Washer_StartInterior']
+            'Electronics': ['electronics_wago_logo', 'electronics_wago_alt1', 'electronics_wago_alt2', 'electronics_wire_nut', 'electronics_generic'],
+            'Screw Heads': ['heads_cross', 'heads_hex_external', 'heads_hex_socket', 'heads_phillips', 'heads_pozidrive', 'heads_robertson', 'heads_slotted', 'heads_square_external', 'heads_ta', 'heads_torx', 'heads_torx_tamperproof'],
+            'Inserts': ['inserts_heat', 'inserts_wood'],
+            'Nuts': ['nuts_nut_cap', 'nuts_nut_lock', 'nuts_nut_standard'],
+            'Screws': ['fasteners_screw_round', 'fasteners_screw_tbolt', 'fasteners_screw_truss', 'fasteners_screw_truss_modified', 'fasteners_screw_wafer', 'fasteners_screw_bugle', 'fasteners_screw_fillister', 'fasteners_screw_flat', 'fasteners_screw_hex', 'fasteners_screw_oval', 'fasteners_screw_pan', 'fasteners_screw_pan_hex', 'fasteners_screw_thumb_knurled', 'fasteners_screw_trim', 'fasteners_thumb_screw'],
+            'Washers': ['washers_fender', 'washers_flat', 'washers_split', 'washers_star_exterior', 'washers_star_interior']
         };
 
         const iconNames = {
-            'Elec_WagoLogo': 'Wago Logo',
-            'Elec_Wago_Alt1': 'Wago Alt 1',
-            'Elec_Wago_Alt2': 'Wago Alt 2',
-            'Elec_WireNut': 'Wire Nut',
-            'Electrical_Generic': 'Generic Electrical',
-            'Head_Flat': 'Flat Head',
-            'Head_Hex': 'Hex Head',
-            'Head_Phillips': 'Phillips Head',
-            'Head_Robinson': 'Robinson Head',
-            'Head_SlottedPhillips': 'Slotted Phillips',
-            'Head_Torx': 'Torx Head',
-            'Insert_Heat': 'Heat Insert',
-            'Insert_Wood': 'Wood Insert',
-            'Nut_CapNut': 'Cap Nut',
-            'Nut_LockNut': 'Lock Nut',
-            'Nut_Standard': 'Standard Nut',
-            'Screw Round': 'Round Screw',
-            'Screw Tbolt': 'T-Bolt',
-            'Screw Truss': 'Truss Screw',
-            'Screw TrussModified': 'Truss Modified',
-            'Screw Wafer': 'Wafer Screw',
-            'Screw_Bugle': 'Bugle Screw',
-            'Screw_Fillister': 'Fillister Screw',
-            'Screw_Flat': 'Flat Screw',
-            'Screw_Hex': 'Hex Screw',
-            'Screw_Oval': 'Oval Screw',
-            'Screw_Pan': 'Pan Screw',
-            'Screw_PanHex': 'Pan Hex Screw',
-            'Screw_ThumbKnurled': 'Thumb Knurled',
-            'Screw_Trim': 'Trim Screw',
-            'ThumbScrew': 'Thumb Screw',
-            'Washer_Fender': 'Fender Washer',
-            'Washer_Flat': 'Flat Washer',
-            'Washer_Split': 'Split Washer',
-            'Washer_StarExterior': 'Star Exterior',
-            'Washer_StartInterior': 'Star Interior'
+            'electronics_wago_logo': 'Wago Logo',
+            'electronics_wago_alt1': 'Wago Alt 1',
+            'electronics_wago_alt2': 'Wago Alt 2',
+            'electronics_wire_nut': 'Wire Nut',
+            'electronics_generic': 'Generic Electrical',
+            'heads_cross': 'Cross Head',
+            'heads_hex_external': 'Hex External',
+            'heads_hex_socket': 'Hex Socket',
+            'heads_phillips': 'Phillips Head',
+            'heads_pozidrive': 'Pozidrive',
+            'heads_robertson': 'Robertson Head',
+            'heads_slotted': 'Slotted Head',
+            'heads_square_external': 'Square External',
+            'heads_ta': 'TA Head',
+            'heads_torx': 'Torx Head',
+            'heads_torx_tamperproof': 'Torx Tamperproof',
+            'inserts_heat': 'Heat Insert',
+            'inserts_wood': 'Wood Insert',
+            'nuts_nut_cap': 'Cap Nut',
+            'nuts_nut_lock': 'Lock Nut',
+            'nuts_nut_standard': 'Standard Nut',
+            'fasteners_screw_round': 'Round Screw',
+            'fasteners_screw_tbolt': 'T-Bolt',
+            'fasteners_screw_truss': 'Truss Screw',
+            'fasteners_screw_truss_modified': 'Truss Modified',
+            'fasteners_screw_wafer': 'Wafer Screw',
+            'fasteners_screw_bugle': 'Bugle Screw',
+            'fasteners_screw_fillister': 'Fillister Screw',
+            'fasteners_screw_flat': 'Flat Screw',
+            'fasteners_screw_hex': 'Hex Screw',
+            'fasteners_screw_oval': 'Oval Screw',
+            'fasteners_screw_pan': 'Pan Screw',
+            'fasteners_screw_pan_hex': 'Pan Hex Screw',
+            'fasteners_screw_thumb_knurled': 'Thumb Knurled',
+            'fasteners_screw_trim': 'Trim Screw',
+            'fasteners_thumb_screw': 'Thumb Screw',
+            'washers_fender': 'Fender Washer',
+            'washers_flat': 'Flat Washer',
+            'washers_split': 'Split Washer',
+            'washers_star_exterior': 'Star Exterior',
+            'washers_star_interior': 'Star Interior'
         };
 
         this.iconCategories = iconCategories;
         this.iconNames = iconNames;
-        this.selectedIcon = 'Head_Hex';
+        this.selectedIcon = 'heads_hex_socket';
 
         // Populate the icon grid
         this.populateIconGrid();
@@ -1282,7 +1523,7 @@ labels:
             
             // If this was the selected icon, switch to default
             if (this.selectedIcon === iconKey) {
-                this.selectIcon('Head_Hex');
+                this.selectIcon('heads_hex_socket');
             }
         }
     }
