@@ -13,8 +13,10 @@ body {
 
 .container {
     max-width: 600px;
+    min-width: calc(var(--label-width, 40mm) * 2 + 200px + 120px); /* label * scale + controls + margins */
     margin: 0 auto;
     padding: 15px;
+    width: max-content;
 }
 
 header {
@@ -364,11 +366,15 @@ main {
     /* Custom checkbox styling can be added here if needed */
 }
 
-/* Export Section Layout */
+/* Export Section - Three Column Layout */
 .export-section {
+    margin-top: 15px;
+}
+
+.export-columns {
     display: flex;
     gap: 15px;
-    margin-top: 15px;
+    align-items: stretch;
 }
 
 .export-column {
@@ -378,31 +384,96 @@ main {
 }
 
 .export-column .control-group {
-    margin-bottom: 10px;
+    margin-bottom: 0;
 }
 
-.export-column button {
+/* Compact checkbox styling */
+.checkbox-label.compact {
+    margin-bottom: 8px;
+}
+
+/* DPI settings container */
+.dpi-setting {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* DPI input line */
+.dpi-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-right: 2px; /* Account for button gap to align edges */
+}
+
+.dpi-line label {
+    font-size: 13px;
+    color: #6c757d;
+    margin: 0;
+    min-width: fit-content;
+}
+
+.dpi-line input {
+    width: 50px;
+    padding: 4px 6px;
+    font-size: 12px;
+    margin: 0;
+    margin-left: auto; /* Push to right */
+}
+
+/* DPI preset buttons line */
+.dpi-presets {
+    display: flex;
+    gap: 4px;
+    margin-left: 0; /* Align with label */
+    width: 100%;
+}
+
+.dpi-preset-btn {
+    padding: 2px 8px;
+    font-size: 10px;
+    height: auto;
+    flex: 1; /* Equal width distribution */
+    text-align: center;
+}
+
+.export-button {
     background-color: #3498db;
     color: white;
     border: none;
-    padding: 8px 16px;
+    padding: 12px 20px;
     border-radius: 6px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
     box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
-    margin-top: auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.export-column button:hover {
+.export-button:hover {
     background-color: #2980b9;
     box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
     transform: translateY(-1px);
 }
 
+#download-png.export-button {
+    background-color: #27ae60;
+    box-shadow: 0 2px 4px rgba(39, 174, 96, 0.2);
+}
+
+#download-png.export-button:hover {
+    background-color: #219a52;
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+}
+
 @media (max-width: 600px) {
-    .export-section {
+    .export-columns {
         flex-direction: column;
         gap: 15px;
     }
@@ -583,7 +654,6 @@ button {
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    margin-right: 10px;
     margin-bottom: 10px;
     transition: all 0.3s;
     box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
@@ -1120,10 +1190,7 @@ button:hover {
 
 /* Footer Styles */
 footer {
-    margin-top: 40px;
-    padding: 20px 0;
-    border-top: 1px solid #e0e0e0;
-    background: #f8f9fa;
+    margin-top: 20px;
 }
 
 .attribution {
@@ -1365,6 +1432,8 @@ footer {
     position: relative;
     min-height: 120px;
     width: 100%;
+    min-width: calc(var(--label-width, 40mm) * 2 + 160px); /* ensure controls fit */
+    overflow: visible;
 }
 
 .height-control {
@@ -1473,9 +1542,10 @@ footer {
 .export-section .button-group {
     display: flex;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 .export-section .button-group button {
     flex: 1;
 }
+

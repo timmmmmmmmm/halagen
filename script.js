@@ -395,7 +395,7 @@ class LabelMaker {
             const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
             const dpi = this.validateDPI(parseInt(document.getElementById('png-dpi').value) || 96);
-            const shouldRotate = document.getElementById('png-rotate').checked;
+            const shouldRotate = document.getElementById('export-rotate').checked;
             const mmToPx = dpi / 25.4;
             
             // Always set canvas to normal dimensions first (we'll rotate after drawing)
@@ -493,12 +493,15 @@ class LabelMaker {
             const subTextInputs = document.querySelectorAll('.sub-text-input');
             const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
+            const shouldRotate = document.getElementById('export-rotate').checked;
+            
             const svg = await this.generateLabelSVG({
                 height_mm: height,
                 width_mm: width,
                 columns: mainTexts.length > 0 ? mainTexts : ['M3', 'M3', 'M3'],
                 subtext_columns: subTexts.length > 0 ? subTexts : ['8 mm', '10 mm', '12 mm'],
-                icon: iconSelect
+                icon: iconSelect,
+                rotate: shouldRotate
             });
             
             // Save DPI setting to localStorage
@@ -507,7 +510,8 @@ class LabelMaker {
             const blob = new Blob([svg], { type: 'image/svg+xml' });
             const link = document.createElement('a');
             const labelName = mainTexts.length > 0 ? mainTexts.join('_') : 'label';
-            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}.svg`;
+            const rotation = shouldRotate ? '_rotated' : '';
+            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}${rotation}.svg`;
             link.href = URL.createObjectURL(blob);
             link.click();
             URL.revokeObjectURL(link.href);
@@ -518,8 +522,14 @@ class LabelMaker {
     }
 
     async generateLabelSVG(label) {
-        const height = label.height_mm;
-        const width = label.width_mm;
+        const originalHeight = label.height_mm;
+        const originalWidth = label.width_mm;
+        const shouldRotate = label.rotate || false;
+        
+        // For rotation, swap dimensions for the SVG canvas
+        const height = shouldRotate ? originalWidth : originalHeight;
+        const width = shouldRotate ? originalHeight : originalWidth;
+        
         const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
         const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
         const iconSelect = label.icon;
@@ -552,6 +562,11 @@ class LabelMaker {
       </rdf:Description>
     </rdf:RDF>
   </metadata>`;
+
+        // Add rotation group if needed
+        if (shouldRotate) {
+            svgContent += `<g transform="rotate(90 ${viewBoxWidth/2} ${viewBoxHeight/2})">`;
+        }
 
         // Add icon - convert coordinates to pixel space
         const iconXPx = iconX * scale;
@@ -628,6 +643,11 @@ class LabelMaker {
                     svgContent += `<text x="${columnXPx}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
                 });
             }
+        }
+
+        // Close rotation group if needed
+        if (shouldRotate) {
+            svgContent += '</g>';
         }
 
         svgContent += '</svg>';
@@ -1723,8 +1743,8 @@ labels:
                     document.getElementById('png-dpi').value = this.validateDPI(parsed.pngDpi);
                 }
                 // SVG DPI removed - using fixed 96 DPI
-                if (parsed.pngRotate !== undefined) {
-                    document.getElementById('png-rotate').checked = parsed.pngRotate;
+                if (parsed.exportRotate !== undefined) {
+                    document.getElementById('export-rotate').checked = parsed.exportRotate;
                 }
             }
         } catch (error) {
@@ -1736,7 +1756,7 @@ labels:
         try {
             const settings = {
                 pngDpi: parseInt(document.getElementById('png-dpi').value),
-                pngRotate: document.getElementById('png-rotate').checked
+                exportRotate: document.getElementById('export-rotate').checked
             };
             localStorage.setItem('dpiSettings', JSON.stringify(settings));
         } catch (error) {
