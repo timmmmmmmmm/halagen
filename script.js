@@ -589,6 +589,11 @@ class LabelMaker {
             svgContent += `<g transform="translate(${translateX + centerX}, ${translateY + centerY}) rotate(90) translate(${-centerX}, ${-centerY})">`;
         }
 
+        // Add transparent background box for easier selection in design software
+        const backgroundWidth = originalWidth * mmToPx;
+        const backgroundHeight = originalHeight * mmToPx;
+        svgContent += `<rect x="0" y="0" width="${backgroundWidth}" height="${backgroundHeight}" fill="white" fill-opacity="0.01" stroke="none"/>`;
+
         // Add icon - convert coordinates to pixel space
         const iconXPx = iconX * scale;
         const iconYPx = iconY * scale;
