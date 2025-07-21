@@ -259,7 +259,7 @@ class LabelMaker {
         
         let currentCount = container.querySelectorAll(`.${inputClass}`).length;
         
-        if (action === 'add' && currentCount < 4) {
+        if (action === 'add' && currentCount < 8) {
             currentCount++;
         } else if (action === 'remove' && currentCount > 1) {
             currentCount--;
@@ -365,9 +365,18 @@ class LabelMaker {
 
         labelPreview.setAttribute('data-height', height);
         labelPreview.style.width = `${width}mm`;
+        labelPreview.style.height = `${height}mm`;
         
         // Update CSS custom property for control positioning
         document.documentElement.style.setProperty('--label-width', `${width}mm`);
+        
+        // Dynamically set icon size based on height (height - 2mm for 1mm margin on each side)
+        const iconSize = Math.max(6, height - 2); // Minimum 6mm, otherwise height - 2mm
+        const labelIcon = labelPreview.querySelector('.label-icon');
+        if (labelIcon) {
+            labelIcon.style.width = `${iconSize}mm`;
+            labelIcon.style.height = `${iconSize}mm`;
+        }
 
         // Check if sub text has any non-empty columns
         const subTextColumns = document.querySelectorAll('.sub-text-column');
@@ -526,34 +535,35 @@ class LabelMaker {
         const originalWidth = label.width_mm;
         const shouldRotate = label.rotate || false;
         
-        // For rotation, swap dimensions for the SVG canvas
-        const height = shouldRotate ? originalWidth : originalHeight;
-        const width = shouldRotate ? originalHeight : originalWidth;
-        
         const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
         const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
         const iconSelect = label.icon;
         const svgDpi = 96; // Fixed SVG DPI
 
-        const iconSize = height - 2;
+        // Always use original dimensions for layout calculations
+        const iconSize = originalHeight - 2;
         const iconX = 1;
         const iconY = 1;
         const textX = iconX + iconSize + 2;
-        const textAreaWidth = width - textX - 1;
+        const textAreaWidth = originalWidth - textX - 1;
+        
+        // For rotation, swap dimensions only for the SVG canvas
+        const canvasHeight = shouldRotate ? originalWidth : originalHeight;
+        const canvasWidth = shouldRotate ? originalHeight : originalWidth;
 
         // Use 96 PPI for SVG (Inkscape standard)
         const dpi = 96;
         const mmToPx = dpi / 25.4; // ~3.78
-        const baseFontSize = this.calculateFontSize(height);
+        const baseFontSize = this.calculateFontSize(originalHeight);
         const mainFontSizePx = baseFontSize * mmToPx;
         const subFontSizePx = mainFontSizePx * 0.75;
         
         // Convert to px-based viewBox for consistent sizing with PNG
-        const viewBoxWidth = width * mmToPx;
-        const viewBoxHeight = height * mmToPx;
+        const viewBoxWidth = canvasWidth * mmToPx;
+        const viewBoxHeight = canvasHeight * mmToPx;
         const scale = mmToPx; // For converting mm coordinates to px
 
-        let svgContent = `<svg width="${width}mm" height="${height}mm" viewBox="0 0 ${viewBoxWidth} ${viewBoxHeight}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        let svgContent = `<svg width="${canvasWidth}mm" height="${canvasHeight}mm" viewBox="0 0 ${viewBoxWidth} ${viewBoxHeight}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <metadata>
     <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
       <rdf:Description>
@@ -565,7 +575,18 @@ class LabelMaker {
 
         // Add rotation group if needed
         if (shouldRotate) {
-            svgContent += `<g transform="rotate(90 ${viewBoxWidth/2} ${viewBoxHeight/2})">`;
+            // For 90-degree rotation, we need to rotate around the center and then translate
+            // to ensure the content fits within the swapped canvas dimensions
+            const originalViewBoxWidth = originalWidth * mmToPx;
+            const originalViewBoxHeight = originalHeight * mmToPx;
+            const centerX = originalViewBoxWidth / 2;
+            const centerY = originalViewBoxHeight / 2;
+            
+            // Calculate the translation needed after rotation to center content in new canvas
+            const translateX = (viewBoxWidth - originalViewBoxWidth) / 2;
+            const translateY = (viewBoxHeight - originalViewBoxHeight) / 2;
+            
+            svgContent += `<g transform="translate(${translateX + centerX}, ${translateY + centerY}) rotate(90) translate(${-centerX}, ${-centerY})">`;
         }
 
         // Add icon - convert coordinates to pixel space
@@ -618,7 +639,7 @@ class LabelMaker {
         // Add main text - position so bottom of text is on horizontal centerline
         const textXPx = textX * scale;
         const textAreaWidthPx = textAreaWidth * scale;
-        const centerYPx = viewBoxHeight / 2; // Horizontal centerline of label
+        const centerYPx = (originalHeight * mmToPx) / 2; // Use original height for centerline
         const textYPx = subTexts.length > 0 ? centerYPx : centerYPx;
         
         if (mainTexts.length === 1) {
@@ -1035,8 +1056,8 @@ class LabelMaker {
                 errors.push(`Label ${labelNum}: Cannot have both title and columns. Use either title for single column or columns/maintext_columns for multi-column`);
             } else if (label.title && typeof label.title !== 'string') {
                 errors.push(`Label ${labelNum}: Invalid title. Must be a string`);
-            } else if (label.columns && (!Array.isArray(label.columns) || label.columns.length === 0 || label.columns.length > 4)) {
-                errors.push(`Label ${labelNum}: Invalid columns/maintext_columns. Must be an array with 1-4 string elements`);
+            } else if (label.columns && (!Array.isArray(label.columns) || label.columns.length === 0 || label.columns.length > 8)) {
+                errors.push(`Label ${labelNum}: Invalid columns/maintext_columns. Must be an array with 1-8 string elements`);
             } else if (label.columns && label.columns.some(col => typeof col !== 'string')) {
                 errors.push(`Label ${labelNum}: Invalid columns/maintext_columns. All column values must be strings`);
             }
@@ -1059,8 +1080,8 @@ class LabelMaker {
                 errors.push(`Label ${labelNum}: Invalid subtext. Must be a string if provided`);
             }
             
-            if (label.subtext_columns && (!Array.isArray(label.subtext_columns) || label.subtext_columns.length === 0 || label.subtext_columns.length > 4)) {
-                errors.push(`Label ${labelNum}: Invalid subtext_columns. Must be an array with 1-4 string elements if provided`);
+            if (label.subtext_columns && (!Array.isArray(label.subtext_columns) || label.subtext_columns.length === 0 || label.subtext_columns.length > 8)) {
+                errors.push(`Label ${labelNum}: Invalid subtext_columns. Must be an array with 1-8 string elements if provided`);
             } else if (label.subtext_columns && label.subtext_columns.some(col => typeof col !== 'string')) {
                 errors.push(`Label ${labelNum}: Invalid subtext_columns. All column values must be strings`);
             }
@@ -1388,7 +1409,7 @@ height_mm: 12         # Default height for all labels (9, 12, 18, or 24mm)
 labels:
   # Multi-column label example (great for drawer compartments)
   - icon: "heads_hex_socket"            # Icon to display on the left
-    maintext_columns:                   # Main text columns (1-4 columns max)
+    maintext_columns:                   # Main text columns (1-8 columns max)
       - "M3"
       - "M3" 
       - "M3"

@@ -362,9 +362,6 @@ main {
     margin: 0;
 }
 
-.checkmark {
-    /* Custom checkbox styling can be added here if needed */
-}
 
 /* Export Section - Three Column Layout */
 .export-section {
@@ -415,7 +412,7 @@ main {
 }
 
 .dpi-line input {
-    width: 50px;
+    width: 75px;
     padding: 4px 6px;
     font-size: 12px;
     margin: 0;
