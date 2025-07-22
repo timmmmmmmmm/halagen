@@ -348,7 +348,7 @@ class LabelMaker {
         });
     }
 
-    updatePreview() {
+    async updatePreview() {
         const iconSelect = document.getElementById('icon-select').value;
         const height = document.getElementById('label-height').value;
         const width = document.getElementById('label-width').value;
@@ -356,8 +356,20 @@ class LabelMaker {
         const labelPreview = document.getElementById('header-label-preview');
         const iconContainer = labelPreview.querySelector('.label-icon img');
 
-        // Get icon path from either built-in icons or custom icons
-        const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
+        // Get icon path from built-in icons, custom icons, or Lucide icons
+        let iconPath;
+        if (iconSelect.startsWith('lucide_')) {
+            const iconName = iconSelect.replace('lucide_', '');
+            const svgContent = await this.loadLucideIcon(iconName);
+            if (svgContent) {
+                const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+                iconPath = URL.createObjectURL(blob);
+            } else {
+                iconPath = this.icons['heads_hex_socket']; // fallback
+            }
+        } else {
+            iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
+        }
         if (iconContainer) {
             iconContainer.src = iconPath;
             iconContainer.alt = iconSelect;
@@ -599,8 +611,57 @@ class LabelMaker {
         const iconYPx = iconY * scale;
         const iconSizePx = iconSize * scale;
         
-        const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
-        if (iconPath.endsWith('.svg')) {
+        let iconPath;
+        let isLucideIcon = false;
+        let lucideSvgContent = null;
+        
+        if (iconSelect.startsWith('lucide_')) {
+            isLucideIcon = true;
+            const iconName = iconSelect.replace('lucide_', '');
+            lucideSvgContent = await this.loadLucideIcon(iconName);
+            if (!lucideSvgContent) {
+                iconPath = this.icons['heads_hex_socket']; // fallback
+            }
+        } else {
+            iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
+        }
+        
+        if (isLucideIcon && lucideSvgContent) {
+            // Handle Lucide SVG icon
+            try {
+                const parser = new DOMParser();
+                const iconDoc = parser.parseFromString(lucideSvgContent, 'image/svg+xml');
+                const iconSvgElement = iconDoc.documentElement;
+                
+                // Get original viewBox or width/height to calculate proper scale
+                const viewBox = iconSvgElement.getAttribute('viewBox');
+                let originalWidth = 100, originalHeight = 100; // fallback
+                
+                if (viewBox) {
+                    const parts = viewBox.split(' ');
+                    if (parts.length === 4) {
+                        originalWidth = parseFloat(parts[2]);
+                        originalHeight = parseFloat(parts[3]);
+                    }
+                } else {
+                    const widthAttr = iconSvgElement.getAttribute('width');
+                    const heightAttr = iconSvgElement.getAttribute('height');
+                    if (widthAttr) originalWidth = parseFloat(widthAttr.replace(/\D/g, ''));
+                    if (heightAttr) originalHeight = parseFloat(heightAttr.replace(/\D/g, ''));
+                }
+                
+                // Calculate scale to fit icon in square
+                const iconScale = iconSizePx / Math.max(originalWidth, originalHeight);
+                
+                // Extract the inner content and scale it properly
+                const iconContent = iconSvgElement.innerHTML;
+                svgContent += `<g transform="translate(${iconXPx},${iconYPx}) scale(${iconScale})">`;
+                svgContent += iconContent;
+                svgContent += '</g>';
+            } catch (error) {
+                console.error('Failed to embed Lucide SVG icon:', error);
+            }
+        } else if (iconPath && iconPath.endsWith('.svg')) {
             try {
                 const response = await fetch(iconPath);
                 const iconSvg = await response.text();
@@ -636,7 +697,7 @@ class LabelMaker {
             } catch (error) {
                 console.error('Failed to embed SVG icon:', error);
             }
-        } else {
+        } else if (iconPath) {
             // For PNG icons, embed as image
             svgContent += `<image x="${iconXPx}" y="${iconYPx}" width="${iconSizePx}" height="${iconSizePx}" href="${iconPath}"/>`;
         }
@@ -699,7 +760,20 @@ class LabelMaker {
     }
 
     async drawIcon(ctx, x, y, size, iconType) {
-        const iconPath = this.icons[iconType] || this.customIcons[iconType] || this.icons['heads_hex_socket'];
+        let iconPath;
+        
+        if (iconType.startsWith('lucide_')) {
+            const iconName = iconType.replace('lucide_', '');
+            const svgContent = await this.loadLucideIcon(iconName);
+            if (svgContent) {
+                const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+                iconPath = URL.createObjectURL(blob);
+            } else {
+                iconPath = this.icons['heads_hex_socket']; // fallback
+            }
+        } else {
+            iconPath = this.icons[iconType] || this.customIcons[iconType] || this.icons['heads_hex_socket'];
+        }
         
         return new Promise((resolve, reject) => {
             if (iconPath.endsWith('.svg')) {
@@ -1255,8 +1329,11 @@ class LabelMaker {
     }
 
     loadAvailableIcons() {
-        // Use all available icons from the icon picker + custom icons
-        this.availableIcons = Object.keys(this.icons).concat(Object.keys(this.customIcons));
+        // Use all available icons from the icon picker + custom icons + Lucide icons
+        const lucideIconKeys = this.lucideIcons ? this.lucideIcons.map(name => `lucide_${name}`) : [];
+        this.availableIcons = Object.keys(this.icons)
+            .concat(Object.keys(this.customIcons))
+            .concat(lucideIconKeys);
         // Only generate prompt if YAML editor is ready
         if (this.yamlEditor) {
             this.generatePrompt();
@@ -1380,7 +1457,7 @@ class LabelMaker {
             this.loadAvailableIcons();
             
             // Refresh the icon picker
-            this.populateIconGrid();
+            this.populateIconGrid().catch(console.error);
             
             // Auto-select the new icon
             this.selectIcon(iconName);
@@ -1504,6 +1581,17 @@ labels:
             'Washers': ['washers_fender', 'washers_flat', 'washers_split', 'washers_star_exterior', 'washers_star_interior']
         };
 
+        // Curated Lucide icons for hardware/technology  
+        const lucideIcons = [
+            'wrench', 'hammer', 'settings', 'cog', 'cpu', 'hard-drive', 'memory-stick',
+            'usb', 'cable', 'plug', 'power', 'battery', 'zap', 'wifi', 'bluetooth',
+            'smartphone', 'monitor', 'server', 'printer', 'camera', 'microchip'
+        ];
+
+        this.lucideIcons = lucideIcons;
+        this.lucideIconsCache = {}; // Cache for loaded Lucide SVGs
+        this.recentIcons = this.loadRecentIcons();
+
         const iconNames = {
             'electronics_wago_logo': 'Wago Logo',
             'electronics_wago_alt1': 'Wago Alt 1',
@@ -1553,87 +1641,214 @@ labels:
         this.selectedIcon = 'heads_hex_socket';
 
         // Populate the icon grid
-        this.populateIconGrid();
+        this.populateIconGrid().catch(console.error);
+
+        // Update available icons now that Lucide icons are loaded
+        this.loadAvailableIcons();
 
         // Search functionality
         const searchInput = document.getElementById('icon-search');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
-                this.filterIcons(e.target.value);
+                const searchTerm = e.target.value;
+                if (searchTerm === '') {
+                    // Clear search results when search is empty
+                    this.clearSearchResults();
+                }
+                this.filterIcons(searchTerm);
             });
         }
     }
 
-    populateIconGrid() {
+    async populateIconGrid() {
         const grid = document.getElementById('icon-grid');
         grid.innerHTML = '';
 
-        // Add custom icons first if they exist
+        // Add recent icons first if they exist
+        if (this.recentIcons.length > 0) {
+            this.addCategoryHeader(grid, 'Recently Used', 'recent-icon-category');
+            for (const iconKey of this.recentIcons) {
+                await this.addIconToGrid(grid, iconKey);
+            }
+        }
+
+        // Add custom icons if they exist
         if (Object.keys(this.customIcons).length > 0) {
-            const customCategoryDiv = document.createElement('div');
-            customCategoryDiv.className = 'icon-picker-category custom-icon-category';
-            customCategoryDiv.textContent = 'Custom Icons';
-            grid.appendChild(customCategoryDiv);
-
+            this.addCategoryHeader(grid, 'Custom Icons', 'custom-icon-category');
             Object.keys(this.customIcons).forEach(iconKey => {
-                const iconDiv = document.createElement('div');
-                iconDiv.className = 'icon-picker-item';
-                iconDiv.dataset.icon = iconKey;
-                iconDiv.innerHTML = `
-                    <img src="${this.customIcons[iconKey]}" alt="${iconKey}">
-                    <span>${iconKey.replace('Custom_', '').replace(/_/g, ' ')}</span>
-                    <button class="delete-icon-btn" onclick="event.stopPropagation(); labelMaker.deleteCustomIcon('${iconKey}')">×</button>
-                `;
-
-                iconDiv.addEventListener('click', () => {
-                    this.selectIcon(iconKey);
-                });
-
-                if (iconKey === this.selectedIcon) {
-                    iconDiv.classList.add('selected');
-                }
-
-                grid.appendChild(iconDiv);
+                this.addCustomIconToGrid(grid, iconKey);
             });
         }
 
-        // Add built-in icons
+        // Add Lucide icons category
+        this.addLucideCategoryHeader(grid);
+        // Load Lucide icons
+        for (const iconName of this.lucideIcons) {
+            await this.addLucideIconToGrid(grid, iconName);
+        }
+
+        // Add built-in hardware icons
         Object.entries(this.iconCategories).forEach(([category, icons]) => {
-            // Add category header
-            const categoryDiv = document.createElement('div');
-            categoryDiv.className = 'icon-picker-category';
-            categoryDiv.textContent = category;
-            grid.appendChild(categoryDiv);
-
-            // Add icons
+            this.addCategoryHeader(grid, category);
             icons.forEach(iconKey => {
-                const iconDiv = document.createElement('div');
-                iconDiv.className = 'icon-picker-item';
-                iconDiv.dataset.icon = iconKey;
-                iconDiv.innerHTML = `
-                    <img src="${this.icons[iconKey]}" alt="${iconKey}">
-                    <span>${this.iconNames[iconKey]}</span>
-                `;
-
-                iconDiv.addEventListener('click', () => {
-                    this.selectIcon(iconKey);
-                });
-
-                if (iconKey === this.selectedIcon) {
-                    iconDiv.classList.add('selected');
-                }
-
-                grid.appendChild(iconDiv);
+                this.addBuiltInIconToGrid(grid, iconKey);
             });
         });
     }
 
-    selectIcon(iconKey) {
+    addCategoryHeader(grid, title, className = '') {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = `icon-picker-category ${className}`;
+        categoryDiv.textContent = title;
+        grid.appendChild(categoryDiv);
+    }
+
+    addLucideCategoryHeader(grid) {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'icon-picker-category lucide-icon-category';
+        categoryDiv.innerHTML = `
+            Lucide Icons 
+            <a href="https://lucide.dev/icons/" target="_blank" class="lucide-link" title="Browse all Lucide icons">🔗 Explore More</a>
+        `;
+        grid.appendChild(categoryDiv);
+    }
+
+    addCustomIconToGrid(grid, iconKey) {
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'icon-picker-item';
+        iconDiv.dataset.icon = iconKey;
+        iconDiv.innerHTML = `
+            <img src="${this.customIcons[iconKey]}" alt="${iconKey}">
+            <span>${iconKey.replace('Custom_', '').replace(/_/g, ' ')}</span>
+            <button class="delete-icon-btn" onclick="event.stopPropagation(); labelMaker.deleteCustomIcon('${iconKey}')">×</button>
+        `;
+
+        iconDiv.addEventListener('click', () => {
+            this.selectIcon(iconKey);
+        });
+
+        if (iconKey === this.selectedIcon) {
+            iconDiv.classList.add('selected');
+        }
+
+        grid.appendChild(iconDiv);
+    }
+
+    addBuiltInIconToGrid(grid, iconKey) {
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'icon-picker-item';
+        iconDiv.dataset.icon = iconKey;
+        iconDiv.innerHTML = `
+            <img src="${this.icons[iconKey]}" alt="${iconKey}">
+            <span>${this.iconNames[iconKey]}</span>
+        `;
+
+        iconDiv.addEventListener('click', () => {
+            this.selectIcon(iconKey);
+        });
+
+        if (iconKey === this.selectedIcon) {
+            iconDiv.classList.add('selected');
+        }
+
+        grid.appendChild(iconDiv);
+    }
+
+    async addIconToGrid(grid, iconKey) {
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'icon-picker-item';
+        iconDiv.dataset.icon = iconKey;
+
+        let iconSrc, displayName;
+
+        if (iconKey.startsWith('lucide_')) {
+            // Handle Lucide icon
+            const iconName = iconKey.replace('lucide_', '');
+            const svgContent = await this.loadLucideIcon(iconName);
+            if (svgContent) {
+                const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+                iconSrc = URL.createObjectURL(blob);
+                displayName = this.getLucideIconDisplayName(iconName);
+            } else {
+                return; // Skip if failed to load
+            }
+        } else if (this.customIcons[iconKey]) {
+            iconSrc = this.customIcons[iconKey];
+            displayName = iconKey.replace('Custom_', '').replace(/_/g, ' ');
+        } else if (this.icons[iconKey]) {
+            iconSrc = this.icons[iconKey];
+            displayName = this.iconNames[iconKey];
+        } else {
+            return; // Skip if icon not found
+        }
+
+        iconDiv.innerHTML = `
+            <img src="${iconSrc}" alt="${iconKey}">
+            <span>${displayName}</span>
+        `;
+
+        iconDiv.addEventListener('click', () => {
+            this.selectIcon(iconKey);
+        });
+
+        if (iconKey === this.selectedIcon) {
+            iconDiv.classList.add('selected');
+        }
+
+        grid.appendChild(iconDiv);
+    }
+
+    async addLucideIconToGrid(grid, iconName) {
+        const iconKey = `lucide_${iconName}`;
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'icon-picker-item';
+        iconDiv.dataset.icon = iconKey;
+
+        const svgContent = await this.loadLucideIcon(iconName);
+        if (!svgContent) return;
+
+        const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+        const iconSrc = URL.createObjectURL(blob);
+        const displayName = this.getLucideIconDisplayName(iconName);
+
+        iconDiv.innerHTML = `
+            <img src="${iconSrc}" alt="${iconKey}">
+            <span>${displayName}</span>
+        `;
+
+        iconDiv.addEventListener('click', () => {
+            this.selectIcon(iconKey);
+        });
+
+        if (iconKey === this.selectedIcon) {
+            iconDiv.classList.add('selected');
+        }
+
+        grid.appendChild(iconDiv);
+    }
+
+    async selectIcon(iconKey) {
         this.selectedIcon = iconKey;
         
-        // Get icon path and display name
-        const iconPath = this.icons[iconKey] || this.customIcons[iconKey];
-        const displayName = this.iconNames[iconKey] || iconKey.replace('Custom_', '').replace(/_/g, ' ');
+        // Add to recent icons
+        this.addToRecentIcons(iconKey);
+        
+        let iconPath, displayName;
+        
+        if (iconKey.startsWith('lucide_')) {
+            // Handle Lucide icon
+            const iconName = iconKey.replace('lucide_', '');
+            const svgContent = await this.loadLucideIcon(iconName);
+            if (svgContent) {
+                const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+                iconPath = URL.createObjectURL(blob);
+                displayName = this.getLucideIconDisplayName(iconName);
+            }
+        } else {
+            // Handle built-in and custom icons
+            iconPath = this.icons[iconKey] || this.customIcons[iconKey];
+            displayName = this.iconNames[iconKey] || iconKey.replace('Custom_', '').replace(/_/g, ' ');
+        }
         
         // Update the selected icon display
         const selectedIconDiv = document.querySelector('.selected-icon');
@@ -1693,12 +1908,14 @@ labels:
         }
     }
 
-    filterIcons(searchTerm) {
+    async filterIcons(searchTerm) {
         const items = document.querySelectorAll('.icon-picker-item');
         const categories = document.querySelectorAll('.icon-picker-category');
+        const grid = document.getElementById('icon-grid');
         
         searchTerm = searchTerm.toLowerCase();
         
+        // Filter existing icons
         items.forEach(item => {
             const iconKey = item.dataset.icon;
             const iconName = (this.iconNames[iconKey] || iconKey.replace('Custom_', '').replace(/_/g, ' ')).toLowerCase();
@@ -1722,6 +1939,76 @@ labels:
             
             category.style.display = hasVisibleItems ? 'block' : 'none';
         });
+
+        // If search term looks like a Lucide icon name and we haven't loaded it yet, try to load it
+        if (searchTerm.length > 2 && !searchTerm.includes(' ') && !items.length) {
+            await this.tryLoadDynamicLucideIcon(searchTerm, grid);
+        }
+    }
+
+    async tryLoadDynamicLucideIcon(iconName, grid) {
+        const iconKey = `lucide_${iconName}`;
+        
+        // Check if we already have this icon
+        if (document.querySelector(`[data-icon="${iconKey}"]`)) {
+            return;
+        }
+
+        try {
+            const svgContent = await this.loadLucideIcon(iconName);
+            if (svgContent) {
+                // Add a temporary search results category
+                let searchCategory = document.getElementById('search-results-category');
+                if (!searchCategory) {
+                    searchCategory = document.createElement('div');
+                    searchCategory.id = 'search-results-category';
+                    searchCategory.className = 'icon-picker-category lucide-icon-category';
+                    searchCategory.innerHTML = 'Search Results';
+                    grid.insertBefore(searchCategory, grid.firstChild);
+                }
+
+                // Add the found icon
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'icon-picker-item search-result';
+                iconDiv.dataset.icon = iconKey;
+
+                const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+                const iconSrc = URL.createObjectURL(blob);
+                const displayName = this.getLucideIconDisplayName(iconName);
+
+                iconDiv.innerHTML = `
+                    <img src="${iconSrc}" alt="${iconKey}">
+                    <span>${displayName}</span>
+                `;
+
+                iconDiv.addEventListener('click', () => {
+                    this.selectIcon(iconKey);
+                });
+
+                searchCategory.insertAdjacentElement('afterend', iconDiv);
+            }
+        } catch (error) {
+            console.log('Icon not found:', iconName);
+        }
+    }
+
+    clearSearchResults() {
+        // Remove search results category and its icons
+        const searchCategory = document.getElementById('search-results-category');
+        if (searchCategory) {
+            let nextElement = searchCategory.nextElementSibling;
+            while (nextElement && nextElement.classList.contains('search-result')) {
+                const toRemove = nextElement;
+                nextElement = nextElement.nextElementSibling;
+                toRemove.remove();
+            }
+            searchCategory.remove();
+        }
+        
+        // Show all icons and categories
+        document.querySelectorAll('.icon-picker-item, .icon-picker-category').forEach(item => {
+            item.style.display = item.classList.contains('icon-picker-category') ? 'flex' : 'flex';
+        });
     }
 
     deleteCustomIcon(iconKey) {
@@ -1729,7 +2016,7 @@ labels:
             delete this.customIcons[iconKey];
             this.saveCustomIcons();
             this.loadAvailableIcons();
-            this.populateIconGrid();
+            this.populateIconGrid().catch(console.error);
             
             // If this was the selected icon, switch to default
             if (this.selectedIcon === iconKey) {
@@ -1737,6 +2024,61 @@ labels:
             }
         }
     }
+
+    async loadLucideIcon(iconName) {
+        if (this.lucideIconsCache[iconName]) {
+            return this.lucideIconsCache[iconName];
+        }
+
+        try {
+            // Use the raw GitHub CDN which works reliably for Lucide icons
+            const response = await fetch(`https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/${iconName}.svg`);
+            if (response.ok) {
+                const svgText = await response.text();
+                if (svgText.includes('<svg')) {
+                    this.lucideIconsCache[iconName] = svgText;
+                    return svgText;
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load Lucide icon:', iconName, error);
+        }
+        return null;
+    }
+
+    loadRecentIcons() {
+        try {
+            const recent = localStorage.getItem('recentIcons');
+            return recent ? JSON.parse(recent) : [];
+        } catch (error) {
+            console.error('Error loading recent icons:', error);
+            return [];
+        }
+    }
+
+    saveRecentIcons() {
+        try {
+            localStorage.setItem('recentIcons', JSON.stringify(this.recentIcons));
+        } catch (error) {
+            console.error('Error saving recent icons:', error);
+        }
+    }
+
+    addToRecentIcons(iconKey) {
+        // Remove if already exists
+        this.recentIcons = this.recentIcons.filter(key => key !== iconKey);
+        // Add to beginning
+        this.recentIcons.unshift(iconKey);
+        // Keep only last 12 icons
+        this.recentIcons = this.recentIcons.slice(0, 12);
+        this.saveRecentIcons();
+    }
+
+    getLucideIconDisplayName(iconName) {
+        return iconName.replace(/-/g, ' ')
+                      .replace(/\b\w/g, l => l.toUpperCase());
+    }
+
 
     validateDPI(dpi) {
         // Validate DPI is within acceptable range

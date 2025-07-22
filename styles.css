@@ -1121,11 +1121,43 @@ button:hover {
     margin-bottom: 4px;
     padding-bottom: 4px;
     border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .icon-picker-category:first-child {
     margin-top: 0;
 }
+
+.recent-icon-category {
+    color: #28a745;
+    border-bottom-color: #28a745;
+}
+
+.lucide-icon-category {
+    color: #007bff;
+    border-bottom-color: #007bff;
+}
+
+.lucide-link {
+    font-size: 10px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.lucide-link:hover {
+    text-decoration: underline;
+}
+
+.custom-icon-category {
+    color: #fd7e14;
+    border-bottom-color: #fd7e14;
+}
+
 
 /* Icon Upload Section */
 .icon-upload-section {
