@@ -30,6 +30,10 @@ build/
 *.min.js
 *.min.css
 
+# Allow library files
+!lib/*.min.js
+!lib/*.min.css
+
 # Environment variables
 .env
 .env.local
