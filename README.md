@@ -58,9 +58,11 @@ labels:
   - text: "M4 × 12"
     subtext: "DIN 7984"
     icon: "Screw_Socket"
+    rotate: false
   - text: "M6 × 20"
     subtext: "Hex Bolt"
     icon: "Screw_Hex"
+    rotate: false
 ```
 
 ## Adding New Icons

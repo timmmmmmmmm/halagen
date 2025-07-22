@@ -28,7 +28,7 @@ class LabelMaker {
                 'hex-external': 'Hex External',
                 'hex-socket': 'Hex Socket',
                 'phillips': 'Phillips Head',
-                'pozidrive': 'Pozidrive',
+                'pozidriv': 'Pozidriv',
                 'robertson': 'Robertson Head',
                 'slotted': 'Slotted Head',
                 'square-external': 'Square External',
@@ -1422,6 +1422,7 @@ labels:
       - "8 mm"
       - "10 mm"
       - "12 mm"
+    rotate: false                       # Rotate label 90 degrees (default: false)
 
   # Another multi-column example
   - icon: "heads_hex_socket"
@@ -1433,6 +1434,7 @@ labels:
       - "14 mm"
       - "16 mm"
       - "18 mm"
+    rotate: false                       # Rotate label 90 degrees (default: false)
 
 # Single column alternatives (if you prefer):
 # - title: "M5 × 20"                   # Single main text
@@ -1440,6 +1442,7 @@ labels:
 #   icon: "fasteners_screw_hex"
 #   width_mm: 45                       # Override global width
 #   height_mm: 18                      # Override global height
+#   rotate: false                      # Rotate label 90 degrees (default: false)
 `;
         
         // Set the template in the YAML editor
@@ -1491,7 +1494,7 @@ labels:
     initializeIconPicker() {
         const iconCategories = {
             'Electronics': ['electronics_wago_logo', 'electronics_wago_alt1', 'electronics_wago_alt2', 'electronics_wire_nut', 'electronics_generic'],
-            'Screw Heads': ['heads_cross', 'heads_hex_external', 'heads_hex_socket', 'heads_phillips', 'heads_pozidrive', 'heads_robertson', 'heads_slotted', 'heads_square_external', 'heads_ta', 'heads_torx', 'heads_torx_tamperproof'],
+            'Screw Heads': ['heads_cross', 'heads_hex_external', 'heads_hex_socket', 'heads_phillips', 'heads_pozidriv', 'heads_robertson', 'heads_slotted', 'heads_square_external', 'heads_ta', 'heads_torx', 'heads_torx_tamperproof'],
             'Inserts': ['inserts_heat', 'inserts_wood'],
             'Nuts': ['nuts_nut_cap', 'nuts_nut_lock', 'nuts_nut_standard'],
             'Screws': ['fasteners_screw_round', 'fasteners_screw_tbolt', 'fasteners_screw_truss', 'fasteners_screw_truss_modified', 'fasteners_screw_wafer', 'fasteners_screw_bugle', 'fasteners_screw_fillister', 'fasteners_screw_flat', 'fasteners_screw_hex', 'fasteners_screw_oval', 'fasteners_screw_pan', 'fasteners_screw_pan_hex', 'fasteners_screw_thumb_knurled', 'fasteners_screw_trim', 'fasteners_thumb_screw'],
@@ -1508,7 +1511,7 @@ labels:
             'heads_hex_external': 'Hex External',
             'heads_hex_socket': 'Hex Socket',
             'heads_phillips': 'Phillips Head',
-            'heads_pozidrive': 'Pozidrive',
+            'heads_pozidriv': 'Pozidriv',
             'heads_robertson': 'Robertson Head',
             'heads_slotted': 'Slotted Head',
             'heads_square_external': 'Square External',
