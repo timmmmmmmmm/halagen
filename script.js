@@ -1913,14 +1913,22 @@ labels:
         const categories = document.querySelectorAll('.icon-picker-category');
         const grid = document.getElementById('icon-grid');
         
-        searchTerm = searchTerm.toLowerCase();
+        searchTerm = searchTerm.toLowerCase().trim();
         
         // Filter existing icons
         items.forEach(item => {
             const iconKey = item.dataset.icon;
-            const iconName = (this.iconNames[iconKey] || iconKey.replace('Custom_', '').replace(/_/g, ' ')).toLowerCase();
-            const matches = iconName.includes(searchTerm) || iconKey.toLowerCase().includes(searchTerm);
+            let iconName = '';
             
+            if (iconKey.startsWith('lucide_')) {
+                iconName = iconKey.replace('lucide_', '').replace(/-/g, ' ');
+            } else if (this.iconNames[iconKey]) {
+                iconName = this.iconNames[iconKey];
+            } else {
+                iconName = iconKey.replace('Custom_', '').replace(/_/g, ' ');
+            }
+            
+            const matches = iconName.toLowerCase().includes(searchTerm) || iconKey.toLowerCase().includes(searchTerm);
             item.style.display = matches ? 'flex' : 'none';
         });
 
@@ -1940,22 +1948,31 @@ labels:
             category.style.display = hasVisibleItems ? 'block' : 'none';
         });
 
-        // If search term looks like a Lucide icon name and we haven't loaded it yet, try to load it
-        if (searchTerm.length > 2 && !searchTerm.includes(' ') && !items.length) {
-            await this.tryLoadDynamicLucideIcon(searchTerm, grid);
+        // If search term looks like a Lucide icon name and doesn't match existing icons, try to load it
+        if (searchTerm.length > 2 && !searchTerm.includes(' ')) {
+            const visibleItems = Array.from(items).filter(item => item.style.display !== 'none');
+            if (visibleItems.length === 0) {
+                console.log('No matches found, trying to load Lucide icon:', searchTerm);
+                await this.tryLoadDynamicLucideIcon(searchTerm, grid);
+            }
         }
     }
 
     async tryLoadDynamicLucideIcon(iconName, grid) {
         const iconKey = `lucide_${iconName}`;
         
+        console.log('Trying to load dynamic icon:', iconName);
+        
         // Check if we already have this icon
         if (document.querySelector(`[data-icon="${iconKey}"]`)) {
+            console.log('Icon already exists:', iconKey);
             return;
         }
 
         try {
             const svgContent = await this.loadLucideIcon(iconName);
+            console.log('Loaded SVG content:', !!svgContent);
+            
             if (svgContent) {
                 // Add a temporary search results category
                 let searchCategory = document.getElementById('search-results-category');
@@ -1986,9 +2003,12 @@ labels:
                 });
 
                 searchCategory.insertAdjacentElement('afterend', iconDiv);
+                console.log('Added dynamic icon to grid:', iconName);
+            } else {
+                console.log('No SVG content received for:', iconName);
             }
         } catch (error) {
-            console.log('Icon not found:', iconName);
+            console.log('Error loading icon:', iconName, error);
         }
     }
 
