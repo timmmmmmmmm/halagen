@@ -1591,6 +1591,7 @@ labels:
         this.lucideIcons = lucideIcons;
         this.lucideIconsCache = {}; // Cache for loaded Lucide SVGs
         this.recentIcons = this.loadRecentIcons();
+        this.lucideKeywords = this.getLucideKeywordMappings();
 
         const iconNames = {
             'electronics_wago_logo': 'Wago Logo',
@@ -1649,13 +1650,25 @@ labels:
         // Search functionality
         const searchInput = document.getElementById('icon-search');
         if (searchInput) {
+            let debounceTimer;
             searchInput.addEventListener('input', (e) => {
                 const searchTerm = e.target.value;
-                if (searchTerm === '') {
-                    // Clear search results when search is empty
-                    this.clearSearchResults();
+                
+                // Clear existing timer
+                if (debounceTimer) {
+                    clearTimeout(debounceTimer);
                 }
-                this.filterIcons(searchTerm);
+                
+                if (searchTerm === '') {
+                    // Clear search results immediately when search is empty
+                    this.clearSearchResults();
+                    return;
+                }
+                
+                // Debounce the search with 300ms delay
+                debounceTimer = setTimeout(() => {
+                    this.filterIcons(searchTerm);
+                }, 300);
             });
         }
     }
@@ -1948,30 +1961,64 @@ labels:
             category.style.display = hasVisibleItems ? 'block' : 'none';
         });
 
-        // If search term looks like a Lucide icon name and doesn't match existing icons, try to load it
+        // If search term looks like a Lucide icon name, try to load related icons
         if (searchTerm.length > 2 && !searchTerm.includes(' ')) {
             const visibleItems = Array.from(items).filter(item => item.style.display !== 'none');
             if (visibleItems.length === 0) {
-                console.log('No matches found, trying to load Lucide icon:', searchTerm);
-                await this.tryLoadDynamicLucideIcon(searchTerm, grid);
+                console.log('No matches found, trying to load Lucide icons for:', searchTerm);
+                await this.tryLoadRelatedLucideIcons(searchTerm, grid);
             }
+        }
+    }
+
+    async tryLoadRelatedLucideIcons(searchTerm, grid) {
+        // Common Lucide icon variations to try
+        const variations = [
+            searchTerm,                          // exact match
+            `${searchTerm}-2`,                   // numbered variants
+            `${searchTerm}-3`, 
+            `${searchTerm}-off`,                 // state variants
+            `${searchTerm}-on`,
+            `${searchTerm}-plus`,                // action variants
+            `${searchTerm}-minus`,
+            `${searchTerm}-x`,
+            `${searchTerm}-check`,
+            `${searchTerm}-circle`,              // shape variants
+            `${searchTerm}-square`,
+            `${searchTerm}-filled`,              // fill variants
+            `${searchTerm}-outline`,
+        ];
+
+        // For some specific terms, add more variations
+        if (searchTerm === 'heart') {
+            variations.push('heart-crack', 'heart-handshake', 'heart-pulse');
+        } else if (searchTerm === 'user') {
+            variations.push('user-plus', 'user-minus', 'user-x', 'user-check', 'users');
+        } else if (searchTerm === 'file') {
+            variations.push('file-text', 'file-image', 'file-video', 'file-audio', 'files');
+        }
+
+        let foundAny = false;
+        for (const variation of variations) {
+            const success = await this.tryLoadDynamicLucideIcon(variation, grid);
+            if (success) foundAny = true;
+        }
+
+        if (!foundAny) {
+            console.log('No Lucide icons found for search term:', searchTerm);
         }
     }
 
     async tryLoadDynamicLucideIcon(iconName, grid) {
         const iconKey = `lucide_${iconName}`;
         
-        console.log('Trying to load dynamic icon:', iconName);
-        
         // Check if we already have this icon
         if (document.querySelector(`[data-icon="${iconKey}"]`)) {
-            console.log('Icon already exists:', iconKey);
-            return;
+            return true; // Already exists, consider it a success
         }
 
         try {
             const svgContent = await this.loadLucideIcon(iconName);
-            console.log('Loaded SVG content:', !!svgContent);
             
             if (svgContent) {
                 // Add a temporary search results category
@@ -2004,11 +2051,12 @@ labels:
 
                 searchCategory.insertAdjacentElement('afterend', iconDiv);
                 console.log('Added dynamic icon to grid:', iconName);
+                return true;
             } else {
-                console.log('No SVG content received for:', iconName);
+                return false;
             }
         } catch (error) {
-            console.log('Error loading icon:', iconName, error);
+            return false;
         }
     }
 
@@ -2097,6 +2145,80 @@ labels:
     getLucideIconDisplayName(iconName) {
         return iconName.replace(/-/g, ' ')
                       .replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    getLucideKeywordMappings() {
+        // Map search keywords to actual Lucide icon names
+        return {
+            // Fire/flame related
+            'fire': ['flame'],
+            'burning': ['flame'],
+            'lit': ['flame'],
+            'spark': ['flame', 'zap'],
+            'embers': ['flame'],
+            'smoke': ['flame'],
+            'firefighter': ['flame'],
+            'fireman': ['flame'],
+            'emergency': ['flame', 'alert-triangle', 'siren'],
+            
+            // User/people related
+            'person': ['user'],
+            'people': ['users'],
+            'account': ['user'],
+            'profile': ['user'],
+            'avatar': ['user'],
+            
+            // Document/file related
+            'document': ['file', 'file-text'],
+            'paper': ['file', 'file-text'],
+            'text': ['file-text', 'type'],
+            'note': ['file-text', 'sticky-note'],
+            'page': ['file', 'file-text'],
+            
+            // Technology related
+            'computer': ['monitor', 'pc'],
+            'laptop': ['laptop'],
+            'phone': ['smartphone'],
+            'mobile': ['smartphone'],
+            'device': ['smartphone', 'monitor'],
+            'screen': ['monitor', 'smartphone'],
+            
+            // Tools related
+            'repair': ['wrench', 'hammer'],
+            'fix': ['wrench', 'hammer'],
+            'build': ['hammer', 'wrench'],
+            'construction': ['hammer', 'hard-hat'],
+            'maintenance': ['wrench', 'cog'],
+            
+            // Storage related
+            'save': ['hard-drive', 'download'],
+            'storage': ['hard-drive', 'database'],
+            'disk': ['hard-drive'],
+            'data': ['database', 'hard-drive'],
+            
+            // Network related
+            'internet': ['wifi', 'globe'],
+            'network': ['wifi', 'radio'],
+            'wireless': ['wifi', 'bluetooth'],
+            'connection': ['wifi', 'cable'],
+            'connect': ['cable', 'plug'],
+            
+            // Power related
+            'electricity': ['zap', 'power', 'battery'],
+            'energy': ['battery', 'zap'],
+            'charge': ['battery', 'power'],
+            'volt': ['zap', 'power'],
+            
+            // Common actions
+            'delete': ['trash', 'x'],
+            'remove': ['trash', 'x', 'minus'],
+            'add': ['plus'],
+            'create': ['plus'],
+            'new': ['plus'],
+            'edit': ['edit', 'pencil'],
+            'modify': ['edit', 'pencil'],
+            'change': ['edit', 'settings']
+        };
     }
 
 
