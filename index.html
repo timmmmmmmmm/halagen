@@ -3,31 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hardware Label Maker</title>
+    <title>halagen</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
+        <div class="header-logo">
+            <img src="img/header.png" alt="HALAGEN" class="logo">
+        </div>
         <header>
-            <div class="header-preview">
-                <div id="header-label-preview" class="label">
-                    <div class="label-icon">
-                        <img class="icon" src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
-                    </div>
-                    <div class="label-text">
-                        <div class="main-text">
-                            <div class="main-text-column">M3</div>
-                            <div class="main-text-column">M3</div>
-                            <div class="main-text-column">M3</div>
-                        </div>
-                        <div class="sub-text">
-                            <div class="sub-text-column">8 mm</div>
-                            <div class="sub-text-column">10 mm</div>
-                            <div class="sub-text-column">12 mm</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </header>
 
         <main>
@@ -39,85 +23,125 @@
             </div>
 
             <div class="tab-content" id="single-tab">
-                <div class="controls">
-                    <div class="control-group label-dimensions">
-                        <div class="dimension-row">
-                            <div class="dimension-item">
-                                <label for="label-height">Height (mm): <span class="tooltip-icon" title="Standard label tape heights for compatibility with label makers">?</span></label>
-                                <input type="number" id="label-height" min="9" max="50" value="12" title="Label height in millimeters">
-                            </div>
-                            <div class="dimension-item">
-                                <label for="label-width">Width (mm): <span class="tooltip-icon" title="Custom width from 20-100mm to fit your container size">?</span></label>
+                <div class="wysiwyg-editor">
+                    <!-- Width control at top -->
+                    <div class="width-control">
+                        <div class="dimensional-line horizontal">
+                            <span class="dimension-arrow">←</span>
+                            <div class="dimension-control">
                                 <input type="number" id="label-width" min="20" max="100" value="50" title="Custom width from 20-100mm">
+                                <label for="label-width">Width (mm)</label>
                             </div>
+                            <span class="dimension-arrow">→</span>
                         </div>
                     </div>
-
-                    <div class="control-group">
-                        <label for="icon-picker">Icon: <span class="tooltip-icon" title="Icon displayed on the left side of the label. Choose from built-in icons or upload custom icons (any aspect ratio supported)">?</span></label>
-                        <div id="icon-picker" class="icon-picker">
-                            <div class="icon-picker-selected">
-                                <div class="selected-icon" data-icon="heads_hex_socket">
-                                    <img src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
-                                    <span>Hex Socket</span>
+                    
+                    <!-- Preview and controls container -->
+                    <div class="preview-container">
+                        <!-- Height control on left -->
+                        <div class="height-control">
+                            <div class="dimensional-line vertical">
+                                <span class="dimension-arrow up">↑</span>
+                                <div class="dimension-control vertical">
+                                    <input type="number" id="label-height" min="9" max="50" value="12" title="Label height in millimeters">
+                                    <label for="label-height">Height (mm)</label>
                                 </div>
-                                <button type="button" class="icon-picker-button">Choose Icon</button>
+                                <span class="dimension-arrow down">↓</span>
                             </div>
-                            <div class="icon-picker-dropdown" style="display: none;">
-                                <div class="icon-picker-search">
-                                    <input type="text" placeholder="Search icons..." id="icon-search">
+                        </div>
+                        
+                        <!-- Main preview -->
+                        <div class="preview-area">
+                            <div id="header-label-preview" class="label">
+                                <div class="label-icon clickable-icon" title="Click to change icon">
+                                    <img class="icon" src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
                                 </div>
-                                <div class="icon-upload-section">
-                                    <input type="file" id="icon-upload" accept="image/png" style="display: none;">
-                                    <button type="button" id="upload-icon-btn" class="upload-icon-btn" title="Upload a custom PNG icon (any aspect ratio, black & white recommended)">📁 Upload Custom Icon</button>
-                                    <div class="upload-instructions">
-                                        <small>Upload PNG icons (any aspect ratio). <a href="https://github.com/timmmmmmmmm/halagen/" target="_blank">Contribute icons</a> to help everyone!</small>
+                                <div class="label-text">
+                                    <div class="main-text">
+                                        <div class="main-text-column editable-text" contenteditable="true">M3</div>
+                                        <div class="main-text-column editable-text" contenteditable="true">M3</div>
+                                        <div class="main-text-column editable-text" contenteditable="true">M3</div>
+                                    </div>
+                                    <div class="sub-text">
+                                        <div class="sub-text-column editable-text" contenteditable="true">8 mm</div>
+                                        <div class="sub-text-column editable-text" contenteditable="true">10 mm</div>
+                                        <div class="sub-text-column editable-text" contenteditable="true">12 mm</div>
                                     </div>
                                 </div>
-                                <div class="icon-picker-grid" id="icon-grid">
-                                    <!-- Icons will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <!-- Column controls on right -->
+                        <div class="column-controls-right">
+                            <div class="main-text-control">
+                                <label>Main text</label>
+                                <div class="column-buttons-right">
+                                    <button type="button" class="column-btn-small" data-action="remove" data-type="main" title="Remove column">-</button>
+                                    <span class="column-count" id="main-column-count">3</span>
+                                    <button type="button" class="column-btn-small" data-action="add" data-type="main" title="Add column (max 4)">+</button>
+                                </div>
+                            </div>
+                            <div class="sub-text-control">
+                                <label>Sub text</label>
+                                <div class="column-buttons-right">
+                                    <button type="button" class="column-btn-small" data-action="remove" data-type="sub" title="Remove sub-text column">-</button>
+                                    <span class="column-count" id="sub-column-count">3</span>
+                                    <button type="button" class="column-btn-small" data-action="add" data-type="sub" title="Add sub-text column (max 4)">+</button>
                                 </div>
                             </div>
                         </div>
-                        <!-- Hidden select for compatibility -->
-                        <select id="icon-select" style="display: none;">
-                            <option value="heads_hex_socket" selected>Hex Socket</option>
-                        </select>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <select id="icon-select" style="display: none;">
+                        <option value="heads_hex_socket" selected>Hex Socket</option>
+                    </select>
+
+                    <!-- Hidden text inputs for compatibility -->
+                    <div id="main-text-inputs" style="display: none;">
+                        <input type="text" class="main-text-input" value="M3">
+                        <input type="text" class="main-text-input" value="M3">
+                        <input type="text" class="main-text-input" value="M3">
+                    </div>
+                    <div id="sub-text-inputs" style="display: none;">
+                        <input type="text" class="sub-text-input" value="8 mm">
+                        <input type="text" class="sub-text-input" value="10 mm">
+                        <input type="text" class="sub-text-input" value="12 mm">
                     </div>
 
-                    <div class="control-group">
-                        <div class="label-with-controls">
-                            <label>Main Text:</label>
-                            <div class="inline-controls">
-                                <button type="button" class="small-column-btn" data-action="remove" title="Remove column">-</button>
-                                <button type="button" class="small-column-btn" data-action="add" title="Add column (max 4)">+</button>
+
+                    <div class="export-section">
+                        <div class="export-columns">
+                            <!-- Column 1: Export Options -->
+                            <div class="export-column">
+                                <label class="checkbox-label compact">
+                                    <input type="checkbox" id="export-rotate">
+                                    <span class="checkmark"></span>
+                                    Rotate 90°
+                                </label>
+                                <div class="dpi-setting">
+                                    <div class="dpi-line">
+                                        <label for="png-dpi">PNG DPI</label>
+                                        <input type="number" id="png-dpi" min="50" max="1200" value="300" title="Dots per inch for PNG export (50-1200)">
+                                    </div>
+                                    <div class="dpi-presets">
+                                        <button type="button" class="dpi-preset-btn" data-dpi="96">Default</button>
+                                        <button type="button" class="dpi-preset-btn" data-dpi="203">Niimbot</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Column 2: Download PNG -->
+                            <div class="export-column">
+                                <button id="download-png" class="export-button" title="Download as high-quality PNG with transparent background">Download PNG</button>
+                            </div>
+                            
+                            <!-- Column 3: Download SVG -->
+                            <div class="export-column">
+                                <button id="download-svg" class="export-button" title="Download as vector SVG (scalable and editable)">Download SVG</button>
                             </div>
                         </div>
-                        <div class="main-text-inputs" id="main-text-inputs">
-                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
-                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
-                            <input type="text" class="main-text-input" placeholder="e.g. M4 × 12" value="M3">
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="label-with-controls">
-                            <label>Sub Text (optional): <span class="tooltip-icon" title="Use multiple columns when labeling containers with separate compartments">?</span></label>
-                            <div class="inline-controls">
-                                <button type="button" class="small-sub-column-btn" data-action="remove" title="Remove sub-text column">-</button>
-                                <button type="button" class="small-sub-column-btn" data-action="add" title="Add sub-text column (max 4)">+</button>
-                            </div>
-                        </div>
-                        <div class="sub-text-inputs" id="sub-text-inputs">
-                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="8 mm">
-                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="10 mm">
-                            <input type="text" class="sub-text-input" placeholder="e.g. DIN 7984" value="12 mm">
-                        </div>
-                    </div>
-
-                    <div class="button-group">
-                        <button id="download-png" title="Download as high-quality PNG with transparent background">Download PNG</button>
-                        <button id="download-svg" title="Download as vector SVG (scalable and editable)">Download SVG</button>
                     </div>
                 </div>
 
@@ -126,7 +150,7 @@
             <div class="tab-content" id="batch-tab" style="display: none;">
                 <div class="batch-controls">
                     <div class="control-group">
-                        <label for="yaml-input">YAML Input:</label>
+                        <label for="yaml-input">YAML Input</label>
                         <textarea id="yaml-input" rows="20" placeholder="Loading template..."></textarea>
                     </div>
 
@@ -143,11 +167,39 @@
         
         <footer>
             <div class="attribution">
-                <p><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 8px;"><path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg><a href="https://github.com/timmmmmmmmm/halagen" target="_blank">HaLaGen (Hardware Label Generator)</a> by <a href="https://www.timvanderheide.com" target="_blank">Tim van der Heide</a></p>
+                <p><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 8px;"><path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg><a href="https://github.com/timmmmmmmmm/halagen" target="_blank">halagen (hardware label generator)</a> by <a href="https://www.timvanderheide.com" target="_blank">Tim van der Heide</a></p>
                 <p>Icon set by <a href="https://www.printables.com/model/621771-gridfinity-bin-label-icons" target="_blank">Joe Jankowiak</a> 
                    - Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></p>
             </div>
         </footer>
+    </div>
+
+    <!-- Icon picker overlay - moved to body level -->
+    <div class="icon-picker-overlay"></div>
+
+    <!-- Icon picker modal - moved to body level -->
+    <div id="icon-picker" class="icon-picker" style="display: none;">
+        <div class="icon-picker-header">
+            <h3>Choose Icon</h3>
+            <button type="button" class="icon-picker-close" onclick="labelMaker.closeIconPicker()">×</button>
+        </div>
+        <div class="icon-picker-search">
+            <input type="text" placeholder="Search icons..." id="icon-search">
+            <input type="file" id="icon-upload" accept="image/png" style="display: none;">
+            <button type="button" id="upload-icon-btn" class="upload-icon-btn" title="Upload a custom PNG icon (any aspect ratio, black & white recommended)">📁 Upload Custom Icon</button>
+        </div>
+        <div class="icon-picker-grid" id="icon-grid">
+            <!-- Icons will be populated by JavaScript -->
+        </div>
+        
+        <!-- Hidden elements for compatibility -->
+        <div class="icon-picker-selected" style="display: none;">
+            <div class="selected-icon" data-icon="heads_hex_socket">
+                <img src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
+                <span>Hex Socket</span>
+            </div>
+            <button type="button" class="icon-picker-button">Choose Icon</button>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>

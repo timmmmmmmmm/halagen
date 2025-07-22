@@ -11,6 +11,7 @@ class LabelMaker {
         this.initializeYamlEditor();
         this.initializeIconPicker();
         this.initializeIconUpload();
+        this.loadDPISettings();
     }
 
     loadIconsFromStructure() {
@@ -27,7 +28,7 @@ class LabelMaker {
                 'hex-external': 'Hex External',
                 'hex-socket': 'Hex Socket',
                 'phillips': 'Phillips Head',
-                'pozidrive': 'Pozidrive',
+                'pozidriv': 'Pozidriv',
                 'robertson': 'Robertson Head',
                 'slotted': 'Slotted Head',
                 'square-external': 'Square External',
@@ -95,6 +96,41 @@ class LabelMaker {
         return icons;
     }
 
+    setupEditableTextHandlers(element) {
+        const resetScroll = () => {
+            element.scrollLeft = 0;
+            // Force selection to start if text is focused
+            if (document.activeElement === element) {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if (range.endOffset > element.textContent.length || element.scrollLeft > 0) {
+                        element.scrollLeft = 0;
+                    }
+                }
+            }
+        };
+
+        element.addEventListener('input', () => {
+            this.syncEditableTextToInputs();
+            // Force scroll to beginning to show start of text
+            setTimeout(resetScroll, 0);
+        });
+        
+        element.addEventListener('blur', () => {
+            this.syncEditableTextToInputs();
+            resetScroll();
+        });
+
+        element.addEventListener('focus', () => {
+            resetScroll();
+        });
+
+        element.addEventListener('keyup', () => {
+            resetScroll();
+        });
+    }
+
     initializeEventListeners() {
         // Basic form elements
         const iconSelect = document.getElementById('icon-select');
@@ -109,30 +145,100 @@ class LabelMaker {
         if (labelWidth) labelWidth.addEventListener('input', () => this.updatePreview());
         if (downloadPng) downloadPng.addEventListener('click', () => this.downloadPNG());
         
+        // DPI preset buttons
+        document.querySelectorAll('.dpi-preset-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const dpi = e.target.dataset.dpi;
+                document.getElementById('png-dpi').value = dpi;
+            });
+        });
+        
         const downloadSvg = document.getElementById('download-svg');
         if (downloadSvg) downloadSvg.addEventListener('click', () => this.downloadSVG());
         if (validateYaml) validateYaml.addEventListener('click', () => this.validateYAML());
         if (generateZip) generateZip.addEventListener('click', () => this.generateZIP());
         
-        // Column selector event listeners
-        document.querySelectorAll('.small-column-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const action = e.target.dataset.action;
-                this.updateColumn('main', action);
-            });
-        });
-        
-        document.querySelectorAll('.small-sub-column-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const action = e.target.dataset.action;
-                this.updateColumn('sub', action);
-            });
-        });
-        
+        // WYSIWYG preview interactions
+        this.setupPreviewInteractions();
         
         // Initial setup for text inputs
         this.setupMainTextInputs();
         this.setupSubTextInputs();
+    }
+
+    setupPreviewInteractions() {
+        // Add click handler to existing overlay
+        const overlay = document.querySelector('.icon-picker-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                this.closeIconPicker();
+            });
+        }
+
+        // Click handler for preview icon to open icon picker
+        const previewIcon = document.querySelector('.clickable-icon');
+        if (previewIcon) {
+            previewIcon.addEventListener('click', () => {
+                this.openIconPicker();
+            });
+        }
+
+        // Content editable text change handlers
+        document.querySelectorAll('.editable-text').forEach(element => {
+            this.setupEditableTextHandlers(element);
+        });
+
+
+        // Column control buttons in form
+        document.querySelectorAll('.column-btn, .column-btn-small').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const action = e.target.dataset.action;
+                const type = e.target.dataset.type;
+                this.updateColumn(type, action);
+            });
+        });
+    }
+
+    syncEditableTextToInputs() {
+        // Sync main text
+        const mainTextColumns = document.querySelectorAll('.main-text-column');
+        const mainTextInputs = document.querySelectorAll('.main-text-input');
+        
+        mainTextColumns.forEach((column, index) => {
+            if (mainTextInputs[index]) {
+                mainTextInputs[index].value = column.textContent.trim();
+            }
+        });
+
+        // Sync sub text
+        const subTextColumns = document.querySelectorAll('.sub-text-column');
+        const subTextInputs = document.querySelectorAll('.sub-text-input');
+        
+        subTextColumns.forEach((column, index) => {
+            if (subTextInputs[index]) {
+                subTextInputs[index].value = column.textContent.trim();
+            }
+        });
+    }
+
+
+    addHiddenInput(isMain, value = '') {
+        const container = document.getElementById(isMain ? 'main-text-inputs' : 'sub-text-inputs');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = isMain ? 'main-text-input' : 'sub-text-input';
+        input.value = value;
+        input.addEventListener('input', () => this.updatePreview());
+        container.appendChild(input);
+    }
+
+    removeHiddenInput(isMain) {
+        const container = document.getElementById(isMain ? 'main-text-inputs' : 'sub-text-inputs');
+        const inputs = container.querySelectorAll(isMain ? '.main-text-input' : '.sub-text-input');
+        if (inputs.length > 1) {
+            const lastInput = inputs[inputs.length - 1];
+            lastInput.remove();
+        }
     }
 
     initializeDefaultColumns() {
@@ -153,14 +259,60 @@ class LabelMaker {
         
         let currentCount = container.querySelectorAll(`.${inputClass}`).length;
         
-        if (action === 'add' && currentCount < 4) {
+        if (action === 'add' && currentCount < 8) {
             currentCount++;
         } else if (action === 'remove' && currentCount > 1) {
             currentCount--;
         }
         
         this.updateTextInputs(container, inputClass, currentCount, isMain);
+        this.updateColumnDisplay(type, currentCount);
+        this.updatePreviewFromInputs();
+    }
+
+    updateColumnDisplay(type, count) {
+        const countElement = document.getElementById(type === 'main' ? 'main-column-count' : 'sub-column-count');
+        if (countElement) {
+            countElement.textContent = count;
+        }
+    }
+
+    updatePreviewFromInputs() {
+        // Update the preview based on hidden inputs, then sync to editable elements
+        const mainInputs = document.querySelectorAll('.main-text-input');
+        const subInputs = document.querySelectorAll('.sub-text-input');
+        
+        // Update main text columns
+        const mainContainer = document.querySelector('.main-text');
+        mainContainer.innerHTML = '';
+        Array.from(mainInputs).forEach((input, index) => {
+            const column = document.createElement('div');
+            column.className = 'main-text-column editable-text';
+            column.contentEditable = true;
+            column.textContent = input.value.trim() || `New ${index + 1}`;
+            
+            this.setupEditableTextHandlers(column);
+            
+            mainContainer.appendChild(column);
+        });
+        
+        // Update sub text columns
+        const subContainer = document.querySelector('.sub-text');
+        subContainer.innerHTML = '';
+        Array.from(subInputs).forEach((input, index) => {
+            const column = document.createElement('div');
+            column.className = 'sub-text-column editable-text';
+            column.contentEditable = true;
+            column.textContent = input.value.trim() || `Sub ${index + 1}`;
+            
+            this.setupEditableTextHandlers(column);
+            
+            subContainer.appendChild(column);
+        });
+        
+        // Update other preview elements
         this.updatePreview();
+        
     }
 
     updateTextInputs(container, inputClass, columnCount, isMain) {
@@ -198,46 +350,45 @@ class LabelMaker {
 
     updatePreview() {
         const iconSelect = document.getElementById('icon-select').value;
-        const mainTextInputs = document.querySelectorAll('.main-text-input');
-        const mainTexts = Array.from(mainTextInputs).map(input => input.value.trim()).filter(text => text);
-        const subTextInputs = document.querySelectorAll('.sub-text-input');
-        const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
         const height = document.getElementById('label-height').value;
         const width = document.getElementById('label-width').value;
 
         const labelPreview = document.getElementById('header-label-preview');
-        const iconContainer = labelPreview.querySelector('.label-icon');
-        const mainTextElement = labelPreview.querySelector('.main-text');
-        const subTextElement = labelPreview.querySelector('.sub-text');
+        const iconContainer = labelPreview.querySelector('.label-icon img');
 
         // Get icon path from either built-in icons or custom icons
         const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
-        iconContainer.innerHTML = `<img class="icon" src="${iconPath}" alt="${iconSelect}">`;
-        
-        // Update main text with columns
-        if (mainTexts.length === 0) {
-            mainTextElement.innerHTML = '<div class="main-text-column">M3</div><div class="main-text-column">M3</div><div class="main-text-column">M3</div>';
-        } else {
-            const columnHTML = mainTexts.map(text => `<div class="main-text-column">${text}</div>`).join('');
-            mainTextElement.innerHTML = columnHTML;
-        }
-        
-        // Update sub text with columns
-        if (subTexts.length === 0) {
-            subTextElement.innerHTML = '<div class="sub-text-column">8 mm</div><div class="sub-text-column">10 mm</div><div class="sub-text-column">12 mm</div>';
-        } else {
-            const subColumnHTML = subTexts.map(text => `<div class="sub-text-column">${text}</div>`).join('');
-            subTextElement.innerHTML = subColumnHTML;
+        if (iconContainer) {
+            iconContainer.src = iconPath;
+            iconContainer.alt = iconSelect;
         }
 
         labelPreview.setAttribute('data-height', height);
         labelPreview.style.width = `${width}mm`;
-
-        if (subTexts.length === 0) {
-            subTextElement.style.display = 'none';
-        } else {
-            subTextElement.style.display = 'flex';
+        labelPreview.style.height = `${height}mm`;
+        
+        // Update CSS custom property for control positioning
+        document.documentElement.style.setProperty('--label-width', `${width}mm`);
+        
+        // Dynamically set icon size based on height (height - 2mm for 1mm margin on each side)
+        const iconSize = Math.max(6, height - 2); // Minimum 6mm, otherwise height - 2mm
+        const labelIcon = labelPreview.querySelector('.label-icon');
+        if (labelIcon) {
+            labelIcon.style.width = `${iconSize}mm`;
+            labelIcon.style.height = `${iconSize}mm`;
         }
+
+        // Check if sub text has any non-empty columns
+        const subTextColumns = document.querySelectorAll('.sub-text-column');
+        const hasSubText = Array.from(subTextColumns).some(col => col.textContent.trim());
+        const subTextContainer = document.querySelector('.sub-text');
+        
+        if (!hasSubText) {
+            subTextContainer.style.display = 'none';
+        } else {
+            subTextContainer.style.display = 'flex';
+        }
+        
     }
 
     async downloadPNG() {
@@ -252,9 +403,11 @@ class LabelMaker {
             const subTextInputs = document.querySelectorAll('.sub-text-input');
             const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
-            const dpi = 300;
+            const dpi = this.validateDPI(parseInt(document.getElementById('png-dpi').value) || 96);
+            const shouldRotate = document.getElementById('export-rotate').checked;
             const mmToPx = dpi / 25.4;
             
+            // Always set canvas to normal dimensions first (we'll rotate after drawing)
             canvas.width = width * mmToPx;
             canvas.height = height * mmToPx;
 
@@ -319,10 +472,20 @@ class LabelMaker {
                 });
             }
 
+            // Apply rotation if requested
+            let finalCanvas = canvas;
+            if (shouldRotate) {
+                finalCanvas = this.rotateCanvas(canvas, 90);
+            }
+            
+            // Save DPI setting to localStorage
+            this.saveDPISettings();
+            
             const link = document.createElement('a');
             const labelName = mainTexts.length > 0 ? mainTexts.join('_') : 'label';
-            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
-            link.href = canvas.toDataURL();
+            const rotation = shouldRotate ? '_rotated' : '';
+            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}-${dpi}dpi${rotation}.png`;
+            link.href = finalCanvas.toDataURL();
             link.click();
         } catch (error) {
             console.error('PNG download failed:', error);
@@ -339,19 +502,25 @@ class LabelMaker {
             const subTextInputs = document.querySelectorAll('.sub-text-input');
             const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
-
+            const shouldRotate = document.getElementById('export-rotate').checked;
+            
             const svg = await this.generateLabelSVG({
                 height_mm: height,
                 width_mm: width,
                 columns: mainTexts.length > 0 ? mainTexts : ['M3', 'M3', 'M3'],
                 subtext_columns: subTexts.length > 0 ? subTexts : ['8 mm', '10 mm', '12 mm'],
-                icon: iconSelect
+                icon: iconSelect,
+                rotate: shouldRotate
             });
+            
+            // Save DPI setting to localStorage
+            this.saveDPISettings();
 
             const blob = new Blob([svg], { type: 'image/svg+xml' });
             const link = document.createElement('a');
             const labelName = mainTexts.length > 0 ? mainTexts.join('_') : 'label';
-            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}.svg`;
+            const rotation = shouldRotate ? '_rotated' : '';
+            link.download = `label-${labelName.replace(/[^a-zA-Z0-9]/g, '_')}${rotation}.svg`;
             link.href = URL.createObjectURL(blob);
             link.click();
             URL.revokeObjectURL(link.href);
@@ -362,31 +531,68 @@ class LabelMaker {
     }
 
     async generateLabelSVG(label) {
-        const height = label.height_mm;
-        const width = label.width_mm;
+        const originalHeight = label.height_mm;
+        const originalWidth = label.width_mm;
+        const shouldRotate = label.rotate || false;
+        
         const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
         const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
         const iconSelect = label.icon;
+        const svgDpi = 96; // Fixed SVG DPI
 
-        const iconSize = height - 2;
+        // Always use original dimensions for layout calculations
+        const iconSize = originalHeight - 2;
         const iconX = 1;
         const iconY = 1;
         const textX = iconX + iconSize + 2;
-        const textAreaWidth = width - textX - 1;
+        const textAreaWidth = originalWidth - textX - 1;
+        
+        // For rotation, swap dimensions only for the SVG canvas
+        const canvasHeight = shouldRotate ? originalWidth : originalHeight;
+        const canvasWidth = shouldRotate ? originalHeight : originalWidth;
 
         // Use 96 PPI for SVG (Inkscape standard)
         const dpi = 96;
         const mmToPx = dpi / 25.4; // ~3.78
-        const baseFontSize = this.calculateFontSize(height);
+        const baseFontSize = this.calculateFontSize(originalHeight);
         const mainFontSizePx = baseFontSize * mmToPx;
         const subFontSizePx = mainFontSizePx * 0.75;
         
         // Convert to px-based viewBox for consistent sizing with PNG
-        const viewBoxWidth = width * mmToPx;
-        const viewBoxHeight = height * mmToPx;
+        const viewBoxWidth = canvasWidth * mmToPx;
+        const viewBoxHeight = canvasHeight * mmToPx;
         const scale = mmToPx; // For converting mm coordinates to px
 
-        let svgContent = `<svg width="${width}mm" height="${height}mm" viewBox="0 0 ${viewBoxWidth} ${viewBoxHeight}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">`;
+        let svgContent = `<svg width="${canvasWidth}mm" height="${canvasHeight}mm" viewBox="0 0 ${viewBoxWidth} ${viewBoxHeight}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <metadata>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description>
+        <dpi>${svgDpi}</dpi>
+        <print-dpi>${svgDpi}</print-dpi>
+      </rdf:Description>
+    </rdf:RDF>
+  </metadata>`;
+
+        // Add rotation group if needed
+        if (shouldRotate) {
+            // For 90-degree rotation, we need to rotate around the center and then translate
+            // to ensure the content fits within the swapped canvas dimensions
+            const originalViewBoxWidth = originalWidth * mmToPx;
+            const originalViewBoxHeight = originalHeight * mmToPx;
+            const centerX = originalViewBoxWidth / 2;
+            const centerY = originalViewBoxHeight / 2;
+            
+            // Calculate the translation needed after rotation to center content in new canvas
+            const translateX = (viewBoxWidth - originalViewBoxWidth) / 2;
+            const translateY = (viewBoxHeight - originalViewBoxHeight) / 2;
+            
+            svgContent += `<g transform="translate(${translateX + centerX}, ${translateY + centerY}) rotate(90) translate(${-centerX}, ${-centerY})">`;
+        }
+
+        // Add transparent background box for easier selection in design software
+        const backgroundWidth = originalWidth * mmToPx;
+        const backgroundHeight = originalHeight * mmToPx;
+        svgContent += `<rect x="0" y="0" width="${backgroundWidth}" height="${backgroundHeight}" fill="white" fill-opacity="0.01" stroke="none"/>`;
 
         // Add icon - convert coordinates to pixel space
         const iconXPx = iconX * scale;
@@ -438,7 +644,7 @@ class LabelMaker {
         // Add main text - position so bottom of text is on horizontal centerline
         const textXPx = textX * scale;
         const textAreaWidthPx = textAreaWidth * scale;
-        const centerYPx = viewBoxHeight / 2; // Horizontal centerline of label
+        const centerYPx = (originalHeight * mmToPx) / 2; // Use original height for centerline
         const textYPx = subTexts.length > 0 ? centerYPx : centerYPx;
         
         if (mainTexts.length === 1) {
@@ -463,6 +669,11 @@ class LabelMaker {
                     svgContent += `<text x="${columnXPx}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
                 });
             }
+        }
+
+        // Close rotation group if needed
+        if (shouldRotate) {
+            svgContent += '</g>';
         }
 
         svgContent += '</svg>';
@@ -616,6 +827,7 @@ class LabelMaker {
             const generateLongPng = parsed.long_png || false;
             const includeCutMarks = parsed.cut_marks || false;
             const generateSvg = parsed.export_svg || false;
+            const dpiSetting = parsed.png_dpi || 300;
             
             // Generate individual labels
             for (let i = 0; i < labels.length; i++) {
@@ -623,7 +835,7 @@ class LabelMaker {
                 const titleText = label.title || (label.columns ? label.columns.join('_') : 'label');
                 
                 // Generate PNG
-                const canvas = await this.generateLabelCanvas(label);
+                const canvas = await this.generateLabelCanvas(label, dpiSetting);
                 const imageData = canvas.toDataURL().split(',')[1];
                 const pngFilename = `label_${i + 1}_${titleText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
                 zip.file(pngFilename, imageData, { base64: true });
@@ -638,7 +850,7 @@ class LabelMaker {
             
             // Generate long PNG strip if requested
             if (generateLongPng) {
-                const longPngCanvas = await this.generateLongPngStrip(labels, includeCutMarks);
+                const longPngCanvas = await this.generateLongPngStrip(labels, includeCutMarks, dpiSetting);
                 const longPngData = longPngCanvas.toDataURL().split(',')[1];
                 
                 // Calculate total strip length - no extra space for cut marks
@@ -746,7 +958,7 @@ class LabelMaker {
                 if (line.includes(':')) {
                     const [key, value] = line.split(':', 2);
                     const trimmedKey = key.trim();
-                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks' || trimmedKey === 'export_svg' || trimmedKey === 'width_mm' || trimmedKey === 'height_mm') {
+                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks' || trimmedKey === 'export_svg' || trimmedKey === 'width_mm' || trimmedKey === 'height_mm' || trimmedKey === 'png_dpi') {
                         result[trimmedKey] = this.parseValue(value.trim());
                     }
                 }
@@ -826,6 +1038,10 @@ class LabelMaker {
         if (parsed.height_mm !== undefined && (typeof parsed.height_mm !== 'number' || !validHeights.includes(parsed.height_mm))) {
             errors.push(`Invalid global height_mm. Must be one of: ${validHeights.join(', ')} if provided`);
         }
+        
+        if (parsed.png_dpi !== undefined && (typeof parsed.png_dpi !== 'number' || parsed.png_dpi < 50 || parsed.png_dpi > 1200)) {
+            errors.push('Invalid global png_dpi. Must be a number between 50 and 1200 if provided');
+        }
 
         parsed.labels.forEach((label, index) => {
             const labelNum = index + 1;
@@ -850,8 +1066,8 @@ class LabelMaker {
                 errors.push(`Label ${labelNum}: Cannot have both title and columns. Use either title for single column or columns/maintext_columns for multi-column`);
             } else if (label.title && typeof label.title !== 'string') {
                 errors.push(`Label ${labelNum}: Invalid title. Must be a string`);
-            } else if (label.columns && (!Array.isArray(label.columns) || label.columns.length === 0 || label.columns.length > 4)) {
-                errors.push(`Label ${labelNum}: Invalid columns/maintext_columns. Must be an array with 1-4 string elements`);
+            } else if (label.columns && (!Array.isArray(label.columns) || label.columns.length === 0 || label.columns.length > 8)) {
+                errors.push(`Label ${labelNum}: Invalid columns/maintext_columns. Must be an array with 1-8 string elements`);
             } else if (label.columns && label.columns.some(col => typeof col !== 'string')) {
                 errors.push(`Label ${labelNum}: Invalid columns/maintext_columns. All column values must be strings`);
             }
@@ -874,8 +1090,8 @@ class LabelMaker {
                 errors.push(`Label ${labelNum}: Invalid subtext. Must be a string if provided`);
             }
             
-            if (label.subtext_columns && (!Array.isArray(label.subtext_columns) || label.subtext_columns.length === 0 || label.subtext_columns.length > 4)) {
-                errors.push(`Label ${labelNum}: Invalid subtext_columns. Must be an array with 1-4 string elements if provided`);
+            if (label.subtext_columns && (!Array.isArray(label.subtext_columns) || label.subtext_columns.length === 0 || label.subtext_columns.length > 8)) {
+                errors.push(`Label ${labelNum}: Invalid subtext_columns. Must be an array with 1-8 string elements if provided`);
             } else if (label.subtext_columns && label.subtext_columns.some(col => typeof col !== 'string')) {
                 errors.push(`Label ${labelNum}: Invalid subtext_columns. All column values must be strings`);
             }
@@ -888,7 +1104,7 @@ class LabelMaker {
         };
     }
 
-    async generateLabelCanvas(label) {
+    async generateLabelCanvas(label, dpi = 300) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
@@ -902,8 +1118,6 @@ class LabelMaker {
         const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
         const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
         const iconSelect = label.icon;
-
-        const dpi = 300;
         const mmToPx = dpi / 25.4;
         
         canvas.width = width * mmToPx;
@@ -963,8 +1177,7 @@ class LabelMaker {
         return canvas;
     }
 
-    async generateLongPngStrip(labels, includeCutMarks) {
-        const dpi = 300;
+    async generateLongPngStrip(labels, includeCutMarks, dpi = 300) {
         const mmToPx = dpi / 25.4;
         
         // Calculate dimensions - horizontal strip
@@ -976,7 +1189,7 @@ class LabelMaker {
         
         // Generate individual label canvases and calculate total width
         for (const label of labels) {
-            const canvas = await this.generateLabelCanvas(label);
+            const canvas = await this.generateLabelCanvas(label, dpi);
             labelCanvases.push(canvas);
             totalWidth += canvas.width;
             // No extra space for cut marks - they're just visual lines
@@ -1199,11 +1412,12 @@ cut_marks: true       # Add cut marks between labels for easy trimming
 export_svg: true      # Also generate SVG files (vector format, scalable)
 width_mm: 50          # Default width for all labels (20-100mm)
 height_mm: 12         # Default height for all labels (9, 12, 18, or 24mm)
+png_dpi: 300          # PNG export resolution in dots per inch (50-1200)
 
 labels:
   # Multi-column label example (great for drawer compartments)
   - icon: "heads_hex_socket"            # Icon to display on the left
-    maintext_columns:                   # Main text columns (1-4 columns max)
+    maintext_columns:                   # Main text columns (1-8 columns max)
       - "M3"
       - "M3" 
       - "M3"
@@ -1211,6 +1425,7 @@ labels:
       - "8 mm"
       - "10 mm"
       - "12 mm"
+    rotate: false                       # Rotate label 90 degrees (default: false)
 
   # Another multi-column example
   - icon: "heads_hex_socket"
@@ -1222,6 +1437,7 @@ labels:
       - "14 mm"
       - "16 mm"
       - "18 mm"
+    rotate: false                       # Rotate label 90 degrees (default: false)
 
 # Single column alternatives (if you prefer):
 # - title: "M5 × 20"                   # Single main text
@@ -1229,6 +1445,7 @@ labels:
 #   icon: "fasteners_screw_hex"
 #   width_mm: 45                       # Override global width
 #   height_mm: 18                      # Override global height
+#   rotate: false                      # Rotate label 90 degrees (default: false)
 `;
         
         // Set the template in the YAML editor
@@ -1280,7 +1497,7 @@ labels:
     initializeIconPicker() {
         const iconCategories = {
             'Electronics': ['electronics_wago_logo', 'electronics_wago_alt1', 'electronics_wago_alt2', 'electronics_wire_nut', 'electronics_generic'],
-            'Screw Heads': ['heads_cross', 'heads_hex_external', 'heads_hex_socket', 'heads_phillips', 'heads_pozidrive', 'heads_robertson', 'heads_slotted', 'heads_square_external', 'heads_ta', 'heads_torx', 'heads_torx_tamperproof'],
+            'Screw Heads': ['heads_cross', 'heads_hex_external', 'heads_hex_socket', 'heads_phillips', 'heads_pozidriv', 'heads_robertson', 'heads_slotted', 'heads_square_external', 'heads_ta', 'heads_torx', 'heads_torx_tamperproof'],
             'Inserts': ['inserts_heat', 'inserts_wood'],
             'Nuts': ['nuts_nut_cap', 'nuts_nut_lock', 'nuts_nut_standard'],
             'Screws': ['fasteners_screw_round', 'fasteners_screw_tbolt', 'fasteners_screw_truss', 'fasteners_screw_truss_modified', 'fasteners_screw_wafer', 'fasteners_screw_bugle', 'fasteners_screw_fillister', 'fasteners_screw_flat', 'fasteners_screw_hex', 'fasteners_screw_oval', 'fasteners_screw_pan', 'fasteners_screw_pan_hex', 'fasteners_screw_thumb_knurled', 'fasteners_screw_trim', 'fasteners_thumb_screw'],
@@ -1297,7 +1514,7 @@ labels:
             'heads_hex_external': 'Hex External',
             'heads_hex_socket': 'Hex Socket',
             'heads_phillips': 'Phillips Head',
-            'heads_pozidrive': 'Pozidrive',
+            'heads_pozidriv': 'Pozidriv',
             'heads_robertson': 'Robertson Head',
             'heads_slotted': 'Slotted Head',
             'heads_square_external': 'Square External',
@@ -1338,30 +1555,13 @@ labels:
         // Populate the icon grid
         this.populateIconGrid();
 
-        // Event listeners
-        const pickerSelected = document.querySelector('.icon-picker-selected');
-        const searchInput = document.getElementById('icon-search');
-
-        pickerSelected.addEventListener('click', () => {
-            const isActive = pickerSelected.classList.contains('active');
-            if (isActive) {
-                this.closeIconPicker();
-            } else {
-                this.openIconPicker();
-            }
-        });
-
-        // Close picker when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!document.getElementById('icon-picker').contains(e.target)) {
-                this.closeIconPicker();
-            }
-        });
-
         // Search functionality
-        searchInput.addEventListener('input', (e) => {
-            this.filterIcons(e.target.value);
-        });
+        const searchInput = document.getElementById('icon-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.filterIcons(e.target.value);
+            });
+        }
     }
 
     populateIconGrid() {
@@ -1459,28 +1659,38 @@ labels:
     }
 
     openIconPicker() {
-        const pickerSelected = document.querySelector('.icon-picker-selected');
-        const pickerDropdown = document.querySelector('.icon-picker-dropdown');
+        const iconPicker = document.getElementById('icon-picker');
+        const overlay = document.querySelector('.icon-picker-overlay');
         
-        pickerSelected.classList.add('active');
-        pickerDropdown.style.display = 'block';
-        
-        // Focus search input
-        setTimeout(() => {
-            document.getElementById('icon-search').focus();
-        }, 100);
+        if (iconPicker && overlay) {
+            iconPicker.style.display = 'block';
+            overlay.classList.add('active');
+            
+            // Focus search input
+            setTimeout(() => {
+                const searchInput = document.getElementById('icon-search');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }, 100);
+        }
     }
 
     closeIconPicker() {
-        const pickerSelected = document.querySelector('.icon-picker-selected');
-        const pickerDropdown = document.querySelector('.icon-picker-dropdown');
+        const iconPicker = document.getElementById('icon-picker');
+        const overlay = document.querySelector('.icon-picker-overlay');
         
-        pickerSelected.classList.remove('active');
-        pickerDropdown.style.display = 'none';
-        
-        // Clear search
-        document.getElementById('icon-search').value = '';
-        this.filterIcons('');
+        if (iconPicker && overlay) {
+            iconPicker.style.display = 'none';
+            overlay.classList.remove('active');
+            
+            // Clear search
+            const searchInput = document.getElementById('icon-search');
+            if (searchInput) {
+                searchInput.value = '';
+                this.filterIcons('');
+            }
+        }
     }
 
     filterIcons(searchTerm) {
@@ -1525,6 +1735,64 @@ labels:
             if (this.selectedIcon === iconKey) {
                 this.selectIcon('heads_hex_socket');
             }
+        }
+    }
+
+    validateDPI(dpi) {
+        // Validate DPI is within acceptable range
+        if (isNaN(dpi) || dpi < 50 || dpi > 1200) {
+            return 96; // Default fallback
+        }
+        return dpi;
+    }
+
+    rotateCanvas(canvas, degrees) {
+        const rotatedCanvas = document.createElement('canvas');
+        const rotatedCtx = rotatedCanvas.getContext('2d');
+        
+        // For 90 degree rotation, swap width and height
+        if (degrees === 90) {
+            rotatedCanvas.width = canvas.height;
+            rotatedCanvas.height = canvas.width;
+            
+            // Translate and rotate
+            rotatedCtx.translate(canvas.height, 0);
+            rotatedCtx.rotate(Math.PI / 2);
+        }
+        
+        // Draw the original canvas onto the rotated canvas
+        rotatedCtx.drawImage(canvas, 0, 0);
+        
+        return rotatedCanvas;
+    }
+
+    loadDPISettings() {
+        try {
+            const settings = localStorage.getItem('dpiSettings');
+            if (settings) {
+                const parsed = JSON.parse(settings);
+                if (parsed.pngDpi) {
+                    document.getElementById('png-dpi').value = this.validateDPI(parsed.pngDpi);
+                }
+                // SVG DPI removed - using fixed 96 DPI
+                if (parsed.exportRotate !== undefined) {
+                    document.getElementById('export-rotate').checked = parsed.exportRotate;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading DPI settings:', error);
+        }
+    }
+
+    saveDPISettings() {
+        try {
+            const settings = {
+                pngDpi: parseInt(document.getElementById('png-dpi').value),
+                exportRotate: document.getElementById('export-rotate').checked
+            };
+            localStorage.setItem('dpiSettings', JSON.stringify(settings));
+        } catch (error) {
+            console.error('Error saving DPI settings:', error);
         }
     }
 }
