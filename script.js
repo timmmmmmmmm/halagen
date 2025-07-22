@@ -827,6 +827,7 @@ class LabelMaker {
             const generateLongPng = parsed.long_png || false;
             const includeCutMarks = parsed.cut_marks || false;
             const generateSvg = parsed.export_svg || false;
+            const dpiSetting = parsed.png_dpi || 300;
             
             // Generate individual labels
             for (let i = 0; i < labels.length; i++) {
@@ -834,7 +835,7 @@ class LabelMaker {
                 const titleText = label.title || (label.columns ? label.columns.join('_') : 'label');
                 
                 // Generate PNG
-                const canvas = await this.generateLabelCanvas(label);
+                const canvas = await this.generateLabelCanvas(label, dpiSetting);
                 const imageData = canvas.toDataURL().split(',')[1];
                 const pngFilename = `label_${i + 1}_${titleText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
                 zip.file(pngFilename, imageData, { base64: true });
@@ -849,7 +850,7 @@ class LabelMaker {
             
             // Generate long PNG strip if requested
             if (generateLongPng) {
-                const longPngCanvas = await this.generateLongPngStrip(labels, includeCutMarks);
+                const longPngCanvas = await this.generateLongPngStrip(labels, includeCutMarks, dpiSetting);
                 const longPngData = longPngCanvas.toDataURL().split(',')[1];
                 
                 // Calculate total strip length - no extra space for cut marks
@@ -957,7 +958,7 @@ class LabelMaker {
                 if (line.includes(':')) {
                     const [key, value] = line.split(':', 2);
                     const trimmedKey = key.trim();
-                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks' || trimmedKey === 'export_svg' || trimmedKey === 'width_mm' || trimmedKey === 'height_mm') {
+                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks' || trimmedKey === 'export_svg' || trimmedKey === 'width_mm' || trimmedKey === 'height_mm' || trimmedKey === 'png_dpi') {
                         result[trimmedKey] = this.parseValue(value.trim());
                     }
                 }
@@ -1037,6 +1038,10 @@ class LabelMaker {
         if (parsed.height_mm !== undefined && (typeof parsed.height_mm !== 'number' || !validHeights.includes(parsed.height_mm))) {
             errors.push(`Invalid global height_mm. Must be one of: ${validHeights.join(', ')} if provided`);
         }
+        
+        if (parsed.png_dpi !== undefined && (typeof parsed.png_dpi !== 'number' || parsed.png_dpi < 50 || parsed.png_dpi > 1200)) {
+            errors.push('Invalid global png_dpi. Must be a number between 50 and 1200 if provided');
+        }
 
         parsed.labels.forEach((label, index) => {
             const labelNum = index + 1;
@@ -1099,7 +1104,7 @@ class LabelMaker {
         };
     }
 
-    async generateLabelCanvas(label) {
+    async generateLabelCanvas(label, dpi = 300) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
@@ -1113,8 +1118,6 @@ class LabelMaker {
         const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
         const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
         const iconSelect = label.icon;
-
-        const dpi = 300;
         const mmToPx = dpi / 25.4;
         
         canvas.width = width * mmToPx;
@@ -1174,8 +1177,7 @@ class LabelMaker {
         return canvas;
     }
 
-    async generateLongPngStrip(labels, includeCutMarks) {
-        const dpi = 300;
+    async generateLongPngStrip(labels, includeCutMarks, dpi = 300) {
         const mmToPx = dpi / 25.4;
         
         // Calculate dimensions - horizontal strip
@@ -1187,7 +1189,7 @@ class LabelMaker {
         
         // Generate individual label canvases and calculate total width
         for (const label of labels) {
-            const canvas = await this.generateLabelCanvas(label);
+            const canvas = await this.generateLabelCanvas(label, dpi);
             labelCanvases.push(canvas);
             totalWidth += canvas.width;
             // No extra space for cut marks - they're just visual lines
@@ -1410,6 +1412,7 @@ cut_marks: true       # Add cut marks between labels for easy trimming
 export_svg: true      # Also generate SVG files (vector format, scalable)
 width_mm: 50          # Default width for all labels (20-100mm)
 height_mm: 12         # Default height for all labels (9, 12, 18, or 24mm)
+png_dpi: 300          # PNG export resolution in dots per inch (50-1200)
 
 labels:
   # Multi-column label example (great for drawer compartments)
