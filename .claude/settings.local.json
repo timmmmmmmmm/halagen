@@ -5,7 +5,8 @@
       "Bash(open:*)",
       "Bash(rm:*)",
       "Bash(find:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }
