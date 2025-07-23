@@ -143,6 +143,21 @@ class LabelMaker {
         if (iconSelect) iconSelect.addEventListener('change', () => this.updatePreview());
         if (labelHeight) labelHeight.addEventListener('change', () => this.updatePreview());
         if (labelWidth) labelWidth.addEventListener('input', () => this.updatePreview());
+        
+        // Icon count selector
+        document.querySelectorAll('.icon-count-selector .btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active state
+                document.querySelectorAll('.icon-count-selector .btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // Update icon display in button
+                this.updateIconCountDisplay();
+                
+                // Update preview
+                this.updatePreview();
+            });
+        });
         if (downloadPng) downloadPng.addEventListener('click', () => this.downloadPNG());
         
         // Dimension arrow controls
@@ -245,6 +260,7 @@ class LabelMaker {
         // Content editable text change handlers
         document.querySelectorAll('.editable-text').forEach(element => {
             this.setupEditableTextHandlers(element);
+            this.setupTextAlignmentTooltip(element);
         });
 
 
@@ -406,20 +422,164 @@ class LabelMaker {
             input.addEventListener('input', () => this.updatePreview());
         });
     }
+    
+    setupTextAlignmentTooltip(element) {
+        const tooltip = document.getElementById('text-alignment-tooltip');
+        
+        // Initialize global hover state if not exists
+        if (!window.tooltipHoverState) {
+            window.tooltipHoverState = {
+                isOverElement: false,
+                isOverTooltip: false,
+                currentElement: null
+            };
+        }
+        
+        // Hover enter on text element
+        element.addEventListener('mouseenter', (e) => {
+            window.tooltipHoverState.isOverElement = true;
+            window.tooltipHoverState.currentElement = element;
+            this.showAlignmentTooltip(element, tooltip);
+        });
+        
+        // Hover leave on text element
+        element.addEventListener('mouseleave', (e) => {
+            window.tooltipHoverState.isOverElement = false;
+            setTimeout(() => {
+                if (!window.tooltipHoverState.isOverElement && !window.tooltipHoverState.isOverTooltip) {
+                    this.hideAlignmentTooltip(tooltip);
+                }
+            }, 100);
+        });
+        
+        // Tooltip hover handlers (only add once)
+        if (!tooltip.hasAttribute('data-handlers-added')) {
+            tooltip.setAttribute('data-handlers-added', 'true');
+            
+            tooltip.addEventListener('mouseenter', () => {
+                window.tooltipHoverState.isOverTooltip = true;
+            });
+            
+            tooltip.addEventListener('mouseleave', () => {
+                window.tooltipHoverState.isOverTooltip = false;
+                setTimeout(() => {
+                    if (!window.tooltipHoverState.isOverElement && !window.tooltipHoverState.isOverTooltip) {
+                        this.hideAlignmentTooltip(tooltip);
+                    }
+                }, 100);
+            });
+            
+            // Alignment button clicks
+            tooltip.querySelectorAll('.alignment-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const alignment = e.currentTarget.dataset.align;
+                    const activeElement = window.tooltipHoverState.currentElement;
+                    if (activeElement) {
+                        this.applyTextAlignment(activeElement, alignment);
+                        this.updateAlignmentButtons(tooltip, alignment);
+                    }
+                });
+            });
+        }
+    }
+    
+    showAlignmentTooltip(targetElement, tooltip) {
+        const rect = targetElement.getBoundingClientRect();
+        const isMainText = targetElement.closest('.main-text') !== null;
+        
+        // Position tooltip centered horizontally
+        const left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2);
+        
+        if (isMainText) {
+            // Show above main text - positioned closer
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${rect.top - tooltip.offsetHeight - 2}px`;
+        } else {
+            // Show below sub text - positioned closer
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${rect.bottom + 2}px`;
+        }
+        
+        tooltip.classList.add('show');
+        
+        // Update active alignment button
+        const currentAlign = this.getCurrentAlignment(targetElement);
+        this.updateAlignmentButtons(tooltip, currentAlign);
+    }
+    
+    hideAlignmentTooltip(tooltip) {
+        tooltip.classList.remove('show');
+    }
+    
+    getCurrentAlignment(element) {
+        const computedStyle = window.getComputedStyle(element);
+        const textAlign = computedStyle.textAlign;
+        return textAlign === 'start' ? 'left' : textAlign;
+    }
+    
+    applyTextAlignment(element, alignment) {
+        element.style.textAlign = alignment;
+        
+        // Apply to all columns in the same row
+        const isMainText = element.closest('.main-text') !== null;
+        const selector = isMainText ? '.main-text-column' : '.sub-text-column';
+        
+        document.querySelectorAll(selector).forEach(col => {
+            col.style.textAlign = alignment;
+        });
+    }
+    
+    updateAlignmentButtons(tooltip, activeAlignment) {
+        tooltip.querySelectorAll('.alignment-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.align === activeAlignment);
+        });
+    }
+    
+    getIconCount() {
+        const activeBtn = document.querySelector('.icon-count-selector .btn.active');
+        return activeBtn ? parseInt(activeBtn.getAttribute('data-icon-count')) : 1;
+    }
+    
+    updateIconCountDisplay() {
+        // Icon display removed for cleaner look
+        // Button text (0, 1, 2) is sufficient indication
+    }
 
     updatePreview() {
         const iconSelect = document.getElementById('icon-select').value;
         const height = document.getElementById('label-height').value;
         const width = document.getElementById('label-width').value;
+        const iconCount = this.getIconCount();
 
         const labelPreview = document.getElementById('header-label-preview');
         const iconContainer = labelPreview.querySelector('.label-icon img');
+        const labelIcon = labelPreview.querySelector('.label-icon');
+        const labelText = labelPreview.querySelector('.label-text');
 
-        // Get icon path from either built-in icons or custom icons
-        const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
-        if (iconContainer) {
-            iconContainer.src = iconPath;
-            iconContainer.alt = iconSelect;
+        // Handle icon visibility based on icon count
+        if (labelIcon) {
+            if (iconCount === 0) {
+                labelIcon.style.display = 'none';
+                // Expand text to full width when no icons
+                if (labelText) {
+                    labelText.style.marginLeft = '0';
+                    labelText.style.width = '100%';
+                }
+            } else {
+                labelIcon.style.display = 'flex';
+                // Reset text positioning for icon mode
+                if (labelText) {
+                    labelText.style.marginLeft = '';
+                    labelText.style.width = '';
+                }
+                
+                // Get icon path from either built-in icons or custom icons
+                const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
+                if (iconContainer) {
+                    iconContainer.src = iconPath;
+                    iconContainer.alt = iconSelect;
+                }
+            }
         }
 
         labelPreview.setAttribute('data-height', height);
@@ -431,7 +591,6 @@ class LabelMaker {
         
         // Dynamically set icon size based on height (height - 2mm for 1mm margin on each side)
         const iconSize = Math.max(6, height - 2); // Minimum 6mm, otherwise height - 2mm
-        const labelIcon = labelPreview.querySelector('.label-icon');
         if (labelIcon) {
             labelIcon.style.width = `${iconSize}mm`;
             labelIcon.style.height = `${iconSize}mm`;

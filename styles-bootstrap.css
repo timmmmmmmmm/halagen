@@ -749,6 +749,99 @@ body {
     background: #c82333;
 }
 
+/* Text Alignment Tooltip Styles */
+.text-alignment-tooltip {
+    position: absolute;
+    background: white;
+    border: 1px solid #adb5bd;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    padding: 3px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.1s ease;
+}
+
+.text-alignment-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.alignment-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.alignment-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #dee2e6;
+    background: white;
+    color: #6c757d;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.alignment-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    color: #495057;
+}
+
+.alignment-btn.active {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.alignment-btn i {
+    font-size: 11px;
+}
+
+/* Enhanced editable text hover state */
+.editable-text:hover {
+    background-color: rgba(0, 123, 255, 0.08);
+    outline: 1px solid rgba(0, 123, 255, 0.25);
+}
+
+/* Icon Count Selector Styles */
+.icon-count-control {
+    margin-bottom: 10px;
+}
+
+.icon-count-selector .btn {
+    font-size: 11px;
+    padding: 4px 8px;
+    font-weight: 600;
+    min-width: 32px;
+    border-color: #dee2e6;
+}
+
+.icon-count-selector .btn.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.icon-count-selector .btn:not(.active):hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.icon-count-selector .btn i {
+    font-size: 10px;
+    margin-left: 2px;
+}
+
 /* Footer Styles */
 footer {
     margin-top: 20px;
