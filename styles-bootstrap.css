@@ -251,6 +251,21 @@ body {
     font-size: 14px;
     color: #666;
     font-weight: bold;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.dimension-arrow:hover {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.dimension-arrow:active {
+    background-color: #dee2e6;
+    transform: scale(0.95);
 }
 
 .dimension-control {
@@ -262,6 +277,18 @@ body {
 
 .dimension-control .input-group {
     width: 95px !important;
+}
+
+/* Hide number input arrows */
+.dimension-control input[type="number"]::-webkit-outer-spin-button,
+.dimension-control input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.dimension-control input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .dimension-control.vertical {
