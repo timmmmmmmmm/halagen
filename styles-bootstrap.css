@@ -775,24 +775,15 @@ footer {
     padding: 2px 8px;
 }
 
-/* PNG DPI inline layout */
-.dpi-inline {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
+/* Make download button group match height of settings column */
+.export-section .btn-group {
+    height: 100%;
 }
 
-.dpi-inline .form-label {
-    margin: 0;
-    white-space: nowrap;
-    font-size: 13px;
+.export-section .btn-group .btn {
+    height: 100%;
 }
 
-.dpi-inline .form-control {
-    width: 75px;
-    flex-shrink: 0;
-}
 
 /* Consistent alignment and font styling for export controls */
 .form-check.form-switch .form-check-label {
