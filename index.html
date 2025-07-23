@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>halagen</title>
     <link rel="icon" type="image/svg+xml" href="icons/heads/Screw_Head_-_Hex_Socket.svg">
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles-bootstrap.css">
 </head>
 <body>
-    <div class="container">
+    <div class="container-fluid"  style="max-width: 800px;">
         <div class="header-logo">
             <img src="img/header.png" alt="HALAGEN" class="logo">
         </div>
@@ -17,9 +18,9 @@
 
         <main>
             <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" data-tab="single">Single</button>
-                    <button class="tab-button" data-tab="batch">Batch</button>
+                <div class="btn-group w-100 mb-2" role="group" aria-label="Tab selection">
+                    <button class="btn btn-outline-primary active" data-tab="single">Single</button>
+                    <button class="btn btn-outline-primary" data-tab="batch">Batch</button>
                 </div>
             </div>
 
@@ -30,8 +31,10 @@
                         <div class="dimensional-line horizontal">
                             <span class="dimension-arrow">←</span>
                             <div class="dimension-control">
-                                <input type="number" id="label-width" min="20" max="100" value="50" title="Custom width from 20-100mm">
-                                <label for="label-width">Width (mm)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" id="label-width" class="form-control" min="20" max="100" value="50" title="Custom width from 20-100mm">
+                                    <span class="input-group-text">mm</span>
+                                </div>
                             </div>
                             <span class="dimension-arrow">→</span>
                         </div>
@@ -44,8 +47,10 @@
                             <div class="dimensional-line vertical">
                                 <span class="dimension-arrow up">↑</span>
                                 <div class="dimension-control vertical">
-                                    <input type="number" id="label-height" min="9" max="50" value="12" title="Label height in millimeters">
-                                    <label for="label-height">Height (mm)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" id="label-height" class="form-control" min="9" max="50" value="12" title="Label height in millimeters">
+                                        <span class="input-group-text">mm</span>
+                                    </div>
                                 </div>
                                 <span class="dimension-arrow down">↓</span>
                             </div>
@@ -112,35 +117,30 @@
                     </div>
 
 
-                    <div class="export-section">
-                        <div class="export-columns">
-                            <!-- Column 1: Export Options -->
-                            <div class="export-column">
-                                <label class="checkbox-label compact">
-                                    <input type="checkbox" id="export-rotate">
-                                    <span class="checkmark"></span>
-                                    Rotate 90°
-                                </label>
-                                <div class="dpi-setting">
-                                    <div class="dpi-line">
-                                        <label for="png-dpi">PNG DPI</label>
-                                        <input type="number" id="png-dpi" min="50" max="1200" value="300" title="Dots per inch for PNG export (50-1200)">
-                                    </div>
-                                    <div class="dpi-presets">
-                                        <button type="button" class="dpi-preset-btn" data-dpi="96">Default</button>
-                                        <button type="button" class="dpi-preset-btn" data-dpi="203">Niimbot</button>
-                                    </div>
+                    <div class="export-section mt-3">
+                        <div class="row g-3">
+                            <!-- Column 1: Export Options (50% width) -->
+                            <div class="col-md-6">
+                                <div class="form-check form-switch d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-check-label" for="export-rotate">
+                                        Rotate 90°
+                                    </label>
+                                    <input class="form-check-input" type="checkbox" role="switch" id="export-rotate">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <input type="number" id="png-dpi" class="form-control" min="50" max="1200" value="300" title="Dots per inch for PNG export (50-1200)">
+                                    <span class="input-group-text">DPI</span>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-dpi="96">Default</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-dpi="203">Niimbot</button>
                                 </div>
                             </div>
                             
-                            <!-- Column 2: Download PNG -->
-                            <div class="export-column">
-                                <button id="download-png" class="export-button" title="Download as high-quality PNG with transparent background">Download PNG</button>
-                            </div>
-                            
-                            <!-- Column 3: Download SVG -->
-                            <div class="export-column">
-                                <button id="download-svg" class="export-button" title="Download as vector SVG (scalable and editable)">Download SVG</button>
+                            <!-- Column 2: Download Buttons (50% width) -->
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="btn-group w-100" role="group" aria-label="Download options">
+                                    <button id="download-png" class="btn btn-success" title="Download as high-quality PNG with transparent background">Download PNG</button>
+                                    <button id="download-svg" class="btn btn-primary" title="Download as vector SVG (scalable and editable)">Download SVG</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -150,15 +150,15 @@
 
             <div class="tab-content" id="batch-tab" style="display: none;">
                 <div class="batch-controls">
-                    <div class="control-group">
-                        <label for="yaml-input">YAML Input</label>
-                        <textarea id="yaml-input" rows="20" placeholder="Loading template..."></textarea>
+                    <div class="mb-3">
+                        <label for="yaml-input" class="form-label">YAML Input</label>
+                        <textarea id="yaml-input" class="form-control" rows="20" placeholder="Loading template..."></textarea>
                     </div>
 
 
-                    <div class="batch-buttons">
-                        <button id="validate-yaml" title="Check YAML syntax and validate label data">Validate YAML</button>
-                        <button id="generate-zip" title="Generate all labels and download as ZIP file">Generate and Download ZIP</button>
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button id="validate-yaml" class="btn btn-outline-primary me-md-2" title="Check YAML syntax and validate label data">Validate YAML</button>
+                        <button id="generate-zip" class="btn btn-success" title="Generate all labels and download as ZIP file">Generate and Download ZIP</button>
                     </div>
 
                     <div id="validation-result" class="validation-result"></div>
@@ -207,6 +207,7 @@
     <link rel="stylesheet" href="lib/codemirror.css">
     <script src="lib/codemirror.js"></script>
     <script src="lib/yaml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

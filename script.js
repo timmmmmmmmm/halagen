@@ -145,8 +145,11 @@ class LabelMaker {
         if (labelWidth) labelWidth.addEventListener('input', () => this.updatePreview());
         if (downloadPng) downloadPng.addEventListener('click', () => this.downloadPNG());
         
+        // Dimension arrow controls
+        this.initializeDimensionArrows();
+        
         // DPI preset buttons
-        document.querySelectorAll('.dpi-preset-btn').forEach(btn => {
+        document.querySelectorAll('[data-dpi]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const dpi = e.target.dataset.dpi;
                 document.getElementById('png-dpi').value = dpi;
@@ -164,6 +167,62 @@ class LabelMaker {
         // Initial setup for text inputs
         this.setupMainTextInputs();
         this.setupSubTextInputs();
+    }
+
+    initializeDimensionArrows() {
+        // Width arrows (horizontal)
+        const widthArrows = document.querySelectorAll('.width-control .dimension-arrow');
+        const widthInput = document.getElementById('label-width');
+        
+        if (widthArrows.length >= 2 && widthInput) {
+            const leftArrow = widthArrows[0]; // ←
+            const rightArrow = widthArrows[1]; // →
+            
+            leftArrow.addEventListener('click', () => {
+                const currentValue = parseInt(widthInput.value);
+                const minValue = parseInt(widthInput.min);
+                if (currentValue > minValue) {
+                    widthInput.value = currentValue - 1;
+                    widthInput.dispatchEvent(new Event('input'));
+                }
+            });
+            
+            rightArrow.addEventListener('click', () => {
+                const currentValue = parseInt(widthInput.value);
+                const maxValue = parseInt(widthInput.max);
+                if (currentValue < maxValue) {
+                    widthInput.value = currentValue + 1;
+                    widthInput.dispatchEvent(new Event('input'));
+                }
+            });
+        }
+        
+        // Height arrows (vertical)
+        const heightArrows = document.querySelectorAll('.height-control .dimension-arrow');
+        const heightInput = document.getElementById('label-height');
+        
+        if (heightArrows.length >= 2 && heightInput) {
+            const upArrow = heightArrows[0]; // ↑
+            const downArrow = heightArrows[1]; // ↓
+            
+            upArrow.addEventListener('click', () => {
+                const currentValue = parseInt(heightInput.value);
+                const maxValue = parseInt(heightInput.max);
+                if (currentValue < maxValue) {
+                    heightInput.value = currentValue + 1;
+                    heightInput.dispatchEvent(new Event('change'));
+                }
+            });
+            
+            downArrow.addEventListener('click', () => {
+                const currentValue = parseInt(heightInput.value);
+                const minValue = parseInt(heightInput.min);
+                if (currentValue > minValue) {
+                    heightInput.value = currentValue - 1;
+                    heightInput.dispatchEvent(new Event('change'));
+                }
+            });
+        }
     }
 
     setupPreviewInteractions() {
@@ -755,7 +814,7 @@ class LabelMaker {
     }
 
     initializeTabs() {
-        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabButtons = document.querySelectorAll('.btn[data-tab]');
         const tabContents = document.querySelectorAll('.tab-content');
 
         tabButtons.forEach(button => {
