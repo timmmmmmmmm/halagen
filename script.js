@@ -146,7 +146,7 @@ class LabelMaker {
         if (downloadPng) downloadPng.addEventListener('click', () => this.downloadPNG());
         
         // DPI preset buttons
-        document.querySelectorAll('.dpi-preset-btn').forEach(btn => {
+        document.querySelectorAll('[data-dpi]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const dpi = e.target.dataset.dpi;
                 document.getElementById('png-dpi').value = dpi;
@@ -755,7 +755,7 @@ class LabelMaker {
     }
 
     initializeTabs() {
-        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabButtons = document.querySelectorAll('.btn[data-tab]');
         const tabContents = document.querySelectorAll('.tab-content');
 
         tabButtons.forEach(button => {
