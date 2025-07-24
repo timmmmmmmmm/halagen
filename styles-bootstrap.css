@@ -834,11 +834,70 @@ body {
     justify-content: space-between !important;
 }
 
-/* Icon Count Selector Styles */
-.icon-count-control {
-    margin-bottom: 10px;
+/* Advanced Formatting Accordion Styles */
+.advanced-formatting-accordion {
+    margin-bottom: 15px;
 }
 
+.advanced-formatting-accordion .accordion-item {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.advanced-formatting-accordion .accordion-button {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+    border: none;
+    box-shadow: none;
+}
+
+.advanced-formatting-accordion .accordion-button:not(.collapsed) {
+    background-color: #e9ecef;
+    color: #495057;
+    box-shadow: none;
+}
+
+.advanced-formatting-accordion .accordion-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    border-color: #86b7fe;
+}
+
+.advanced-formatting-accordion .accordion-button::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23495057'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    width: 1.25rem;
+    height: 1.25rem;
+    transition: transform 0.2s ease-in-out;
+}
+
+.advanced-formatting-accordion .accordion-button:not(.collapsed)::after {
+    transform: rotate(180deg);
+}
+
+.advanced-formatting-accordion .accordion-body {
+    padding: 20px;
+    background-color: white;
+}
+
+.advanced-section {
+    text-align: center;
+    padding: 10px;
+}
+
+.section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 5px;
+}
+
+/* Icon Count Selector Styles (now in advanced formatting) */
 .icon-count-selector .btn {
     font-size: 11px;
     padding: 4px 8px;
@@ -902,6 +961,40 @@ body {
 .global-main-align-selector .btn i,
 .global-sub-align-selector .btn i {
     font-size: 10px;
+}
+
+/* Advanced formatting button group adjustments */
+.advanced-section .btn-group {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.advanced-section .btn-group .btn {
+    border-color: #dee2e6;
+}
+
+/* QR Code section styling */
+.advanced-section .btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.advanced-section .btn[disabled]:hover {
+    opacity: 0.6;
+}
+
+/* Responsive adjustments for advanced formatting */
+@media (max-width: 768px) {
+    .advanced-section {
+        margin-bottom: 20px;
+    }
+    
+    .advanced-section .btn-group {
+        width: 100%;
+    }
+    
+    .section-title {
+        font-size: 12px;
+    }
 }
 
 /* Footer Styles */

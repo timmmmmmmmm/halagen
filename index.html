@@ -27,71 +27,6 @@
 
             <div class="tab-content" id="single-tab">
                 <div class="wysiwyg-editor">
-                    <!-- Icon count and text alignment selectors -->
-                    <div class="icon-count-control">
-                        <div class="d-flex justify-content-center align-items-center mb-3 gap-4">
-                            <!-- Icon count selector -->
-                            <div class="d-flex align-items-center">
-                                <span class="me-2 text-muted" style="font-size: 12px;">Icons:</span>
-                                <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
-                                    <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
-                                        <i class="bi bi-ban"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
-                                        <i class="bi bi-1-circle-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
-                                        <i class="bi bi-2-circle-fill"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Main text alignment selector -->
-                            <div class="d-flex align-items-center">
-                                <span class="me-2 text-muted" style="font-size: 12px;">Main text:</span>
-                                <div class="btn-group btn-group-sm global-main-align-selector" role="group" aria-label="Main text alignment">
-                                    <button type="button" class="btn btn-outline-primary active" data-align="left" title="Align left">
-                                        <i class="bi bi-text-left"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary" data-align="center" title="Align center">
-                                        <i class="bi bi-text-center"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary" data-align="right" title="Align right">
-                                        <i class="bi bi-text-right"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary" data-align="justify" title="Justify">
-                                        <i class="bi bi-justify"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-warning" data-align="custom" title="Custom per-cell alignment">
-                                        <i class="bi bi-gear"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Sub text alignment selector -->
-                            <div class="d-flex align-items-center">
-                                <span class="me-2 text-muted" style="font-size: 12px;">Sub text:</span>
-                                <div class="btn-group btn-group-sm global-sub-align-selector" role="group" aria-label="Sub text alignment">
-                                    <button type="button" class="btn btn-outline-primary active" data-align="left" title="Align left">
-                                        <i class="bi bi-text-left"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary" data-align="center" title="Align center">
-                                        <i class="bi bi-text-center"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary" data-align="right" title="Align right">
-                                        <i class="bi bi-text-right"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary" data-align="justify" title="Justify">
-                                        <i class="bi bi-justify"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-warning" data-align="custom" title="Custom per-cell alignment">
-                                        <i class="bi bi-gear"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <!-- Width control at top -->
                     <div class="width-control">
                         <div class="dimensional-line horizontal">
@@ -165,6 +100,151 @@
                     </div>
                 </div>
                 
+                <!-- Advanced Formatting Accordion -->
+                <div class="accordion accordion-flush advanced-formatting-accordion mb-3" id="advancedFormattingAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="advancedFormattingHeading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFormattingCollapse" aria-expanded="false" aria-controls="advancedFormattingCollapse">
+                                <i class="bi bi-gear me-2"></i>Advanced Formatting
+                            </button>
+                        </h2>
+                        <div id="advancedFormattingCollapse" class="accordion-collapse collapse" aria-labelledby="advancedFormattingHeading" data-bs-parent="#advancedFormattingAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-3">
+                                    <!-- Left Column: Icon Settings -->
+                                    <div class="col-md-4">
+                                        <div class="advanced-section">
+                                            <h6 class="section-title">Icons</h6>
+                                            <div class="d-flex flex-column align-items-center">
+                                                <span class="mb-2 text-muted" style="font-size: 11px;">Icon count:</span>
+                                                <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
+                                                    <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
+                                                        <i class="bi bi-ban"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
+                                                        <i class="bi bi-1-circle-fill"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
+                                                        <i class="bi bi-2-circle-fill"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Middle Column: Text Alignment -->
+                                    <div class="col-md-4">
+                                        <div class="advanced-section">
+                                            <h6 class="section-title">Text Alignment</h6>
+                                            
+                                            <!-- Main text alignment -->
+                                            <div class="mb-3">
+                                                <span class="mb-2 text-muted d-block" style="font-size: 11px;">Main text:</span>
+                                                <div class="btn-group btn-group-sm global-main-align-selector w-100" role="group" aria-label="Main text alignment">
+                                                    <button type="button" class="btn btn-outline-primary active" data-align="left" title="Align left">
+                                                        <i class="bi bi-text-left"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" data-align="center" title="Align center">
+                                                        <i class="bi bi-text-center"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" data-align="right" title="Align right">
+                                                        <i class="bi bi-text-right"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" data-align="justify" title="Justify">
+                                                        <i class="bi bi-justify"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-warning" data-align="custom" title="Custom per-cell alignment">
+                                                        <i class="bi bi-gear"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Sub text alignment -->
+                                            <div>
+                                                <span class="mb-2 text-muted d-block" style="font-size: 11px;">Sub text:</span>
+                                                <div class="btn-group btn-group-sm global-sub-align-selector w-100" role="group" aria-label="Sub text alignment">
+                                                    <button type="button" class="btn btn-outline-primary active" data-align="left" title="Align left">
+                                                        <i class="bi bi-text-left"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" data-align="center" title="Align center">
+                                                        <i class="bi bi-text-center"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" data-align="right" title="Align right">
+                                                        <i class="bi bi-text-right"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" data-align="justify" title="Justify">
+                                                        <i class="bi bi-justify"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-warning" data-align="custom" title="Custom per-cell alignment">
+                                                        <i class="bi bi-gear"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Right Column: QR Code & Future Features -->
+                                    <div class="col-md-4">
+                                        <div class="advanced-section">
+                                            <h6 class="section-title">QR Code</h6>
+                                            <div class="d-flex flex-column align-items-center">
+                                                <span class="mb-2 text-muted" style="font-size: 11px;">Add QR code:</span>
+                                                <button type="button" class="btn btn-outline-success btn-sm" disabled title="QR Code feature coming soon">
+                                                    <i class="bi bi-qr-code me-1"></i>Add QR Code
+                                                </button>
+                                                <small class="text-muted mt-1" style="font-size: 10px;">Coming soon</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Horizontal Divider -->
+                                <hr class="advanced-section-divider">
+                                
+                                <!-- Export Settings Section -->
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="advanced-section">
+                                            <h6 class="section-title">Export Settings</h6>
+                                            
+                                            <div class="row g-3">
+                                                <!-- Rotation Setting -->
+                                                <div class="col-md-6">
+                                                    <div class="export-setting-item">
+                                                        <div class="form-check form-switch d-flex justify-content-center align-items-center">
+                                                            <input class="form-check-input me-2" type="checkbox" role="switch" id="export-rotate">
+                                                            <label class="form-check-label" for="export-rotate">
+                                                                <i class="bi bi-arrow-clockwise me-1"></i>Rotate 90°
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- DPI Setting -->
+                                                <div class="col-md-6">
+                                                    <div class="export-setting-item">
+                                                        <div class="d-flex flex-column align-items-center">
+                                                            <span class="mb-2 text-muted" style="font-size: 11px;">PNG Resolution:</span>
+                                                            <div class="input-group input-group-sm" style="max-width: 200px;">
+                                                                <input type="number" id="png-dpi" class="form-control" min="50" max="1200" value="300" title="Dots per inch for PNG export (50-1200)">
+                                                                <span class="input-group-text">DPI</span>
+                                                            </div>
+                                                            <div class="btn-group btn-group-sm mt-2" role="group">
+                                                                <button type="button" class="btn btn-outline-secondary" data-dpi="96">Default</button>
+                                                                <button type="button" class="btn btn-outline-secondary" data-dpi="203">Niimbot</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="controls">
                     <select id="icon-select" style="display: none;">
                         <option value="heads_hex_socket" selected>Hex Socket</option>
@@ -183,30 +263,18 @@
                     </div>
 
 
-                    <div class="export-section mt-3">
-                        <div class="row g-3">
-                            <!-- Column 1: Export Options (50% width) -->
+                    <!-- Simplified Download Section -->
+                    <div class="download-section mt-4">
+                        <div class="row g-2">
                             <div class="col-md-6">
-                                <div class="form-check form-switch d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-check-label" for="export-rotate">
-                                        Rotate 90°
-                                    </label>
-                                    <input class="form-check-input" type="checkbox" role="switch" id="export-rotate">
-                                </div>
-                                <div class="input-group mb-2">
-                                    <input type="number" id="png-dpi" class="form-control" min="50" max="1200" value="300" title="Dots per inch for PNG export (50-1200)">
-                                    <span class="input-group-text">DPI</span>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-dpi="96">Default</button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-dpi="203">Niimbot</button>
-                                </div>
+                                <button id="download-png" class="btn btn-success w-100" title="Download as high-quality PNG with transparent background">
+                                    <i class="bi bi-download me-2"></i>Download PNG
+                                </button>
                             </div>
-                            
-                            <!-- Column 2: Download Buttons (50% width) -->
-                            <div class="col-md-6 d-flex align-items-center">
-                                <div class="btn-group w-100" role="group" aria-label="Download options">
-                                    <button id="download-png" class="btn btn-success" title="Download as high-quality PNG with transparent background">Download PNG</button>
-                                    <button id="download-svg" class="btn btn-primary" title="Download as vector SVG (scalable and editable)">Download SVG</button>
-                                </div>
+                            <div class="col-md-6">
+                                <button id="download-svg" class="btn btn-primary w-100" title="Download as vector SVG (scalable and editable)">
+                                    <i class="bi bi-download me-2"></i>Download SVG
+                                </button>
                             </div>
                         </div>
                     </div>
