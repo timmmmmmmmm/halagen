@@ -9,7 +9,7 @@ body {
 /* Container adjustments for Bootstrap */
 .container-fluid {
     min-width: calc(var(--label-width, 40mm) * 2 + 200px + 120px);
-    width: max-content;
+    width: calc(var(--label-width, 40mm) * 2 + 200px + 120px);
     position: relative;
 }
 

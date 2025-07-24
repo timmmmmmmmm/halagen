@@ -81,7 +81,7 @@
                         <!-- Column controls on right -->
                         <div class="column-controls-right">
                             <div class="main-text-control">
-                                <label>Main text</label>
+                                <label><small class="text-secondary me-1">main</small><i class="bi bi-layout-three-columns text-muted"></i></label>
                                 <div class="column-buttons-right">
                                     <button type="button" class="column-btn-small" data-action="remove" data-type="main" title="Remove column">-</button>
                                     <span class="column-count" id="main-column-count">3</span>
@@ -89,7 +89,7 @@
                                 </div>
                             </div>
                             <div class="sub-text-control">
-                                <label>Sub text</label>
+                                <label><small class="text-secondary me-1">sub</small><i class="bi bi-layout-three-columns text-muted"></i></label>
                                 <div class="column-buttons-right">
                                     <button type="button" class="column-btn-small" data-action="remove" data-type="sub" title="Remove sub-text column">-</button>
                                     <span class="column-count" id="sub-column-count">3</span>
@@ -100,150 +100,83 @@
                     </div>
                 </div>
                 
-                <!-- Advanced Formatting Accordion -->
-                <div class="accordion accordion-flush advanced-formatting-accordion mb-3" id="advancedFormattingAccordion">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="advancedFormattingHeading">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFormattingCollapse" aria-expanded="false" aria-controls="advancedFormattingCollapse">
-                                <i class="bi bi-gear me-2"></i>Advanced Formatting
+                <!-- Compact Formatting Toolbar -->
+                <div class="formatting-toolbar d-flex align-items-center justify-content-between p-2 mb-3 border rounded bg-light">
+                    <!-- Left: Icon Count -->
+                    <div class="toolbar-group d-flex align-items-center">
+                        <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
+                            <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
+                                <i class="bi bi-ban"></i>
                             </button>
-                        </h2>
-                        <div id="advancedFormattingCollapse" class="accordion-collapse collapse" aria-labelledby="advancedFormattingHeading" data-bs-parent="#advancedFormattingAccordion">
-                            <div class="accordion-body">
-                                <div class="row g-3">
-                                    <!-- Left Column: Icon Settings -->
-                                    <div class="col-md-4">
-                                        <div class="advanced-section">
-                                            <h6 class="section-title">Icons</h6>
-                                            <div class="d-flex flex-column align-items-center">
-                                                <span class="mb-2 text-muted" style="font-size: 11px;">Icon count:</span>
-                                                <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
-                                                    <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
-                                                        <i class="bi bi-ban"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
-                                                        <i class="bi bi-1-circle-fill"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
-                                                        <i class="bi bi-2-circle-fill"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Middle Column: Text Alignment -->
-                                    <div class="col-md-4">
-                                        <div class="advanced-section">
-                                            <h6 class="section-title">Text Alignment</h6>
-                                            
-                                            <!-- Main text alignment -->
-                                            <div class="mb-3">
-                                                <span class="mb-2 text-muted d-block" style="font-size: 11px;">Main text:</span>
-                                                <div class="btn-group btn-group-sm global-main-align-selector w-100" role="group" aria-label="Main text alignment">
-                                                    <button type="button" class="btn btn-outline-primary active" data-align="left" title="Align left">
-                                                        <i class="bi bi-text-left"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-primary" data-align="center" title="Align center">
-                                                        <i class="bi bi-text-center"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-primary" data-align="right" title="Align right">
-                                                        <i class="bi bi-text-right"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-primary" data-align="justify" title="Justify">
-                                                        <i class="bi bi-justify"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-warning" data-align="custom" title="Custom per-cell alignment">
-                                                        <i class="bi bi-gear"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Sub text alignment -->
-                                            <div>
-                                                <span class="mb-2 text-muted d-block" style="font-size: 11px;">Sub text:</span>
-                                                <div class="btn-group btn-group-sm global-sub-align-selector w-100" role="group" aria-label="Sub text alignment">
-                                                    <button type="button" class="btn btn-outline-primary active" data-align="left" title="Align left">
-                                                        <i class="bi bi-text-left"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-primary" data-align="center" title="Align center">
-                                                        <i class="bi bi-text-center"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-primary" data-align="right" title="Align right">
-                                                        <i class="bi bi-text-right"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-primary" data-align="justify" title="Justify">
-                                                        <i class="bi bi-justify"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-warning" data-align="custom" title="Custom per-cell alignment">
-                                                        <i class="bi bi-gear"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Right Column: QR Code & Future Features -->
-                                    <div class="col-md-4">
-                                        <div class="advanced-section">
-                                            <h6 class="section-title">QR Code</h6>
-                                            <div class="d-flex flex-column align-items-center">
-                                                <span class="mb-2 text-muted" style="font-size: 11px;">Add QR code:</span>
-                                                <button type="button" class="btn btn-outline-success btn-sm" disabled title="QR Code feature coming soon">
-                                                    <i class="bi bi-qr-code me-1"></i>Add QR Code
-                                                </button>
-                                                <small class="text-muted mt-1" style="font-size: 10px;">Coming soon</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Horizontal Divider -->
-                                <hr class="advanced-section-divider">
-                                
-                                <!-- Export Settings Section -->
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <div class="advanced-section">
-                                            <h6 class="section-title">Export Settings</h6>
-                                            
-                                            <div class="row g-3">
-                                                <!-- Rotation Setting -->
-                                                <div class="col-md-6">
-                                                    <div class="export-setting-item">
-                                                        <div class="form-check form-switch d-flex justify-content-center align-items-center">
-                                                            <input class="form-check-input me-2" type="checkbox" role="switch" id="export-rotate">
-                                                            <label class="form-check-label" for="export-rotate">
-                                                                <i class="bi bi-arrow-clockwise me-1"></i>Rotate 90°
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                
-                                                <!-- DPI Setting -->
-                                                <div class="col-md-6">
-                                                    <div class="export-setting-item">
-                                                        <div class="d-flex flex-column align-items-center">
-                                                            <span class="mb-2 text-muted" style="font-size: 11px;">PNG Resolution:</span>
-                                                            <div class="input-group input-group-sm" style="max-width: 200px;">
-                                                                <input type="number" id="png-dpi" class="form-control" min="50" max="1200" value="300" title="Dots per inch for PNG export (50-1200)">
-                                                                <span class="input-group-text">DPI</span>
-                                                            </div>
-                                                            <div class="btn-group btn-group-sm mt-2" role="group">
-                                                                <button type="button" class="btn btn-outline-secondary" data-dpi="96">Default</button>
-                                                                <button type="button" class="btn btn-outline-secondary" data-dpi="203">Niimbot</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
+                                <i class="bi bi-image"></i>
+                            </button>
                         </div>
                     </div>
+                    
+                    <!-- Center: Text Alignment -->
+                    <div class="toolbar-group d-flex align-items-center">
+                        <small class="me-1 text-secondary" title="Main text alignment">main</small>
+                        <div class="btn-group btn-group-sm global-main-align-selector me-2" role="group" aria-label="Main text alignment">
+                            <button type="button" class="btn btn-outline-primary active" data-align="left" title="Main text - Align left">
+                                <i class="bi bi-text-left"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" data-align="center" title="Main text - Align center">
+                                <i class="bi bi-text-center"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" data-align="right" title="Main text - Align right">
+                                <i class="bi bi-text-right"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" data-align="justify" title="Main text - Justify">
+                                <i class="bi bi-justify"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" data-align="custom" title="Main text - Custom per-cell alignment">
+                                <i class="bi bi-gear"></i>
+                            </button>
+                        </div>
+                        <small class="me-1 ms-3 text-secondary" title="Sub text alignment">sub</small>
+                        <div class="btn-group btn-group-sm global-sub-align-selector" role="group" aria-label="Sub text alignment">
+                            <button type="button" class="btn btn-outline-primary active" data-align="left" title="Sub text - Align left">
+                                <i class="bi bi-text-left"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" data-align="center" title="Sub text - Align center">
+                                <i class="bi bi-text-center"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" data-align="right" title="Sub text - Align right">
+                                <i class="bi bi-text-right"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" data-align="justify" title="Sub text - Justify">
+                                <i class="bi bi-justify"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" data-align="custom" title="Sub text - Custom per-cell alignment">
+                                <i class="bi bi-gear"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- QR Code - Commented out for later implementation -->
+                    <!-- 
+                    <div class="toolbar-group d-flex align-items-center me-3">
+                        <div class="input-group input-group-sm" style="max-width: 200px;">
+                            <span class="input-group-text"><i class="bi bi-qr-code"></i></span>
+                            <input type="url" id="qr-url-input" class="form-control" placeholder="URL" maxlength="2048" title="Enter URL to generate QR code">
+                        </div>
+                        <div id="qr-preview" class="ms-2" style="display: none;">
+                            <canvas id="qr-canvas" width="40" height="40"></canvas>
+                        </div>
+                    </div>
+                    -->
+                    
+                    <!-- Right: Rotation Toggle -->
+                    <div class="toolbar-group d-flex align-items-center">
+                        <button type="button" class="btn btn-outline-secondary btn-sm toggle-btn" id="export-rotate-btn" title="Toggle 90° rotation">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                        <input type="checkbox" id="export-rotate" style="display: none;">
+                        <input type="hidden" id="png-dpi" value="300">
+                    </div>
                 </div>
+                
                 
                 <div class="controls">
                     <select id="icon-select" style="display: none;">
@@ -267,9 +200,20 @@
                     <div class="download-section mt-4">
                         <div class="row g-2">
                             <div class="col-md-6">
-                                <button id="download-png" class="btn btn-success w-100" title="Download as high-quality PNG with transparent background">
-                                    <i class="bi bi-download me-2"></i>Download PNG
-                                </button>
+                                <div class="btn-group w-100" role="group">
+                                    <button id="download-png" class="btn btn-success flex-grow-1 text-center" title="Download PNG (300 DPI)" data-dpi="300">
+                                        <i class="bi bi-download me-2"></i>Download PNG
+                                    </button>
+                                    <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split px-2" data-bs-toggle="dropdown" aria-expanded="false" style="flex: 0 0 auto;">
+                                        <span class="visually-hidden">Toggle Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" id="download-png-96" data-dpi="96">PNG - 96 DPI (Default)</a></li>
+                                        <li><a class="dropdown-item" href="#" id="download-png-203" data-dpi="203">PNG - 203 DPI (Niimbot)</a></li>
+                                        <li><a class="dropdown-item" href="#" id="download-png-300" data-dpi="300">PNG - 300 DPI (High Quality)</a></li>
+                                        <li><a class="dropdown-item" href="#" id="download-png-600" data-dpi="600">PNG - 600 DPI (Print)</a></li>
+                                    </ul>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <button id="download-svg" class="btn btn-primary w-100" title="Download as vector SVG (scalable and editable)">
@@ -290,9 +234,13 @@
                     </div>
 
 
-                    <div class="d-grid gap-2 d-md-flex">
-                        <button id="validate-yaml" class="btn btn-outline-primary me-md-2" title="Check YAML syntax and validate label data">Validate YAML</button>
-                        <button id="generate-zip" class="btn btn-success" title="Generate all labels and download as ZIP file">Generate and Download ZIP</button>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button id="validate-yaml" class="btn btn-outline-primary w-100" title="Check YAML syntax and validate label data">Validate YAML</button>
+                        </div>
+                        <div class="col-6">
+                            <button id="generate-zip" class="btn btn-success w-100" title="Generate all labels and download as ZIP file">Generate and Download ZIP</button>
+                        </div>
                     </div>
 
                     <div id="validation-result" class="validation-result"></div>
@@ -367,5 +315,48 @@
     <script src="lib/yaml.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
+    <script>
+        // Handle rotation toggle button and PNG download options
+        document.addEventListener('DOMContentLoaded', function() {
+            const rotateBtn = document.getElementById('export-rotate-btn');
+            const rotateCheckbox = document.getElementById('export-rotate');
+            
+            if (rotateBtn && rotateCheckbox) {
+                rotateBtn.addEventListener('click', function() {
+                    rotateCheckbox.checked = !rotateCheckbox.checked;
+                    if (rotateCheckbox.checked) {
+                        rotateBtn.classList.remove('btn-outline-secondary');
+                        rotateBtn.classList.add('btn-primary');
+                    } else {
+                        rotateBtn.classList.remove('btn-primary');
+                        rotateBtn.classList.add('btn-outline-secondary');
+                    }
+                });
+            }
+            
+            // Handle PNG download dropdown options
+            const pngDropdownItems = document.querySelectorAll('#download-png-96, #download-png-203, #download-png-300, #download-png-600');
+            const pngDpiInput = document.getElementById('png-dpi');
+            const mainPngBtn = document.getElementById('download-png');
+            
+            pngDropdownItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const dpi = this.dataset.dpi;
+                    if (pngDpiInput) {
+                        pngDpiInput.value = dpi;
+                    }
+                    if (mainPngBtn) {
+                        mainPngBtn.dataset.dpi = dpi;
+                        mainPngBtn.title = `Download PNG (${dpi} DPI)`;
+                    }
+                    // Trigger download
+                    if (typeof labelMaker !== 'undefined') {
+                        labelMaker.downloadPNG();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

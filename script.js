@@ -716,6 +716,9 @@ class LabelMaker {
 
     async downloadPNG() {
         try {
+            // Sync editable content to hidden inputs before export
+            this.syncEditableTextToInputs();
+            
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
@@ -817,6 +820,9 @@ class LabelMaker {
 
     async downloadSVG() {
         try {
+            // Sync editable content to hidden inputs before export
+            this.syncEditableTextToInputs();
+            
             const height = parseInt(document.getElementById('label-height').value);
             const width = parseInt(document.getElementById('label-width').value);
             const mainTextInputs = document.querySelectorAll('.main-text-input');
@@ -2278,6 +2284,7 @@ labels:
             console.error('Error loading DPI settings:', error);
         }
     }
+
 
     saveDPISettings() {
         try {
