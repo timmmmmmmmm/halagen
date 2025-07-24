@@ -27,20 +27,67 @@
 
             <div class="tab-content" id="single-tab">
                 <div class="wysiwyg-editor">
-                    <!-- Icon count selector -->
+                    <!-- Icon count and text alignment selectors -->
                     <div class="icon-count-control">
-                        <div class="d-flex justify-content-center align-items-center mb-3">
-                            <span class="me-2 text-muted" style="font-size: 12px;">Icons:</span>
-                            <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
-                                <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
-                                    <i class="bi bi-ban"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
-                                    <i class="bi bi-1-circle-fill"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
-                                    <i class="bi bi-2-circle-fill"></i>
-                                </button>
+                        <div class="d-flex justify-content-center align-items-center mb-3 gap-4">
+                            <!-- Icon count selector -->
+                            <div class="d-flex align-items-center">
+                                <span class="me-2 text-muted" style="font-size: 12px;">Icons:</span>
+                                <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
+                                    <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
+                                        <i class="bi bi-ban"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
+                                        <i class="bi bi-1-circle-fill"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
+                                        <i class="bi bi-2-circle-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Main text alignment selector -->
+                            <div class="d-flex align-items-center">
+                                <span class="me-2 text-muted" style="font-size: 12px;">Main text:</span>
+                                <div class="btn-group btn-group-sm global-main-align-selector" role="group" aria-label="Main text alignment">
+                                    <button type="button" class="btn btn-outline-primary active" data-align="left" title="Align left">
+                                        <i class="bi bi-text-left"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" data-align="center" title="Align center">
+                                        <i class="bi bi-text-center"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" data-align="right" title="Align right">
+                                        <i class="bi bi-text-right"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" data-align="justify" title="Justify">
+                                        <i class="bi bi-justify"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-warning" data-align="custom" title="Custom per-cell alignment">
+                                        <i class="bi bi-gear"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Sub text alignment selector -->
+                            <div class="d-flex align-items-center">
+                                <span class="me-2 text-muted" style="font-size: 12px;">Sub text:</span>
+                                <div class="btn-group btn-group-sm global-sub-align-selector" role="group" aria-label="Sub text alignment">
+                                    <button type="button" class="btn btn-outline-primary active" data-align="left" title="Align left">
+                                        <i class="bi bi-text-left"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" data-align="center" title="Align center">
+                                        <i class="bi bi-text-center"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" data-align="right" title="Align right">
+                                        <i class="bi bi-text-right"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" data-align="justify" title="Justify">
+                                        <i class="bi bi-justify"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-warning" data-align="custom" title="Custom per-cell alignment">
+                                        <i class="bi bi-gear"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

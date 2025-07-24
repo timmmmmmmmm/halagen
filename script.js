@@ -3,6 +3,9 @@ class LabelMaker {
         this.icons = this.loadIconsFromStructure();
         
         this.customIcons = this.loadCustomIcons();
+        // Global alignment state
+        this.globalMainTextAlign = 'left';
+        this.globalSubTextAlign = 'left';
         this.initializeEventListeners();
         this.initializeDefaultColumns();
         this.updatePreview();
@@ -147,15 +150,37 @@ class LabelMaker {
         // Icon count selector
         document.querySelectorAll('.icon-count-selector .btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                // Get the button element (in case user clicked on icon inside)
+                const button = e.currentTarget;
+                
                 // Update active state
                 document.querySelectorAll('.icon-count-selector .btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
+                button.classList.add('active');
                 
                 // Update icon display in button
                 this.updateIconCountDisplay();
                 
                 // Update preview
                 this.updatePreview();
+            });
+        });
+        
+        // Global text alignment selectors
+        document.querySelectorAll('.global-main-align-selector .btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Get the button element (in case user clicked on icon inside)
+                const button = e.currentTarget;
+                const alignment = button.dataset.align;
+                this.setGlobalMainTextAlignment(alignment);
+            });
+        });
+        
+        document.querySelectorAll('.global-sub-align-selector .btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Get the button element (in case user clicked on icon inside)
+                const button = e.currentTarget;
+                const alignment = button.dataset.align;
+                this.setGlobalSubTextAlignment(alignment);
             });
         });
         if (downloadPng) downloadPng.addEventListener('click', () => this.downloadPNG());
@@ -261,6 +286,14 @@ class LabelMaker {
         document.querySelectorAll('.editable-text').forEach(element => {
             this.setupEditableTextHandlers(element);
             this.setupTextAlignmentTooltip(element);
+            // Initialize with global alignment if not already set
+            const isMainText = element.closest('.main-text') !== null;
+            const textType = isMainText ? 'main' : 'sub';
+            if (!element.getAttribute(`data-${textType}-align`)) {
+                const globalAlign = isMainText ? this.globalMainTextAlign : this.globalSubTextAlign;
+                element.setAttribute(`data-${textType}-align`, globalAlign);
+                element.classList.add(`align-${globalAlign}`);
+            }
         });
 
 
@@ -359,6 +392,12 @@ class LabelMaker {
         
         // Update main text columns
         const mainContainer = document.querySelector('.main-text');
+        // Store existing alignment data before clearing
+        const existingAlignments = [];
+        mainContainer.querySelectorAll('.main-text-column').forEach(col => {
+            existingAlignments.push(col.getAttribute('data-main-align') || 'left');
+        });
+        
         mainContainer.innerHTML = '';
         Array.from(mainInputs).forEach((input, index) => {
             const column = document.createElement('div');
@@ -366,13 +405,32 @@ class LabelMaker {
             column.contentEditable = true;
             column.textContent = input.value.trim() || `New ${index + 1}`;
             
+            // Apply preserved alignment, global alignment, or default to left
+            let alignment;
+            if (this.globalMainTextAlign === 'custom') {
+                // In custom mode, preserve individual alignments
+                alignment = existingAlignments[index] || 'left';
+            } else {
+                // Use global alignment
+                alignment = this.globalMainTextAlign;
+            }
+            column.classList.add(`align-${alignment}`);
+            column.setAttribute('data-main-align', alignment);
+            
             this.setupEditableTextHandlers(column);
+            this.setupTextAlignmentTooltip(column);
             
             mainContainer.appendChild(column);
         });
         
         // Update sub text columns
         const subContainer = document.querySelector('.sub-text');
+        // Store existing alignment data before clearing
+        const existingSubAlignments = [];
+        subContainer.querySelectorAll('.sub-text-column').forEach(col => {
+            existingSubAlignments.push(col.getAttribute('data-sub-align') || 'left');
+        });
+        
         subContainer.innerHTML = '';
         Array.from(subInputs).forEach((input, index) => {
             const column = document.createElement('div');
@@ -380,7 +438,20 @@ class LabelMaker {
             column.contentEditable = true;
             column.textContent = input.value.trim() || `Sub ${index + 1}`;
             
+            // Apply preserved alignment, global alignment, or default to left  
+            let alignment;
+            if (this.globalSubTextAlign === 'custom') {
+                // In custom mode, preserve individual alignments
+                alignment = existingSubAlignments[index] || 'left';
+            } else {
+                // Use global alignment
+                alignment = this.globalSubTextAlign;
+            }
+            column.classList.add(`align-${alignment}`);
+            column.setAttribute('data-sub-align', alignment);
+            
             this.setupEditableTextHandlers(column);
+            this.setupTextAlignmentTooltip(column);
             
             subContainer.appendChild(column);
         });
@@ -472,7 +543,11 @@ class LabelMaker {
             // Alignment button clicks
             tooltip.querySelectorAll('.alignment-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const alignment = e.currentTarget.dataset.align;
+                    // Prevent event bubbling and get the button element
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const button = e.currentTarget;
+                    const alignment = button.dataset.align;
                     const activeElement = window.tooltipHoverState.currentElement;
                     if (activeElement) {
                         this.applyTextAlignment(activeElement, alignment);
@@ -484,8 +559,15 @@ class LabelMaker {
     }
     
     showAlignmentTooltip(targetElement, tooltip) {
-        const rect = targetElement.getBoundingClientRect();
         const isMainText = targetElement.closest('.main-text') !== null;
+        const textType = isMainText ? 'main' : 'sub';
+        
+        // Only show tooltip if in custom mode
+        if (!this.isCustomAlignmentMode(textType)) {
+            return;
+        }
+        
+        const rect = targetElement.getBoundingClientRect();
         
         // Position tooltip centered horizontally
         const left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2);
@@ -512,21 +594,44 @@ class LabelMaker {
     }
     
     getCurrentAlignment(element) {
-        const computedStyle = window.getComputedStyle(element);
-        const textAlign = computedStyle.textAlign;
-        return textAlign === 'start' ? 'left' : textAlign;
+        const isMainText = element.closest('.main-text') !== null;
+        const textType = isMainText ? 'main' : 'sub';
+        const alignAttr = element.getAttribute(`data-${textType}-align`);
+        
+        if (alignAttr) {
+            return alignAttr;
+        }
+        
+        // Check for CSS classes as fallback
+        if (element.classList.contains('align-center')) return 'center';
+        if (element.classList.contains('align-right')) return 'right';
+        if (element.classList.contains('align-justify')) return 'justify';
+        
+        // Default to left
+        return 'left';
     }
     
     applyTextAlignment(element, alignment) {
-        element.style.textAlign = alignment;
-        
-        // Apply to all columns in the same row
+        // Apply to only the specific element (individual cell)
         const isMainText = element.closest('.main-text') !== null;
-        const selector = isMainText ? '.main-text-column' : '.sub-text-column';
+        const textType = isMainText ? 'main' : 'sub';
         
-        document.querySelectorAll(selector).forEach(col => {
-            col.style.textAlign = alignment;
-        });
+        // Remove existing alignment classes from this element only
+        element.classList.remove('align-left', 'align-center', 'align-right', 'align-justify');
+        // Add new alignment class to this element only
+        element.classList.add(`align-${alignment}`);
+        // Set data attribute for tracking on this element
+        element.setAttribute(`data-${textType}-align`, alignment);
+        
+        // Auto-switch to Custom mode when individual alignment is changed
+        if (isMainText) {
+            this.setGlobalMainTextAlignment('custom');
+        } else {
+            this.setGlobalSubTextAlignment('custom');
+        }
+        
+        // Update preview to reflect changes
+        this.updatePreview();
     }
     
     updateAlignmentButtons(tooltip, activeAlignment) {
@@ -641,7 +746,6 @@ class LabelMaker {
             const textAreaWidth = canvas.width - textX - (1 * mmToPx);
 
             ctx.fillStyle = 'black';
-            ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
 
             const mainFontSize = this.calculateFontSize(height);
@@ -656,15 +760,15 @@ class LabelMaker {
                 const columnWidth = textAreaWidth / defaultTexts.length;
                 defaultTexts.forEach((text, index) => {
                     const columnX = textX + (index * columnWidth);
-                    ctx.textAlign = 'left';
-                    ctx.fillText(text, columnX, textY);
+                    const alignment = this.getColumnAlignment('main', index);
+                    this.drawAlignedText(ctx, text, columnX, textY, columnWidth, alignment);
                 });
             } else {
                 const columnWidth = textAreaWidth / mainTexts.length;
                 mainTexts.forEach((text, index) => {
                     const columnX = textX + (index * columnWidth);
-                    ctx.textAlign = 'left';
-                    ctx.fillText(text, columnX, textY);
+                    const alignment = this.getColumnAlignment('main', index);
+                    this.drawAlignedText(ctx, text, columnX, textY, columnWidth, alignment);
                 });
             }
 
@@ -678,15 +782,15 @@ class LabelMaker {
                 const columnWidth = textAreaWidth / defaultSubTexts.length;
                 defaultSubTexts.forEach((text, index) => {
                     const columnX = textX + (index * columnWidth);
-                    ctx.textAlign = 'left';
-                    ctx.fillText(text, columnX, subTextY);
+                    const alignment = this.getColumnAlignment('sub', index);
+                    this.drawAlignedText(ctx, text, columnX, subTextY, columnWidth, alignment);
                 });
             } else {
                 const columnWidth = textAreaWidth / subTexts.length;
                 subTexts.forEach((text, index) => {
                     const columnX = textX + (index * columnWidth);
-                    ctx.textAlign = 'left';
-                    ctx.fillText(text, columnX, subTextY);
+                    const alignment = this.getColumnAlignment('sub', index);
+                    this.drawAlignedText(ctx, text, columnX, subTextY, columnWidth, alignment);
                 });
             }
 
@@ -866,12 +970,20 @@ class LabelMaker {
         const textYPx = subTexts.length > 0 ? centerYPx : centerYPx;
         
         if (mainTexts.length === 1) {
-            svgContent += `<text x="${textXPx}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" dominant-baseline="bottom">${this.escapeXml(mainTexts[0])}</text>`;
+            // For single label export, get alignment from DOM or use batch data
+            const alignment = label.main_text_align || this.getColumnAlignment('main', 0);
+            const alignedX = this.getSvgAlignedX(textXPx, textAreaWidthPx, alignment);
+            const textAnchor = this.getSvgTextAnchor(alignment);
+            svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="bottom">${this.escapeXml(mainTexts[0])}</text>`;
         } else {
             const columnWidthPx = textAreaWidthPx / mainTexts.length;
             mainTexts.forEach((text, index) => {
                 const columnXPx = textXPx + (index * columnWidthPx);
-                svgContent += `<text x="${columnXPx}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
+                // For single label export, get individual column alignment or use batch data
+                const alignment = label.main_text_align || this.getColumnAlignment('main', index);
+                const alignedX = this.getSvgAlignedX(columnXPx, columnWidthPx, alignment);
+                const textAnchor = this.getSvgTextAnchor(alignment);
+                svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
             });
         }
 
@@ -879,12 +991,20 @@ class LabelMaker {
         if (subTexts.length > 0) {
             const subTextYPx = textYPx + (mainFontSizePx * 0.3) + (subFontSizePx * 0.8); // Adjust spacing for new positioning
             if (subTexts.length === 1) {
-                svgContent += `<text x="${textXPx}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" dominant-baseline="bottom">${this.escapeXml(subTexts[0])}</text>`;
+                // For single label export, get alignment from DOM or use batch data
+                const alignment = label.sub_text_align || this.getColumnAlignment('sub', 0);
+                const alignedX = this.getSvgAlignedX(textXPx, textAreaWidthPx, alignment);
+                const textAnchor = this.getSvgTextAnchor(alignment);
+                svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="bottom">${this.escapeXml(subTexts[0])}</text>`;
             } else {
                 const columnWidthPx = textAreaWidthPx / subTexts.length;
                 subTexts.forEach((text, index) => {
                     const columnXPx = textXPx + (index * columnWidthPx);
-                    svgContent += `<text x="${columnXPx}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
+                    // For single label export, get individual column alignment or use batch data
+                    const alignment = label.sub_text_align || this.getColumnAlignment('sub', index);
+                    const alignedX = this.getSvgAlignedX(columnXPx, columnWidthPx, alignment);
+                    const textAnchor = this.getSvgTextAnchor(alignment);
+                    svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
                 });
             }
         }
@@ -914,6 +1034,119 @@ class LabelMaker {
             case 24: return 8;
             default: return 4;
         }
+    }
+    
+    drawAlignedText(ctx, text, x, y, width, alignment) {
+        switch (alignment) {
+            case 'center':
+                ctx.textAlign = 'center';
+                ctx.fillText(text, x + width / 2, y);
+                break;
+            case 'right':
+                ctx.textAlign = 'right';
+                ctx.fillText(text, x + width, y);
+                break;
+            case 'justify':
+                // For justify, use left alignment as canvas doesn't have native justify
+                ctx.textAlign = 'left';
+                ctx.fillText(text, x, y);
+                break;
+            case 'left':
+            default:
+                ctx.textAlign = 'left';
+                ctx.fillText(text, x, y);
+                break;
+        }
+    }
+    
+    getSvgAlignedX(x, width, alignment) {
+        switch (alignment) {
+            case 'center':
+                return x + width / 2;
+            case 'right':
+                return x + width;
+            case 'justify':
+            case 'left':
+            default:
+                return x;
+        }
+    }
+    
+    getSvgTextAnchor(alignment) {
+        switch (alignment) {
+            case 'center':
+                return 'middle';
+            case 'right':
+                return 'end';
+            case 'justify':
+            case 'left':
+            default:
+                return 'start';
+        }
+    }
+    
+    getColumnAlignment(textType, columnIndex) {
+        // If not in custom mode, use global alignment
+        if (!this.isCustomAlignmentMode(textType)) {
+            return textType === 'main' ? this.globalMainTextAlign : this.globalSubTextAlign;
+        }
+        
+        // In custom mode, get alignment from the specific column element in the DOM
+        const selector = textType === 'main' ? '.main-text-column' : '.sub-text-column';
+        const columns = document.querySelectorAll(selector);
+        
+        if (columns[columnIndex]) {
+            const alignment = columns[columnIndex].getAttribute(`data-${textType}-align`);
+            return alignment || 'left';
+        }
+        
+        return 'left'; // Default fallback
+    }
+    
+    setGlobalMainTextAlignment(alignment) {
+        // Update active state in UI
+        document.querySelectorAll('.global-main-align-selector .btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.align === alignment);
+        });
+        
+        this.globalMainTextAlign = alignment;
+        
+        if (alignment !== 'custom') {
+            // Apply alignment to all main text columns
+            document.querySelectorAll('.main-text-column').forEach(col => {
+                col.classList.remove('align-left', 'align-center', 'align-right', 'align-justify');
+                col.classList.add(`align-${alignment}`);
+                col.setAttribute('data-main-align', alignment);
+            });
+        }
+        
+        this.updatePreview();
+    }
+    
+    setGlobalSubTextAlignment(alignment) {
+        // Update active state in UI
+        document.querySelectorAll('.global-sub-align-selector .btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.align === alignment);
+        });
+        
+        this.globalSubTextAlign = alignment;
+        
+        if (alignment !== 'custom') {
+            // Apply alignment to all sub text columns
+            document.querySelectorAll('.sub-text-column').forEach(col => {
+                col.classList.remove('align-left', 'align-center', 'align-right', 'align-justify');
+                col.classList.add(`align-${alignment}`);
+                col.setAttribute('data-sub-align', alignment);
+            });
+        }
+        
+        this.updatePreview();
+    }
+    
+    isCustomAlignmentMode(textType) {
+        return textType === 'main' ? 
+            this.globalMainTextAlign === 'custom' : 
+            this.globalSubTextAlign === 'custom';
     }
 
     async drawIcon(ctx, x, y, size, iconType) {
@@ -1176,7 +1409,7 @@ class LabelMaker {
                 if (line.includes(':')) {
                     const [key, value] = line.split(':', 2);
                     const trimmedKey = key.trim();
-                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks' || trimmedKey === 'export_svg' || trimmedKey === 'width_mm' || trimmedKey === 'height_mm' || trimmedKey === 'png_dpi') {
+                    if (trimmedKey === 'long_png' || trimmedKey === 'cut_marks' || trimmedKey === 'export_svg' || trimmedKey === 'width_mm' || trimmedKey === 'height_mm' || trimmedKey === 'png_dpi' || trimmedKey === 'main_text_align' || trimmedKey === 'sub_text_align') {
                         result[trimmedKey] = this.parseValue(value.trim());
                     }
                 }
@@ -1260,6 +1493,15 @@ class LabelMaker {
         if (parsed.png_dpi !== undefined && (typeof parsed.png_dpi !== 'number' || parsed.png_dpi < 50 || parsed.png_dpi > 1200)) {
             errors.push('Invalid global png_dpi. Must be a number between 50 and 1200 if provided');
         }
+        
+        // Validate global text alignment settings
+        const validAlignments = ['left', 'center', 'right', 'justify'];
+        if (parsed.main_text_align !== undefined && !validAlignments.includes(parsed.main_text_align)) {
+            errors.push(`Invalid global main_text_align. Must be one of: ${validAlignments.join(', ')} if provided`);
+        }
+        if (parsed.sub_text_align !== undefined && !validAlignments.includes(parsed.sub_text_align)) {
+            errors.push(`Invalid global sub_text_align. Must be one of: ${validAlignments.join(', ')} if provided`);
+        }
 
         parsed.labels.forEach((label, index) => {
             const labelNum = index + 1;
@@ -1275,6 +1517,14 @@ class LabelMaker {
             }
             if (!label.height_mm && parsed.height_mm) {
                 label.height_mm = parsed.height_mm;
+            }
+            
+            // Apply text alignment defaults
+            if (!label.main_text_align && parsed.main_text_align) {
+                label.main_text_align = parsed.main_text_align;
+            }
+            if (!label.sub_text_align && parsed.sub_text_align) {
+                label.sub_text_align = parsed.sub_text_align;
             }
             
             // Check for either title (single column) or columns (multi-column)
@@ -1312,6 +1562,15 @@ class LabelMaker {
                 errors.push(`Label ${labelNum}: Invalid subtext_columns. Must be an array with 1-8 string elements if provided`);
             } else if (label.subtext_columns && label.subtext_columns.some(col => typeof col !== 'string')) {
                 errors.push(`Label ${labelNum}: Invalid subtext_columns. All column values must be strings`);
+            }
+            
+            // Validate text alignment options
+            const validAlignments = ['left', 'center', 'right', 'justify'];
+            if (label.main_text_align && !validAlignments.includes(label.main_text_align)) {
+                errors.push(`Label ${labelNum}: Invalid main_text_align. Must be one of: ${validAlignments.join(', ')}`);
+            }
+            if (label.sub_text_align && !validAlignments.includes(label.sub_text_align)) {
+                errors.push(`Label ${labelNum}: Invalid sub_text_align. Must be one of: ${validAlignments.join(', ')}`);
             }
         });
 
@@ -1353,7 +1612,6 @@ class LabelMaker {
         const textAreaWidth = canvas.width - textX - (1 * mmToPx);
 
         ctx.fillStyle = 'black';
-        ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
 
         const mainFontSize = this.calculateFontSize(height);
@@ -1364,13 +1622,15 @@ class LabelMaker {
         
         // Handle multiple columns for main text
         if (mainTexts.length === 1) {
-            ctx.fillText(mainTexts[0], textX, textY);
+            const alignment = label.main_text_align || 'left';
+            this.drawAlignedText(ctx, mainTexts[0], textX, textY, textAreaWidth, alignment);
         } else {
             const columnWidth = textAreaWidth / mainTexts.length;
             mainTexts.forEach((text, index) => {
                 const columnX = textX + (index * columnWidth);
-                ctx.textAlign = 'left';
-                ctx.fillText(text, columnX, textY);
+                // For batch processing, use single alignment for all columns or default
+                const alignment = label.main_text_align || 'left';
+                this.drawAlignedText(ctx, text, columnX, textY, columnWidth, alignment);
             });
         }
 
@@ -1381,13 +1641,15 @@ class LabelMaker {
             const subTextY = textY + (mainFontSize * mmToPx * 1.2);
             
             if (subTexts.length === 1) {
-                ctx.fillText(subTexts[0], textX, subTextY);
+                const alignment = label.sub_text_align || 'left';
+                this.drawAlignedText(ctx, subTexts[0], textX, subTextY, textAreaWidth, alignment);
             } else {
                 const columnWidth = textAreaWidth / subTexts.length;
                 subTexts.forEach((text, index) => {
                     const columnX = textX + (index * columnWidth);
-                    ctx.textAlign = 'left';
-                    ctx.fillText(text, columnX, subTextY);
+                    // For batch processing, use single alignment for all columns or default
+                    const alignment = label.sub_text_align || 'left';
+                    this.drawAlignedText(ctx, text, columnX, subTextY, columnWidth, alignment);
                 });
             }
         }
@@ -1631,6 +1893,8 @@ export_svg: true      # Also generate SVG files (vector format, scalable)
 width_mm: 50          # Default width for all labels (20-100mm)
 height_mm: 12         # Default height for all labels (9, 12, 18, or 24mm)
 png_dpi: 300          # PNG export resolution in dots per inch (50-1200)
+main_text_align: left # Default main text alignment: left, center, right, justify
+sub_text_align: left  # Default sub text alignment: left, center, right, justify
 
 labels:
   # Multi-column label example (great for drawer compartments)
@@ -1644,8 +1908,9 @@ labels:
       - "10 mm"
       - "12 mm"
     rotate: false                       # Rotate label 90 degrees (default: false)
+    # Text alignment inherits from global settings (left) - no need to specify
 
-  # Another multi-column example
+  # Another multi-column example with explicit text alignment
   - icon: "heads_hex_socket"
     maintext_columns:
       - "M4"
@@ -1655,7 +1920,10 @@ labels:
       - "14 mm"
       - "16 mm"
       - "18 mm"
+    main_text_align: center             # Apply center alignment to all main text columns
+    sub_text_align: right               # Apply right alignment to all sub text columns
     rotate: false                       # Rotate label 90 degrees (default: false)
+    # Note: In batch mode, alignment applies to all columns of the same type
 
 # Single column alternatives (if you prefer):
 # - title: "M5 × 20"                   # Single main text
@@ -1663,7 +1931,15 @@ labels:
 #   icon: "fasteners_screw_hex"
 #   width_mm: 45                       # Override global width
 #   height_mm: 18                      # Override global height
+#   main_text_align: center            # Override: center main text
+#   sub_text_align: justify            # Override: justify sub text
 #   rotate: false                      # Rotate label 90 degrees (default: false)
+#
+# 💡 Text Alignment System:
+# - UI has global alignment controls (left, center, right, justify, custom)
+# - When "Custom" is selected, hover tooltips appear for individual cell alignment
+# - Global settings apply to all columns; Custom mode allows per-cell control
+# - For batch processing, alignment applies uniformly to all columns of the same type
 `;
         
         // Set the template in the YAML editor
@@ -1973,12 +2249,13 @@ labels:
             rotatedCanvas.width = canvas.height;
             rotatedCanvas.height = canvas.width;
             
-            // Translate and rotate
+            // Translate and rotate - text alignment is preserved in the original canvas
             rotatedCtx.translate(canvas.height, 0);
             rotatedCtx.rotate(Math.PI / 2);
         }
         
         // Draw the original canvas onto the rotated canvas
+        // Text alignment from the original rendering is preserved
         rotatedCtx.drawImage(canvas, 0, 0);
         
         return rotatedCanvas;
