@@ -62,13 +62,9 @@
                                 <div class="label-text">
                                     <div class="main-text">
                                         <div class="main-text-column editable-text" contenteditable="true">M3</div>
-                                        <div class="main-text-column editable-text" contenteditable="true">M3</div>
-                                        <div class="main-text-column editable-text" contenteditable="true">M3</div>
                                     </div>
                                     <div class="sub-text">
                                         <div class="sub-text-column editable-text" contenteditable="true">8 mm</div>
-                                        <div class="sub-text-column editable-text" contenteditable="true">10 mm</div>
-                                        <div class="sub-text-column editable-text" contenteditable="true">12 mm</div>
                                     </div>
                                 </div>
                             </div>
@@ -76,91 +72,104 @@
                     </div>
                 </div>
 
-                <!-- Label Structure Toolbar -->
-                <div class="structure-toolbar p-3 mb-3 border rounded bg-light">
-                    <!-- Row 1: Icon Settings + Main Text Settings -->
-                    <div class="toolbar-row d-flex align-items-center mb-3">
-                        <!-- Column 1: Icon Settings -->
-                        <div class="toolbar-column me-4" style="width: 254px;">
-                            <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
-                                <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
-                                    <i class="bi bi-ban"></i> <br>No icon
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
-                                    <i class="bi bi-image"></i> <br>One icon
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
-                                    <i class="bi bi-images"></i> <br>Two icons
-                                </button>
-                            </div>
-                        </div>
-                        <!-- Column 2: Main Text (all on one line) -->
-                        <div class="toolbar-column d-flex align-items-center">
-                            <small class="me-3 text-secondary fw-bold" style="min-width: 70px;">Main Text</small>
-                            <div class="input-group input-group-sm me-3" style="width: 120px;">
-                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="remove" data-type="main" title="Remove column">-</button>
-                                <span class="input-group-text column-count" id="main-column-count">3</span>
-                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="add" data-type="main" title="Add column (max 4)">+</button>
-                            </div>
-                            <div class="btn-group btn-group-sm global-main-align-selector" role="group" aria-label="Main text alignment">
-                                <button type="button" class="btn btn-outline-primary active" data-align="left" title="Main text - Align left">
-                                    <i class="bi bi-text-left"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" data-align="center" title="Main text - Align center">
-                                    <i class="bi bi-text-center"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" data-align="right" title="Main text - Align right">
-                                    <i class="bi bi-text-right"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" data-align="justify" title="Main text - Justify">
-                                    <i class="bi bi-justify"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-warning" data-align="custom" title="Main text - Custom per-cell alignment">
-                                    <i class="bi bi-gear"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Row 2: Sub Text Settings -->
-                    <div class="toolbar-row d-flex align-items-center">
-                        <!-- Column 1: QR Code input -->
-                        <div class="toolbar-column me-4" style="width: 254px;">
-                            <div class="input-group input-group-sm" style="max-width: 200px;">
-                                <span class="input-group-text"><i class="bi bi-qr-code"></i></span>
-                                <input type="url" id="qr-url-input" class="form-control" placeholder="URL" maxlength="2048" title="Enter URL to generate QR code">
-                                <button class="btn btn-outline-secondary" type="button" id="clear-qr-btn" title="Clear QR URL">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </div>
-                            <div id="qr-preview" class="ms-2" style="display: none;">
-                                <canvas id="qr-canvas" width="40" height="40"></canvas>
-                            </div>
-                        </div>
-                        <!-- Column 2: Sub Text (all on one line) -->
-                        <div class="toolbar-column d-flex align-items-center">
-                            <small class="me-3 text-secondary fw-bold" style="min-width: 70px;">Sub Text</small>
-                            <div class="input-group input-group-sm me-3" style="width: 120px;">
-                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="remove" data-type="sub" title="Remove sub-text column">-</button>
-                                <span class="input-group-text column-count" id="sub-column-count">3</span>
-                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="add" data-type="sub" title="Add sub-text column (max 4)">+</button>
-                            </div>
-                            <div class="btn-group btn-group-sm global-sub-align-selector" role="group" aria-label="Sub text alignment">
-                                <button type="button" class="btn btn-outline-primary active" data-align="left" title="Sub text - Align left">
-                                    <i class="bi bi-text-left"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" data-align="center" title="Sub text - Align center">
-                                    <i class="bi bi-text-center"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" data-align="right" title="Sub text - Align right">
-                                    <i class="bi bi-text-right"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" data-align="justify" title="Sub text - Justify">
-                                    <i class="bi bi-justify"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-warning" data-align="custom" title="Sub text - Custom per-cell alignment">
-                                    <i class="bi bi-gear"></i>
-                                </button>
+                <!-- Advanced Settings Accordion -->
+                <div class="accordion mb-3" id="advancedSettingsAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="advancedHeading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#advancedCollapse" aria-expanded="false" aria-controls="advancedCollapse">
+                                <i class="bi bi-gear me-2"></i>Advanced Settings
+                            </button>
+                        </h2>
+                        <div id="advancedCollapse" class="accordion-collapse collapse" aria-labelledby="advancedHeading" data-bs-parent="#advancedSettingsAccordion">
+                            <div class="accordion-body">
+                                <div class="structure-toolbar">
+                                    <!-- Row 1: Icon Settings + Main Text Settings -->
+                                    <div class="toolbar-row d-flex align-items-center mb-3">
+                                        <!-- Column 1: Icon Settings -->
+                                        <div class="toolbar-column me-4" style="width: 254px;">
+                                            <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
+                                                <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
+                                                    <i class="bi bi-ban"></i> <br>No icon
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
+                                                    <i class="bi bi-image"></i> <br>One icon
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
+                                                    <i class="bi bi-images"></i> <br>Two icons
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- Column 2: Main Text (all on one line) -->
+                                        <div class="toolbar-column d-flex align-items-center">
+                                            <small class="me-3 text-secondary fw-bold" style="min-width: 70px;">Main Text</small>
+                                            <div class="input-group input-group-sm me-3" style="width: 120px;">
+                                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="remove" data-type="main" title="Remove column">-</button>
+                                                <span class="input-group-text column-count" id="main-column-count">1</span>
+                                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="add" data-type="main" title="Add column (max 4)">+</button>
+                                            </div>
+                                            <div class="btn-group btn-group-sm global-main-align-selector" role="group" aria-label="Main text alignment">
+                                                <button type="button" class="btn btn-outline-primary active" data-align="left" title="Main text - Align left">
+                                                    <i class="bi bi-text-left"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary" data-align="center" title="Main text - Align center">
+                                                    <i class="bi bi-text-center"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary" data-align="right" title="Main text - Align right">
+                                                    <i class="bi bi-text-right"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary" data-align="justify" title="Main text - Justify">
+                                                    <i class="bi bi-justify"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-warning" data-align="custom" title="Main text - Custom per-cell alignment">
+                                                    <i class="bi bi-gear"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Row 2: Sub Text Settings -->
+                                    <div class="toolbar-row d-flex align-items-center">
+                                        <!-- Column 1: QR Code input -->
+                                        <div class="toolbar-column me-4" style="width: 254px;">
+                                            <div class="input-group input-group-sm" style="max-width: 200px;">
+                                                <span class="input-group-text"><i class="bi bi-qr-code"></i></span>
+                                                <input type="url" id="qr-url-input" class="form-control" placeholder="URL" maxlength="2048" title="Enter URL to generate QR code">
+                                                <button class="btn btn-outline-secondary" type="button" id="clear-qr-btn" title="Clear QR URL">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                            <div id="qr-preview" class="ms-2" style="display: none;">
+                                                <canvas id="qr-canvas" width="40" height="40"></canvas>
+                                            </div>
+                                        </div>
+                                        <!-- Column 2: Sub Text (all on one line) -->
+                                        <div class="toolbar-column d-flex align-items-center">
+                                            <small class="me-3 text-secondary fw-bold" style="min-width: 70px;">Sub Text</small>
+                                            <div class="input-group input-group-sm me-3" style="width: 120px;">
+                                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="remove" data-type="sub" title="Remove sub-text column">-</button>
+                                                <span class="input-group-text column-count" id="sub-column-count">1</span>
+                                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="add" data-type="sub" title="Add sub-text column (max 4)">+</button>
+                                            </div>
+                                            <div class="btn-group btn-group-sm global-sub-align-selector" role="group" aria-label="Sub text alignment">
+                                                <button type="button" class="btn btn-outline-primary active" data-align="left" title="Sub text - Align left">
+                                                    <i class="bi bi-text-left"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary" data-align="center" title="Sub text - Align center">
+                                                    <i class="bi bi-text-center"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary" data-align="right" title="Sub text - Align right">
+                                                    <i class="bi bi-text-right"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary" data-align="justify" title="Sub text - Justify">
+                                                    <i class="bi bi-justify"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-warning" data-align="custom" title="Sub text - Custom per-cell alignment">
+                                                    <i class="bi bi-gear"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -189,13 +198,9 @@
                     <!-- Hidden text inputs for compatibility -->
                     <div id="main-text-inputs" style="display: none;">
                         <input type="text" class="main-text-input" value="M3">
-                        <input type="text" class="main-text-input" value="M3">
-                        <input type="text" class="main-text-input" value="M3">
                     </div>
                     <div id="sub-text-inputs" style="display: none;">
                         <input type="text" class="sub-text-input" value="8 mm">
-                        <input type="text" class="sub-text-input" value="10 mm">
-                        <input type="text" class="sub-text-input" value="12 mm">
                     </div>
 
 
