@@ -30,18 +30,14 @@
                 <div class="dimensions-toolbar d-flex align-items-center justify-content-center p-2 mb-2 border rounded bg-light">
                     <div class="toolbar-group d-flex align-items-center">
                         <small class="me-2 text-secondary">Width</small>
-                        <div class="input-group input-group-sm me-4" style="width: 160px;">
-                            <button class="btn btn-outline-secondary dimension-arrow" type="button">←</button>
+                        <div class="input-group input-group-sm me-4" style="width: 100px;">
                             <input type="number" id="label-width" class="form-control text-center" min="20" max="100" value="50" title="Custom width from 20-100mm">
                             <span class="input-group-text">mm</span>
-                            <button class="btn btn-outline-secondary dimension-arrow" type="button">→</button>
                         </div>
                         <small class="me-2 text-secondary">Height</small>
-                        <div class="input-group input-group-sm me-4" style="width: 160px;">
-                            <button class="btn btn-outline-secondary dimension-arrow" type="button">↑</button>
+                        <div class="input-group input-group-sm me-4" style="width: 100px;">
                             <input type="number" id="label-height" class="form-control text-center" min="9" max="50" value="12" title="Label height in millimeters">
                             <span class="input-group-text">mm</span>
-                            <button class="btn btn-outline-secondary dimension-arrow" type="button">↓</button>
                         </div>
                         <button type="button" class="btn btn-outline-secondary btn-sm toggle-btn" id="export-rotate-btn" title="Toggle 90° rotation for output">
                             <i class="bi bi-arrow-clockwise"></i> Output 90°
@@ -81,32 +77,34 @@
                 </div>
 
                 <!-- Label Structure Toolbar -->
-                <div class="structure-toolbar d-flex align-items-start p-3 mb-3 border rounded bg-light">
-                    <!-- Left: Icon Settings -->
-                    <div class="toolbar-section d-flex flex-column align-items-center me-5">
-                        <div class="btn-group-vertical btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
-                            <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
-                                <i class="bi bi-ban"></i> No icon
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
-                                <i class="bi bi-image"></i> One icon
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
-                                <i class="bi bi-images"></i> Two icons
-                            </button>
+                <div class="structure-toolbar p-3 mb-3 border rounded bg-light">
+                    <!-- Row 1: Icon Settings + Main Text Settings -->
+                    <div class="toolbar-row d-flex align-items-center mb-3">
+                        <!-- Column 1: Icon Settings -->
+                        <div class="toolbar-column me-4" style="width: 254px;">
+                            <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
+                                <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
+                                    <i class="bi bi-ban"></i> <br>No icon
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
+                                    <i class="bi bi-image"></i> <br>One icon
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
+                                    <i class="bi bi-images"></i> <br>Two icons
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- Right: Text Settings (2 rows) - Right aligned -->
-                    <div class="toolbar-section flex-grow-1 d-flex flex-column align-items-end">
-                        <!-- Row 1: Main Text Settings -->
-                        <div class="toolbar-row d-flex align-items-center mb-3">
+                        <!-- Column 2: Main Text Label + Controls -->
+                        <div class="toolbar-column me-3" style="width: 193px;">
                             <small class="me-3 text-secondary fw-bold" style="min-width: 70px;">Main Text</small>
-                            <div class="input-group input-group-sm me-3" style="width: 120px;">
+                            <div class="input-group input-group-sm" style="width: 120px;">
                                 <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="remove" data-type="main" title="Remove column">-</button>
                                 <span class="input-group-text column-count" id="main-column-count">3</span>
                                 <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="add" data-type="main" title="Add column (max 4)">+</button>
                             </div>
+                        </div>
+                        <!-- Column 3: Main Text Alignment -->
+                        <div class="toolbar-column">
                             <div class="btn-group btn-group-sm global-main-align-selector" role="group" aria-label="Main text alignment">
                                 <button type="button" class="btn btn-outline-primary active" data-align="left" title="Main text - Align left">
                                     <i class="bi bi-text-left"></i>
@@ -125,15 +123,23 @@
                                 </button>
                             </div>
                         </div>
-                        
-                        <!-- Row 2: Sub Text Settings -->
-                        <div class="toolbar-row d-flex align-items-center">
+                    </div>
+                    
+                    <!-- Row 2: Sub Text Settings -->
+                    <div class="toolbar-row d-flex align-items-center">
+                        <!-- Column 1: Empty spacer -->
+                        <div class="toolbar-column me-4" style="width: 254px;"></div>
+                        <!-- Column 2: Sub Text Label + Controls -->
+                        <div class="toolbar-column me-3" style="width: 193px;">
                             <small class="me-3 text-secondary fw-bold" style="min-width: 70px;">Sub Text</small>
-                            <div class="input-group input-group-sm me-3" style="width: 120px;">
+                            <div class="input-group input-group-sm" style="width: 120px;">
                                 <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="remove" data-type="sub" title="Remove sub-text column">-</button>
                                 <span class="input-group-text column-count" id="sub-column-count">3</span>
                                 <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="add" data-type="sub" title="Add sub-text column (max 4)">+</button>
                             </div>
+                        </div>
+                        <!-- Column 3: Sub Text Alignment -->
+                        <div class="toolbar-column">
                             <div class="btn-group btn-group-sm global-sub-align-selector" role="group" aria-label="Sub text alignment">
                                 <button type="button" class="btn btn-outline-primary active" data-align="left" title="Sub text - Align left">
                                     <i class="bi bi-text-left"></i>
@@ -153,20 +159,20 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- QR Code - Commented out for later implementation -->
-                    <!-- 
-                    <div class="toolbar-group d-flex align-items-center me-3">
-                        <div class="input-group input-group-sm" style="max-width: 200px;">
-                            <span class="input-group-text"><i class="bi bi-qr-code"></i></span>
-                            <input type="url" id="qr-url-input" class="form-control" placeholder="URL" maxlength="2048" title="Enter URL to generate QR code">
-                        </div>
-                        <div id="qr-preview" class="ms-2" style="display: none;">
-                            <canvas id="qr-canvas" width="40" height="40"></canvas>
-                        </div>
-                    </div>
-                    -->
                 </div>
+                
+                <!-- QR Code - Commented out for later implementation -->
+                <!-- 
+                <div class="toolbar-group d-flex align-items-center me-3">
+                    <div class="input-group input-group-sm" style="max-width: 200px;">
+                        <span class="input-group-text"><i class="bi bi-qr-code"></i></span>
+                        <input type="url" id="qr-url-input" class="form-control" placeholder="URL" maxlength="2048" title="Enter URL to generate QR code">
+                    </div>
+                    <div id="qr-preview" class="ms-2" style="display: none;">
+                        <canvas id="qr-canvas" width="40" height="40"></canvas>
+                    </div>
+                </div>
+                -->
                 
                 
                 
