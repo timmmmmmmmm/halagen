@@ -124,8 +124,19 @@
                     
                     <!-- Row 2: Sub Text Settings -->
                     <div class="toolbar-row d-flex align-items-center">
-                        <!-- Column 1: Empty spacer -->
-                        <div class="toolbar-column me-4" style="width: 254px;"></div>
+                        <!-- Column 1: QR Code input -->
+                        <div class="toolbar-column me-4" style="width: 254px;">
+                            <div class="input-group input-group-sm" style="max-width: 200px;">
+                                <span class="input-group-text"><i class="bi bi-qr-code"></i></span>
+                                <input type="url" id="qr-url-input" class="form-control" placeholder="URL" maxlength="2048" title="Enter URL to generate QR code">
+                                <button class="btn btn-outline-secondary" type="button" id="clear-qr-btn" title="Clear QR URL">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                            <div id="qr-preview" class="ms-2" style="display: none;">
+                                <canvas id="qr-canvas" width="40" height="40"></canvas>
+                            </div>
+                        </div>
                         <!-- Column 2: Sub Text (all on one line) -->
                         <div class="toolbar-column d-flex align-items-center">
                             <small class="me-3 text-secondary fw-bold" style="min-width: 70px;">Sub Text</small>
