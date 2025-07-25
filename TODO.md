@@ -1,17 +1,56 @@
-# Feature Requests from Reddit Feedback
+# Halagen Label Generator - Todo List
 
-## **Priority Recommendations**
+## **CURRENT PRIORITIES** 🚀
 
-**Phase 1 (Quick wins):**
-- UI Framework Migration (Bootstrap 5)
-- Icon Count Selection Feature (0/1/2 icons)
-- Text centering
-- Toggle second row
+### ✅ 1. Copy YAML Button Feature - COMPLETED
+**Add toolbar button to export current single editor settings as YAML**
+- ✅ Add "Copy YAML" button to main toolbar
+- ✅ Extract current form values (text, dimensions, icons, alignment, etc.)
+- ✅ Convert to YAML format matching batch processor structure
+- ✅ Copy to clipboard with success notification
+- ✅ Helps users transition from single editor to batch processor
+
+### 2. Shorter Footer - COMPLETED
+**Reduce footer height by bringing attribution lines closer together**
+- Move GitHub attribution and Ko-fi link closer together
+- Reduce vertical spacing between footer elements
+- Keep functionality but make more compact
+
+### 3. Two Icons Option - COMPLETED
+**Add support for displaying two icons on labels**
+- Extend current icon count selector (0/1) to include 2 icons
+- Show two identical icon selectors when "2 icons" is selected
+- Update preview canvas to render both icons
+- Adjust text layout to accommodate two icons
+- Consider icon positioning (side-by-side or stacked)
+
+### 4. Replace Column Icon with Text
+**Change column selector icon to text labels**
+- Replace current column icon with text "Main Columns" 
+- Replace sub-column icon with text "Sub-Columns"
+- Improve clarity of what each setting controls
+
+### 5. Button Group Consistency
+**Improve visual cohesion of width/height/column controls**
+- Make width arrows visually part of input field group (Bootstrap input group)
+- Make height arrows visually grouped (vertical button group if possible)
+- Apply same grouping treatment to column number +/- buttons
+- Ensure all arrow buttons are clearly clickable (not just on hover)
+
+---
+
+## **EXISTING REDDIT REQUESTS**
+
+**Phase 1 Status:**
+- ✅ ~~UI Framework Migration (Bootstrap 5)~~ - *Implemented*
+- 🔄 Icon Count Selection Feature (0/1/2 icons) - *Needs 2-icon support*
+- ✅ ~~Text centering~~ - *Implemented*
+- ✅ ~~Toggle second row~~ - *Implemented*
 
 **Phase 2 (Enhanced functionality):**
-- Basic crimping icons
-- Icon overlay system
-- QR code integration
+- ⏳ Basic crimping icons
+- ⏳ Icon overlay system
+- ⏳ QR code integration
 
 ## **Future Considerations / Maybe Later**
 - **Direct printing integration**: Enable direct printing to label printers without saving as PNG first

@@ -708,7 +708,7 @@ button:hover {
 .label-icon {
     width: 8mm;
     height: 8mm;
-    margin: 2mm;
+    margin: 2mm 1mm 2mm 1mm;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -716,6 +716,22 @@ button:hover {
 }
 
 .label-icon .icon {
+    width: 100%;
+    height: 100%;
+    fill: #333;
+}
+
+.label-icon-2 {
+    width: 8mm;
+    height: 8mm;
+    margin: 2mm 0mm 2mm 0.5mm;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.label-icon-2 .icon {
     width: 100%;
     height: 100%;
     fill: #333;
@@ -773,6 +789,13 @@ button:hover {
 .label[data-height="9"] .label-icon {
     width: 6mm;
     height: 6mm;
+    margin: 1.5mm 0.5mm 1.5mm 0.75mm;
+}
+
+.label[data-height="9"] .label-icon-2 {
+    width: 6mm;
+    height: 6mm;
+    margin: 1.5mm 0mm 1.5mm 0.25mm;
 }
 
 .label[data-height="9"] .main-text {
@@ -786,6 +809,13 @@ button:hover {
 .label[data-height="18"] .label-icon {
     width: 14mm;
     height: 14mm;
+    margin: 2mm 1mm 2mm 1mm;
+}
+
+.label[data-height="18"] .label-icon-2 {
+    width: 14mm;
+    height: 14mm;
+    margin: 2mm 0mm 2mm 0.5mm;
 }
 
 .label[data-height="18"] .main-text {
@@ -799,6 +829,13 @@ button:hover {
 .label[data-height="24"] .label-icon {
     width: 18mm;
     height: 18mm;
+    margin: 3mm 1mm 3mm 1.5mm;
+}
+
+.label[data-height="24"] .label-icon-2 {
+    width: 18mm;
+    height: 18mm;
+    margin: 3mm 0mm 3mm 0.5mm;
 }
 
 .label[data-height="24"] .main-text {
@@ -1403,11 +1440,7 @@ footer {
     justify-content: center;
 }
 
-.dimension-arrow {
-    font-size: 14px;
-    color: #666;
-    font-weight: bold;
-}
+/* Dimension arrows now use Bootstrap button classes */
 
 .dimension-control {
     display: flex;
@@ -1516,23 +1549,10 @@ footer {
 }
 
 .column-btn-small {
-    width: 20px;
-    height: 20px;
-    border: 1px solid #dee2e6;
-    background: white;
-    color: #6c757d;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 3px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-    transform: none;
+    width: auto !important;
+    height: auto !important;
+    min-width: 30px;
+    /* Let Bootstrap handle the styling */
 }
 
 .column-btn-small:hover {

@@ -6,6 +6,11 @@ class LabelMaker {
         // Global alignment state
         this.globalMainTextAlign = 'left';
         this.globalSubTextAlign = 'left';
+        // Track which icon selector is currently active (1 or 2)
+        this.currentIconSelector = 1;
+        // Store icons for each selector
+        this.selectedIcon1 = 'heads_hex_socket';
+        this.selectedIcon2 = 'heads_hex_socket';
         this.initializeEventListeners();
         this.initializeDefaultColumns();
         this.updatePreview();
@@ -198,6 +203,10 @@ class LabelMaker {
         
         const downloadSvg = document.getElementById('download-svg');
         if (downloadSvg) downloadSvg.addEventListener('click', () => this.downloadSVG());
+        
+        const copyYamlBtn = document.getElementById('copy-yaml-btn');
+        if (copyYamlBtn) copyYamlBtn.addEventListener('click', () => this.copyYAML());
+        
         if (validateYaml) validateYaml.addEventListener('click', () => this.validateYAML());
         if (generateZip) generateZip.addEventListener('click', () => this.generateZIP());
         
@@ -211,10 +220,11 @@ class LabelMaker {
 
     initializeDimensionArrows() {
         // Width arrows (horizontal)
-        const widthArrows = document.querySelectorAll('.width-control .dimension-arrow');
         const widthInput = document.getElementById('label-width');
+        const widthContainer = widthInput?.closest('.input-group');
+        const widthArrows = widthContainer?.querySelectorAll('.dimension-arrow');
         
-        if (widthArrows.length >= 2 && widthInput) {
+        if (widthArrows && widthArrows.length >= 2 && widthInput) {
             const leftArrow = widthArrows[0]; // ←
             const rightArrow = widthArrows[1]; // →
             
@@ -238,10 +248,11 @@ class LabelMaker {
         }
         
         // Height arrows (vertical)
-        const heightArrows = document.querySelectorAll('.height-control .dimension-arrow');
         const heightInput = document.getElementById('label-height');
+        const heightContainer = heightInput?.closest('.input-group');
+        const heightArrows = heightContainer?.querySelectorAll('.dimension-arrow');
         
-        if (heightArrows.length >= 2 && heightInput) {
+        if (heightArrows && heightArrows.length >= 2 && heightInput) {
             const upArrow = heightArrows[0]; // ↑
             const downArrow = heightArrows[1]; // ↓
             
@@ -274,10 +285,20 @@ class LabelMaker {
             });
         }
 
-        // Click handler for preview icon to open icon picker
-        const previewIcon = document.querySelector('.clickable-icon');
+        // Click handler for preview icons to open icon picker
+        const previewIcon = document.querySelector('.label-icon.clickable-icon');
+        const previewIcon2 = document.querySelector('.label-icon-2.clickable-icon');
+        
         if (previewIcon) {
             previewIcon.addEventListener('click', () => {
+                this.currentIconSelector = 1;
+                this.openIconPicker();
+            });
+        }
+        
+        if (previewIcon2) {
+            previewIcon2.addEventListener('click', () => {
+                this.currentIconSelector = 2;
                 this.openIconPicker();
             });
         }
@@ -659,30 +680,54 @@ class LabelMaker {
         const labelPreview = document.getElementById('header-label-preview');
         const iconContainer = labelPreview.querySelector('.label-icon img');
         const labelIcon = labelPreview.querySelector('.label-icon');
+        const iconContainer2 = labelPreview.querySelector('.label-icon-2 img');
+        const labelIcon2 = labelPreview.querySelector('.label-icon-2');
         const labelText = labelPreview.querySelector('.label-text');
 
         // Handle icon visibility based on icon count
         if (labelIcon) {
             if (iconCount === 0) {
                 labelIcon.style.display = 'none';
+                if (labelIcon2) labelIcon2.style.display = 'none';
                 // Expand text to full width when no icons
                 if (labelText) {
                     labelText.style.marginLeft = '0';
                     labelText.style.width = '100%';
                 }
-            } else {
+            } else if (iconCount === 1) {
                 labelIcon.style.display = 'flex';
-                // Reset text positioning for icon mode
+                if (labelIcon2) labelIcon2.style.display = 'none';
+                // Reset text positioning for single icon mode
                 if (labelText) {
                     labelText.style.marginLeft = '';
                     labelText.style.width = '';
                 }
                 
                 // Get icon path from either built-in icons or custom icons
-                const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
+                const iconPath1 = this.icons[this.selectedIcon1] || this.customIcons[this.selectedIcon1] || this.icons['heads_hex_socket'];
                 if (iconContainer) {
-                    iconContainer.src = iconPath;
-                    iconContainer.alt = iconSelect;
+                    iconContainer.src = iconPath1;
+                    iconContainer.alt = this.selectedIcon1;
+                }
+            } else if (iconCount === 2) {
+                labelIcon.style.display = 'flex';
+                if (labelIcon2) labelIcon2.style.display = 'flex';
+                // Adjust text positioning for two icon mode
+                if (labelText) {
+                    labelText.style.marginLeft = '';
+                    labelText.style.width = '';
+                }
+                
+                // Get icon paths for both icons
+                const iconPath1 = this.icons[this.selectedIcon1] || this.customIcons[this.selectedIcon1] || this.icons['heads_hex_socket'];
+                const iconPath2 = this.icons[this.selectedIcon2] || this.customIcons[this.selectedIcon2] || this.icons['heads_hex_socket'];
+                if (iconContainer) {
+                    iconContainer.src = iconPath1;
+                    iconContainer.alt = this.selectedIcon1;
+                }
+                if (iconContainer2) {
+                    iconContainer2.src = iconPath2;
+                    iconContainer2.alt = this.selectedIcon2;
                 }
             }
         }
@@ -699,6 +744,10 @@ class LabelMaker {
         if (labelIcon) {
             labelIcon.style.width = `${iconSize}mm`;
             labelIcon.style.height = `${iconSize}mm`;
+        }
+        if (labelIcon2) {
+            labelIcon2.style.width = `${iconSize}mm`;
+            labelIcon2.style.height = `${iconSize}mm`;
         }
 
         // Check if sub text has any non-empty columns
@@ -729,6 +778,7 @@ class LabelMaker {
             const subTextInputs = document.querySelectorAll('.sub-text-input');
             const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
+            const iconCount = this.getIconCount();
             const dpi = this.validateDPI(parseInt(document.getElementById('png-dpi').value) || 96);
             const shouldRotate = document.getElementById('export-rotate').checked;
             const mmToPx = dpi / 25.4;
@@ -739,14 +789,35 @@ class LabelMaker {
 
             // Always use transparent background
 
-            const iconSize = (height - 2) * mmToPx;
-            const iconX = 1 * mmToPx;
-            const iconY = 1 * mmToPx;
+            let textX, textAreaWidth;
+            
+            if (iconCount === 0) {
+                // No icons - text takes full width
+                textX = 1 * mmToPx;
+                textAreaWidth = canvas.width - (2 * mmToPx);
+            } else if (iconCount === 1) {
+                // Single icon
+                const iconSize = (height - 2) * mmToPx;
+                const iconX = 1 * mmToPx;
+                const iconY = 1 * mmToPx;
 
-            await this.drawIcon(ctx, iconX, iconY, iconSize, iconSelect);
+                await this.drawIcon(ctx, iconX, iconY, iconSize, this.selectedIcon1);
 
-            const textX = iconX + iconSize + (2 * mmToPx);
-            const textAreaWidth = canvas.width - textX - (1 * mmToPx);
+                textX = iconX + iconSize + (2 * mmToPx);
+                textAreaWidth = canvas.width - textX - (1 * mmToPx);
+            } else if (iconCount === 2) {
+                // Two icons
+                const iconSize = (height - 2) * mmToPx;
+                const icon1X = 1 * mmToPx;
+                const icon2X = icon1X + iconSize + (0.5 * mmToPx);
+                const iconY = 1 * mmToPx;
+
+                await this.drawIcon(ctx, icon1X, iconY, iconSize, this.selectedIcon1);
+                await this.drawIcon(ctx, icon2X, iconY, iconSize, this.selectedIcon2);
+
+                textX = icon2X + iconSize + (2 * mmToPx);
+                textAreaWidth = canvas.width - textX - (1 * mmToPx);
+            }
 
             ctx.fillStyle = 'black';
             ctx.textBaseline = 'top';
@@ -755,6 +826,9 @@ class LabelMaker {
             const subFontSize = mainFontSize * 0.75;
 
             ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
+            // Calculate textY based on icon presence  
+            const iconSize = (height - 2) * mmToPx;
+            const iconY = 1 * mmToPx;
             const textY = subTexts.length > 0 ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
             
             // Handle multiple columns for main text
@@ -830,6 +904,7 @@ class LabelMaker {
             const subTextInputs = document.querySelectorAll('.sub-text-input');
             const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
             const iconSelect = document.getElementById('icon-select').value;
+            const iconCount = this.getIconCount();
             const shouldRotate = document.getElementById('export-rotate').checked;
             
             const svg = await this.generateLabelSVG({
@@ -838,6 +913,9 @@ class LabelMaker {
                 columns: mainTexts.length > 0 ? mainTexts : ['M3', 'M3', 'M3'],
                 subtext_columns: subTexts.length > 0 ? subTexts : ['8 mm', '10 mm', '12 mm'],
                 icon: iconSelect,
+                icon_count: iconCount,
+                icon1: this.selectedIcon1,
+                icon2: this.selectedIcon2,
                 rotate: shouldRotate
             });
             
@@ -858,6 +936,79 @@ class LabelMaker {
         }
     }
 
+    async copyYAML() {
+        try {
+            // Sync editable content to hidden inputs before extracting values
+            this.syncEditableTextToInputs();
+            
+            // Extract current form values
+            const height = parseInt(document.getElementById('label-height').value);
+            const width = parseInt(document.getElementById('label-width').value);
+            const mainTextInputs = document.querySelectorAll('.main-text-input');
+            const mainTexts = Array.from(mainTextInputs).map(input => input.value.trim()).filter(text => text);
+            const subTextInputs = document.querySelectorAll('.sub-text-input');
+            const subTexts = Array.from(subTextInputs).map(input => input.value.trim()).filter(text => text);
+            const iconSelect = document.getElementById('icon-select').value;
+            const iconCount = this.getIconCount();
+            const shouldRotate = document.getElementById('export-rotate').checked;
+            const pngDpi = parseInt(document.getElementById('png-dpi').value) || 300;
+            
+            // Generate YAML structure matching batch processor format
+            let yamlContent = `# Generated from Single Editor Settings\n`;
+            yamlContent += `# Copy this YAML to the Batch tab for processing multiple labels\n\n`;
+            yamlContent += `# Global settings\n`;
+            yamlContent += `width_mm: ${width}\n`;
+            yamlContent += `height_mm: ${height}\n`;
+            yamlContent += `png_dpi: ${pngDpi}\n`;
+            yamlContent += `main_text_align: ${this.globalMainTextAlign}\n`;
+            yamlContent += `sub_text_align: ${this.globalSubTextAlign}\n`;
+            if (shouldRotate) {
+                yamlContent += `export_rotate: true\n`;
+            }
+            yamlContent += `\n`;
+            yamlContent += `labels:\n`;
+            yamlContent += `  - name: "current_label"\n`;
+            
+            if (iconCount > 0) {
+                yamlContent += `    icon: "${iconSelect}"\n`;
+            }
+            
+            if (mainTexts.length > 0) {
+                yamlContent += `    columns:\n`;
+                mainTexts.forEach(text => {
+                    yamlContent += `      - "${text}"\n`;
+                });
+            }
+            
+            if (subTexts.length > 0) {
+                yamlContent += `    subtext_columns:\n`;
+                subTexts.forEach(text => {
+                    yamlContent += `      - "${text}"\n`;
+                });
+            }
+            
+            // Copy to clipboard
+            await navigator.clipboard.writeText(yamlContent);
+            
+            // Show success feedback
+            const button = document.getElementById('copy-yaml-btn');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            button.classList.remove('btn-outline-info');
+            button.classList.add('btn-success');
+            
+            setTimeout(() => {
+                button.innerHTML = originalContent;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-info');
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Copy YAML failed:', error);
+            alert('Failed to copy YAML to clipboard. Please try again.');
+        }
+    }
+
     async generateLabelSVG(label) {
         const originalHeight = label.height_mm;
         const originalWidth = label.width_mm;
@@ -866,14 +1017,28 @@ class LabelMaker {
         const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
         const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
         const iconSelect = label.icon;
+        const iconCount = label.icon_count || 1;
+        const icon1 = label.icon1 || iconSelect;
+        const icon2 = label.icon2 || iconSelect;
         const svgDpi = 96; // Fixed SVG DPI
 
         // Always use original dimensions for layout calculations
+        let textX, textAreaWidth;
         const iconSize = originalHeight - 2;
-        const iconX = 1;
-        const iconY = 1;
-        const textX = iconX + iconSize + 2;
-        const textAreaWidth = originalWidth - textX - 1;
+        
+        if (iconCount === 0) {
+            // No icons - text takes full width
+            textX = 1;
+            textAreaWidth = originalWidth - 2;
+        } else if (iconCount === 1) {
+            // Single icon
+            textX = 1 + iconSize + 2;
+            textAreaWidth = originalWidth - textX - 1;
+        } else if (iconCount === 2) {
+            // Two icons
+            textX = 1 + iconSize + 0.5 + iconSize + 2;
+            textAreaWidth = originalWidth - textX - 1;
+        }
         
         // For rotation, swap dimensions only for the SVG canvas
         const canvasHeight = shouldRotate ? originalWidth : originalHeight;
@@ -922,51 +1087,87 @@ class LabelMaker {
         const backgroundHeight = originalHeight * mmToPx;
         svgContent += `<rect x="0" y="0" width="${backgroundWidth}" height="${backgroundHeight}" fill="white" fill-opacity="0.01" stroke="none"/>`;
 
-        // Add icon - convert coordinates to pixel space
-        const iconXPx = iconX * scale;
-        const iconYPx = iconY * scale;
-        const iconSizePx = iconSize * scale;
-        
-        const iconPath = this.icons[iconSelect] || this.customIcons[iconSelect] || this.icons['heads_hex_socket'];
-        if (iconPath.endsWith('.svg')) {
-            try {
-                const response = await fetch(iconPath);
-                const iconSvg = await response.text();
-                const parser = new DOMParser();
-                const iconDoc = parser.parseFromString(iconSvg, 'image/svg+xml');
-                const iconSvgElement = iconDoc.documentElement;
+        // Add icons based on icon count
+        if (iconCount > 0) {
+            const iconY = 1;
+            const iconSizePx = iconSize * scale;
+            
+            // Helper function to add an icon
+            const addIcon = async (iconKey, xPosition) => {
+                const iconXPx = xPosition * scale;
+                const iconYPx = iconY * scale;
                 
-                // Get original viewBox or width/height to calculate proper scale
-                const viewBox = iconSvgElement.getAttribute('viewBox');
-                let originalWidth = 100, originalHeight = 100; // fallback
-                
-                if (viewBox) {
-                    const parts = viewBox.split(' ');
-                    if (parts.length === 4) {
-                        originalWidth = parseFloat(parts[2]);
-                        originalHeight = parseFloat(parts[3]);
+                const iconPath = this.icons[iconKey] || this.customIcons[iconKey] || this.icons['heads_hex_socket'];
+                if (iconPath && iconPath.toLowerCase().endsWith('.svg')) {
+                    try {
+                        const response = await fetch(iconPath);
+                        const iconSvg = await response.text();
+                        const parser = new DOMParser();
+                        const iconDoc = parser.parseFromString(iconSvg, 'image/svg+xml');
+                        const iconSvgElement = iconDoc.documentElement;
+                        
+                        // Get original viewBox or width/height to calculate proper scale
+                        const viewBox = iconSvgElement.getAttribute('viewBox');
+                        let originalWidth = 100, originalHeight = 100; // fallback
+                        
+                        if (viewBox) {
+                            const parts = viewBox.split(' ');
+                            if (parts.length === 4) {
+                                originalWidth = parseFloat(parts[2]);
+                                originalHeight = parseFloat(parts[3]);
+                            }
+                        } else {
+                            const widthAttr = iconSvgElement.getAttribute('width');
+                            const heightAttr = iconSvgElement.getAttribute('height');
+                            if (widthAttr) originalWidth = parseFloat(widthAttr.replace(/\D/g, ''));
+                            if (heightAttr) originalHeight = parseFloat(heightAttr.replace(/\D/g, ''));
+                        }
+                        
+                        // Calculate scale to fit icon in square
+                        const iconScale = iconSizePx / Math.max(originalWidth, originalHeight);
+                        
+                        // Extract the inner content and scale it properly
+                        const iconContent = iconSvgElement.innerHTML;
+                        svgContent += `<g transform="translate(${iconXPx},${iconYPx}) scale(${iconScale})">`;
+                        svgContent += iconContent;
+                        svgContent += '</g>';
+                    } catch (error) {
+                        console.error('Failed to embed SVG icon:', error);
+                        // Fallback to a simple rectangle
+                        svgContent += `<rect x="${iconXPx}" y="${iconYPx}" width="${iconSizePx}" height="${iconSizePx}" fill="#ccc" stroke="#999"/>`;
+                    }
+                } else if (iconPath) {
+                    // For PNG icons, convert to base64 and embed
+                    try {
+                        const response = await fetch(iconPath);
+                        const blob = await response.blob();
+                        const base64 = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.readAsDataURL(blob);
+                        });
+                        svgContent += `<image x="${iconXPx}" y="${iconYPx}" width="${iconSizePx}" height="${iconSizePx}" href="${base64}"/>`;
+                    } catch (error) {
+                        console.error('Failed to embed PNG icon:', error);
+                        // Fallback to a simple rectangle
+                        svgContent += `<rect x="${iconXPx}" y="${iconYPx}" width="${iconSizePx}" height="${iconSizePx}" fill="#ccc" stroke="#999"/>`;
                     }
                 } else {
-                    const widthAttr = iconSvgElement.getAttribute('width');
-                    const heightAttr = iconSvgElement.getAttribute('height');
-                    if (widthAttr) originalWidth = parseFloat(widthAttr.replace(/\D/g, ''));
-                    if (heightAttr) originalHeight = parseFloat(heightAttr.replace(/\D/g, ''));
+                    console.warn('No icon path found for:', iconKey);
+                    // Fallback to a simple rectangle
+                    svgContent += `<rect x="${iconXPx}" y="${iconYPx}" width="${iconSizePx}" height="${iconSizePx}" fill="#ccc" stroke="#999"/>`;
                 }
-                
-                // Calculate scale to fit icon in square
-                const iconScale = iconSizePx / Math.max(originalWidth, originalHeight);
-                
-                // Extract the inner content and scale it properly
-                const iconContent = iconSvgElement.innerHTML;
-                svgContent += `<g transform="translate(${iconXPx},${iconYPx}) scale(${iconScale})">`;
-                svgContent += iconContent;
-                svgContent += '</g>';
-            } catch (error) {
-                console.error('Failed to embed SVG icon:', error);
+            };
+            
+            // Draw first icon if icon count >= 1
+            if (iconCount >= 1) {
+                await addIcon(icon1, 1);
             }
-        } else {
-            // For PNG icons, embed as image
-            svgContent += `<image x="${iconXPx}" y="${iconYPx}" width="${iconSizePx}" height="${iconSizePx}" href="${iconPath}"/>`;
+            
+            // Draw second icon if icon count >= 2
+            if (iconCount >= 2) {
+                await addIcon(icon2, 1 + iconSize + 0.5);
+            }
         }
 
         // Add main text - position so bottom of text is on horizontal centerline
@@ -1033,12 +1234,13 @@ class LabelMaker {
     }
 
     calculateFontSize(height) {
+        // Font sizes for export - slightly increased from original to better match preview
         switch(height) {
-            case 9: return 3;
-            case 12: return 4;
-            case 18: return 6.5;
-            case 24: return 8;
-            default: return 4;
+            case 9: return 3.5;  // was 3, slightly increased
+            case 12: return 5;   // was 4, slightly increased  
+            case 18: return 7.5; // was 6.5, slightly increased
+            case 24: return 9;   // was 8, slightly increased
+            default: return 5;
         }
     }
     
@@ -1601,6 +1803,9 @@ class LabelMaker {
         const mainTexts = label.columns ? label.columns.filter(col => col.trim()) : [label.title];
         const subTexts = label.subtext_columns ? label.subtext_columns.filter(col => col.trim()) : (label.subtext ? [label.subtext] : []);
         const iconSelect = label.icon;
+        const iconCount = label.icon_count || 1;
+        const icon1 = label.icon1 || iconSelect;
+        const icon2 = label.icon2 || iconSelect;
         const mmToPx = dpi / 25.4;
         
         canvas.width = width * mmToPx;
@@ -1608,14 +1813,35 @@ class LabelMaker {
 
         // Always use transparent background
 
-        const iconSize = (height - 2) * mmToPx;
-        const iconX = 1 * mmToPx;
-        const iconY = 1 * mmToPx;
+        let textX, textAreaWidth;
+        
+        if (iconCount === 0) {
+            // No icons - text takes full width
+            textX = 1 * mmToPx;
+            textAreaWidth = canvas.width - (2 * mmToPx);
+        } else if (iconCount === 1) {
+            // Single icon
+            const iconSize = (height - 2) * mmToPx;
+            const iconX = 1 * mmToPx;
+            const iconY = 1 * mmToPx;
 
-        await this.drawIcon(ctx, iconX, iconY, iconSize, iconSelect);
+            await this.drawIcon(ctx, iconX, iconY, iconSize, icon1);
 
-        const textX = iconX + iconSize + (2 * mmToPx);
-        const textAreaWidth = canvas.width - textX - (1 * mmToPx);
+            textX = iconX + iconSize + (2 * mmToPx);
+            textAreaWidth = canvas.width - textX - (1 * mmToPx);
+        } else if (iconCount === 2) {
+            // Two icons
+            const iconSize = (height - 2) * mmToPx;
+            const icon1X = 1 * mmToPx;
+            const icon2X = icon1X + iconSize + (0.5 * mmToPx);
+            const iconY = 1 * mmToPx;
+
+            await this.drawIcon(ctx, icon1X, iconY, iconSize, icon1);
+            await this.drawIcon(ctx, icon2X, iconY, iconSize, icon2);
+
+            textX = icon2X + iconSize + (2 * mmToPx);
+            textAreaWidth = canvas.width - textX - (1 * mmToPx);
+        }
 
         ctx.fillStyle = 'black';
         ctx.textBaseline = 'top';
@@ -1624,6 +1850,9 @@ class LabelMaker {
         const subFontSize = mainFontSize * 0.75;
 
         ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
+        // Calculate textY based on icon presence
+        const iconSize = (height - 2) * mmToPx;
+        const iconY = 1 * mmToPx;
         const textY = subTexts.length > 0 ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
         
         // Handle multiple columns for main text
@@ -2129,7 +2358,15 @@ labels:
     }
 
     selectIcon(iconKey) {
-        this.selectedIcon = iconKey;
+        // Store the icon for the currently active selector
+        if (this.currentIconSelector === 1) {
+            this.selectedIcon1 = iconKey;
+        } else {
+            this.selectedIcon2 = iconKey;
+        }
+        
+        // For backwards compatibility, also set selectedIcon to the primary icon
+        this.selectedIcon = this.selectedIcon1;
         
         // Get icon path and display name
         const iconPath = this.icons[iconKey] || this.customIcons[iconKey];
@@ -2143,10 +2380,10 @@ labels:
             <span>${displayName}</span>
         `;
 
-        // Update the hidden select for compatibility
+        // Update the hidden select for compatibility (use primary icon)
         const selectElement = document.getElementById('icon-select');
-        selectElement.value = iconKey;
-        selectElement.innerHTML = `<option value="${iconKey}" selected>${displayName}</option>`;
+        selectElement.value = this.selectedIcon1;
+        selectElement.innerHTML = `<option value="${this.selectedIcon1}" selected>${this.iconNames[this.selectedIcon1] || this.selectedIcon1}</option>`;
 
         // Update grid selection
         document.querySelectorAll('.icon-picker-item').forEach(item => {

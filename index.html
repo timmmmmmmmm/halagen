@@ -26,41 +26,41 @@
             </div>
 
             <div class="tab-content" id="single-tab">
-                <div class="wysiwyg-editor">
-                    <!-- Width control at top -->
-                    <div class="width-control">
-                        <div class="dimensional-line horizontal">
-                            <span class="dimension-arrow">←</span>
-                            <div class="dimension-control">
-                                <div class="input-group input-group-sm">
-                                    <input type="number" id="label-width" class="form-control" min="20" max="100" value="50" title="Custom width from 20-100mm">
-                                    <span class="input-group-text">mm</span>
-                                </div>
-                            </div>
-                            <span class="dimension-arrow">→</span>
+                <!-- Dimensions Toolbar -->
+                <div class="dimensions-toolbar d-flex align-items-center justify-content-center p-2 mb-2 border rounded bg-light">
+                    <div class="toolbar-group d-flex align-items-center">
+                        <small class="me-2 text-secondary">Width</small>
+                        <div class="input-group input-group-sm me-4" style="width: 160px;">
+                            <button class="btn btn-outline-secondary dimension-arrow" type="button">←</button>
+                            <input type="number" id="label-width" class="form-control text-center" min="20" max="100" value="50" title="Custom width from 20-100mm">
+                            <span class="input-group-text">mm</span>
+                            <button class="btn btn-outline-secondary dimension-arrow" type="button">→</button>
                         </div>
+                        <small class="me-2 text-secondary">Height</small>
+                        <div class="input-group input-group-sm me-4" style="width: 160px;">
+                            <button class="btn btn-outline-secondary dimension-arrow" type="button">↑</button>
+                            <input type="number" id="label-height" class="form-control text-center" min="9" max="50" value="12" title="Label height in millimeters">
+                            <span class="input-group-text">mm</span>
+                            <button class="btn btn-outline-secondary dimension-arrow" type="button">↓</button>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm toggle-btn" id="export-rotate-btn" title="Toggle 90° rotation for output">
+                            <i class="bi bi-arrow-clockwise"></i> Output 90°
+                        </button>
+                        <input type="checkbox" id="export-rotate" style="display: none;">
+                        <input type="hidden" id="png-dpi" value="300">
                     </div>
-                    
+                </div>
+                
+                <div class="wysiwyg-editor">
                     <!-- Preview and controls container -->
                     <div class="preview-container">
-                        <!-- Height control on left -->
-                        <div class="height-control">
-                            <div class="dimensional-line vertical">
-                                <span class="dimension-arrow up">↑</span>
-                                <div class="dimension-control vertical">
-                                    <div class="input-group input-group-sm">
-                                        <input type="number" id="label-height" class="form-control" min="9" max="50" value="12" title="Label height in millimeters">
-                                        <span class="input-group-text">mm</span>
-                                    </div>
-                                </div>
-                                <span class="dimension-arrow down">↓</span>
-                            </div>
-                        </div>
-                        
                         <!-- Main preview -->
                         <div class="preview-area">
                             <div id="header-label-preview" class="label">
                                 <div class="label-icon clickable-icon" title="Click to change icon">
+                                    <img class="icon" src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
+                                </div>
+                                <div class="label-icon-2 clickable-icon" title="Click to change second icon" style="display: none;">
                                     <img class="icon" src="icons/heads/Screw_Head_-_Hex_Socket.svg" alt="heads_hex_socket">
                                 </div>
                                 <div class="label-text">
@@ -77,80 +77,80 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Column controls on right -->
-                        <div class="column-controls-right">
-                            <div class="main-text-control">
-                                <label><small class="text-secondary me-1">main</small><i class="bi bi-layout-three-columns text-muted"></i></label>
-                                <div class="column-buttons-right">
-                                    <button type="button" class="column-btn-small" data-action="remove" data-type="main" title="Remove column">-</button>
-                                    <span class="column-count" id="main-column-count">3</span>
-                                    <button type="button" class="column-btn-small" data-action="add" data-type="main" title="Add column (max 4)">+</button>
-                                </div>
-                            </div>
-                            <div class="sub-text-control">
-                                <label><small class="text-secondary me-1">sub</small><i class="bi bi-layout-three-columns text-muted"></i></label>
-                                <div class="column-buttons-right">
-                                    <button type="button" class="column-btn-small" data-action="remove" data-type="sub" title="Remove sub-text column">-</button>
-                                    <span class="column-count" id="sub-column-count">3</span>
-                                    <button type="button" class="column-btn-small" data-action="add" data-type="sub" title="Add sub-text column (max 4)">+</button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                
-                <!-- Compact Formatting Toolbar -->
-                <div class="formatting-toolbar d-flex align-items-center justify-content-between p-2 mb-3 border rounded bg-light">
-                    <!-- Left: Icon Count -->
-                    <div class="toolbar-group d-flex align-items-center">
-                        <div class="btn-group btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
+
+                <!-- Label Structure Toolbar -->
+                <div class="structure-toolbar d-flex align-items-start p-3 mb-3 border rounded bg-light">
+                    <!-- Left: Icon Settings -->
+                    <div class="toolbar-section d-flex flex-column align-items-center me-5">
+                        <div class="btn-group-vertical btn-group-sm icon-count-selector" role="group" aria-label="Icon count selection">
                             <button type="button" class="btn btn-outline-secondary" data-icon-count="0" title="No icons - text only">
-                                <i class="bi bi-ban"></i>
+                                <i class="bi bi-ban"></i> No icon
                             </button>
                             <button type="button" class="btn btn-outline-secondary active" data-icon-count="1" title="Single icon (current)">
-                                <i class="bi bi-image"></i>
+                                <i class="bi bi-image"></i> One icon
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-icon-count="2" title="Two icons">
+                                <i class="bi bi-images"></i> Two icons
                             </button>
                         </div>
                     </div>
                     
-                    <!-- Center: Text Alignment -->
-                    <div class="toolbar-group d-flex align-items-center">
-                        <small class="me-1 text-secondary" title="Main text alignment">main</small>
-                        <div class="btn-group btn-group-sm global-main-align-selector me-2" role="group" aria-label="Main text alignment">
-                            <button type="button" class="btn btn-outline-primary active" data-align="left" title="Main text - Align left">
-                                <i class="bi bi-text-left"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" data-align="center" title="Main text - Align center">
-                                <i class="bi bi-text-center"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" data-align="right" title="Main text - Align right">
-                                <i class="bi bi-text-right"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" data-align="justify" title="Main text - Justify">
-                                <i class="bi bi-justify"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-warning" data-align="custom" title="Main text - Custom per-cell alignment">
-                                <i class="bi bi-gear"></i>
-                            </button>
+                    <!-- Right: Text Settings (2 rows) - Right aligned -->
+                    <div class="toolbar-section flex-grow-1 d-flex flex-column align-items-end">
+                        <!-- Row 1: Main Text Settings -->
+                        <div class="toolbar-row d-flex align-items-center mb-3">
+                            <small class="me-3 text-secondary fw-bold" style="min-width: 70px;">Main Text</small>
+                            <div class="input-group input-group-sm me-3" style="width: 120px;">
+                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="remove" data-type="main" title="Remove column">-</button>
+                                <span class="input-group-text column-count" id="main-column-count">3</span>
+                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="add" data-type="main" title="Add column (max 4)">+</button>
+                            </div>
+                            <div class="btn-group btn-group-sm global-main-align-selector" role="group" aria-label="Main text alignment">
+                                <button type="button" class="btn btn-outline-primary active" data-align="left" title="Main text - Align left">
+                                    <i class="bi bi-text-left"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-align="center" title="Main text - Align center">
+                                    <i class="bi bi-text-center"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-align="right" title="Main text - Align right">
+                                    <i class="bi bi-text-right"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-align="justify" title="Main text - Justify">
+                                    <i class="bi bi-justify"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" data-align="custom" title="Main text - Custom per-cell alignment">
+                                    <i class="bi bi-gear"></i>
+                                </button>
+                            </div>
                         </div>
-                        <small class="me-1 ms-3 text-secondary" title="Sub text alignment">sub</small>
-                        <div class="btn-group btn-group-sm global-sub-align-selector" role="group" aria-label="Sub text alignment">
-                            <button type="button" class="btn btn-outline-primary active" data-align="left" title="Sub text - Align left">
-                                <i class="bi bi-text-left"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" data-align="center" title="Sub text - Align center">
-                                <i class="bi bi-text-center"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" data-align="right" title="Sub text - Align right">
-                                <i class="bi bi-text-right"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" data-align="justify" title="Sub text - Justify">
-                                <i class="bi bi-justify"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-warning" data-align="custom" title="Sub text - Custom per-cell alignment">
-                                <i class="bi bi-gear"></i>
-                            </button>
+                        
+                        <!-- Row 2: Sub Text Settings -->
+                        <div class="toolbar-row d-flex align-items-center">
+                            <small class="me-3 text-secondary fw-bold" style="min-width: 70px;">Sub Text</small>
+                            <div class="input-group input-group-sm me-3" style="width: 120px;">
+                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="remove" data-type="sub" title="Remove sub-text column">-</button>
+                                <span class="input-group-text column-count" id="sub-column-count">3</span>
+                                <button type="button" class="btn btn-outline-secondary column-btn-small" data-action="add" data-type="sub" title="Add sub-text column (max 4)">+</button>
+                            </div>
+                            <div class="btn-group btn-group-sm global-sub-align-selector" role="group" aria-label="Sub text alignment">
+                                <button type="button" class="btn btn-outline-primary active" data-align="left" title="Sub text - Align left">
+                                    <i class="bi bi-text-left"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-align="center" title="Sub text - Align center">
+                                    <i class="bi bi-text-center"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-align="right" title="Sub text - Align right">
+                                    <i class="bi bi-text-right"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-align="justify" title="Sub text - Justify">
+                                    <i class="bi bi-justify"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" data-align="custom" title="Sub text - Custom per-cell alignment">
+                                    <i class="bi bi-gear"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -166,16 +166,8 @@
                         </div>
                     </div>
                     -->
-                    
-                    <!-- Right: Rotation Toggle -->
-                    <div class="toolbar-group d-flex align-items-center">
-                        <button type="button" class="btn btn-outline-secondary btn-sm toggle-btn" id="export-rotate-btn" title="Toggle 90° rotation">
-                            <i class="bi bi-arrow-clockwise"></i>
-                        </button>
-                        <input type="checkbox" id="export-rotate" style="display: none;">
-                        <input type="hidden" id="png-dpi" value="300">
-                    </div>
                 </div>
+                
                 
                 
                 <div class="controls">
@@ -199,10 +191,10 @@
                     <!-- Simplified Download Section -->
                     <div class="download-section mt-4">
                         <div class="row g-2">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="btn-group w-100" role="group">
                                     <button id="download-png" class="btn btn-success flex-grow-1 text-center" title="Download PNG (300 DPI)" data-dpi="300">
-                                        <i class="bi bi-download me-2"></i>Download PNG
+                                        <i class="bi bi-download me-2"></i>PNG
                                     </button>
                                     <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split px-2" data-bs-toggle="dropdown" aria-expanded="false" style="flex: 0 0 auto;">
                                         <span class="visually-hidden">Toggle Dropdown</span>
@@ -215,9 +207,14 @@
                                     </ul>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <button id="download-svg" class="btn btn-primary w-100" title="Download as vector SVG (scalable and editable)">
-                                    <i class="bi bi-download me-2"></i>Download SVG
+                                    <i class="bi bi-download me-2"></i>SVG
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" class="btn btn-outline-info w-100" id="copy-yaml-btn" title="Copy current settings as YAML for batch processing">
+                                    <i class="bi bi-clipboard-plus me-2"></i>Copy YAML
                                 </button>
                             </div>
                         </div>
@@ -253,7 +250,7 @@
                 <p><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 8px;"><path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg><a href="https://github.com/timmmmmmmmm/halagen" target="_blank">halagen (hardware label generator)</a> by <a href="https://www.timvanderheide.com" target="_blank">Tim van der Heide</a></p>
                 <p>Icon set by <a href="https://www.printables.com/model/621771-gridfinity-bin-label-icons" target="_blank">Joe Jankowiak</a> 
                    - Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></p>
-                <div class="mt-3">
+                <div class="mt-2">
                     <a href="https://ko-fi.com/timvdh" target="_blank" class="btn btn-outline-warning btn-sm">
                         <i class="bi bi-cup-hot" style="margin-right: 5px;"></i>
                         Buy me a coffee
