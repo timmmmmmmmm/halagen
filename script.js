@@ -820,16 +820,15 @@ class LabelMaker {
             }
 
             ctx.fillStyle = 'black';
-            ctx.textBaseline = 'top';
+            ctx.textBaseline = 'middle';
 
             const mainFontSize = this.calculateFontSize(height);
             const subFontSize = mainFontSize * 0.75;
 
             ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
-            // Calculate textY based on icon presence  
-            const iconSize = (height - 2) * mmToPx;
-            const iconY = 1 * mmToPx;
-            const textY = subTexts.length > 0 ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
+            // Center text vertically like in the preview
+            const centerY = (height * mmToPx) / 2;
+            const textY = subTexts.length > 0 ? centerY - (mainFontSize * mmToPx * 0.3) : centerY;
             
             // Handle multiple columns for main text
             if (mainTexts.length === 0) {
@@ -852,7 +851,7 @@ class LabelMaker {
             // Handle multiple columns for sub text
             ctx.font = `${subFontSize * mmToPx}px Arial`;
             ctx.fillStyle = '#666';
-            const subTextY = textY + (mainFontSize * mmToPx * 1.2);
+            const subTextY = centerY + (subFontSize * mmToPx * 0.6);
             
             if (subTexts.length === 0) {
                 const defaultSubTexts = ['8 mm', '10 mm', '12 mm'];
@@ -1174,14 +1173,14 @@ class LabelMaker {
         const textXPx = textX * scale;
         const textAreaWidthPx = textAreaWidth * scale;
         const centerYPx = (originalHeight * mmToPx) / 2; // Use original height for centerline
-        const textYPx = subTexts.length > 0 ? centerYPx : centerYPx;
+        const textYPx = subTexts.length > 0 ? centerYPx - (mainFontSizePx * 0.3) : centerYPx;
         
         if (mainTexts.length === 1) {
             // For single label export, get alignment from DOM or use batch data
             const alignment = label.main_text_align || this.getColumnAlignment('main', 0);
             const alignedX = this.getSvgAlignedX(textXPx, textAreaWidthPx, alignment);
             const textAnchor = this.getSvgTextAnchor(alignment);
-            svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="bottom">${this.escapeXml(mainTexts[0])}</text>`;
+            svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(mainTexts[0])}</text>`;
         } else {
             const columnWidthPx = textAreaWidthPx / mainTexts.length;
             mainTexts.forEach((text, index) => {
@@ -1190,19 +1189,19 @@ class LabelMaker {
                 const alignment = label.main_text_align || this.getColumnAlignment('main', index);
                 const alignedX = this.getSvgAlignedX(columnXPx, columnWidthPx, alignment);
                 const textAnchor = this.getSvgTextAnchor(alignment);
-                svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
+                svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
             });
         }
 
         // Add sub text - position below main text with same spacing
         if (subTexts.length > 0) {
-            const subTextYPx = textYPx + (mainFontSizePx * 0.3) + (subFontSizePx * 0.8); // Adjust spacing for new positioning
+            const subTextYPx = centerYPx + (subFontSizePx * 0.6); // Position sub text below center
             if (subTexts.length === 1) {
                 // For single label export, get alignment from DOM or use batch data
                 const alignment = label.sub_text_align || this.getColumnAlignment('sub', 0);
                 const alignedX = this.getSvgAlignedX(textXPx, textAreaWidthPx, alignment);
                 const textAnchor = this.getSvgTextAnchor(alignment);
-                svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="bottom">${this.escapeXml(subTexts[0])}</text>`;
+                svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(subTexts[0])}</text>`;
             } else {
                 const columnWidthPx = textAreaWidthPx / subTexts.length;
                 subTexts.forEach((text, index) => {
@@ -1211,7 +1210,7 @@ class LabelMaker {
                     const alignment = label.sub_text_align || this.getColumnAlignment('sub', index);
                     const alignedX = this.getSvgAlignedX(columnXPx, columnWidthPx, alignment);
                     const textAnchor = this.getSvgTextAnchor(alignment);
-                    svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="bottom">${this.escapeXml(text)}</text>`;
+                    svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
                 });
             }
         }
@@ -1844,16 +1843,15 @@ class LabelMaker {
         }
 
         ctx.fillStyle = 'black';
-        ctx.textBaseline = 'top';
+        ctx.textBaseline = 'middle';
 
         const mainFontSize = this.calculateFontSize(height);
         const subFontSize = mainFontSize * 0.75;
 
         ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
-        // Calculate textY based on icon presence
-        const iconSize = (height - 2) * mmToPx;
-        const iconY = 1 * mmToPx;
-        const textY = subTexts.length > 0 ? iconY + (iconSize * 0.2) : iconY + (iconSize * 0.4);
+        // Center text vertically like in the preview
+        const centerY = (height * mmToPx) / 2;
+        const textY = subTexts.length > 0 ? centerY - (mainFontSize * mmToPx * 0.3) : centerY;
         
         // Handle multiple columns for main text
         if (mainTexts.length === 1) {
@@ -1873,7 +1871,7 @@ class LabelMaker {
         if (subTexts.length > 0) {
             ctx.font = `${subFontSize * mmToPx}px Arial`;
             ctx.fillStyle = '#666';
-            const subTextY = textY + (mainFontSize * mmToPx * 1.2);
+            const subTextY = centerY + (subFontSize * mmToPx * 0.6);
             
             if (subTexts.length === 1) {
                 const alignment = label.sub_text_align || 'left';
