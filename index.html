@@ -67,6 +67,9 @@
                                         <div class="sub-text-column editable-text" contenteditable="true">8 mm</div>
                                     </div>
                                 </div>
+                                <div class="label-qr" style="display: none;">
+                                    <canvas class="qr-canvas" width="40" height="40"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -133,13 +136,14 @@
                                         <div class="toolbar-column me-4" style="width: 254px;">
                                             <div class="input-group input-group-sm" style="max-width: 200px;">
                                                 <span class="input-group-text"><i class="bi bi-qr-code"></i></span>
-                                                <input type="url" id="qr-url-input" class="form-control" placeholder="URL" maxlength="2048" title="Enter URL to generate QR code">
+                                                <input type="url" id="qr-url-input" class="form-control" placeholder="URL" maxlength="200" title="Enter URL to generate QR code (recommended max 50 characters)">
                                                 <button class="btn btn-outline-secondary" type="button" id="clear-qr-btn" title="Clear QR URL">
                                                     <i class="bi bi-x"></i>
                                                 </button>
                                             </div>
-                                            <div id="qr-preview" class="ms-2" style="display: none;">
-                                                <canvas id="qr-canvas" width="40" height="40"></canvas>
+                                            <div class="mt-1 d-flex justify-content-between align-items-center">
+                                                <small id="qr-char-counter" class="text-muted">0/54</small>
+                                                <small><a href="https://tinyurl.com" target="_blank" class="text-decoration-none" title="Shorten long URLs"><i class="bi bi-box-arrow-up-right me-1"></i>tinyurl.com</a></small>
                                             </div>
                                         </div>
                                         <!-- Column 2: Sub Text (all on one line) -->
@@ -326,6 +330,7 @@
     <link rel="stylesheet" href="lib/codemirror.css">
     <script src="lib/codemirror.js"></script>
     <script src="lib/yaml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
     <script>

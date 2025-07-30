@@ -216,6 +216,9 @@ class LabelMaker {
         // Initial setup for text inputs
         this.setupMainTextInputs();
         this.setupSubTextInputs();
+        
+        // QR Code functionality
+        this.setupQRCode();
     }
 
     initializeDimensionArrows() {
@@ -515,6 +518,77 @@ class LabelMaker {
         });
     }
     
+    setupQRCode() {
+        const qrInput = document.getElementById('qr-url-input');
+        const clearBtn = document.getElementById('clear-qr-btn');
+        
+        // Store current QR URL
+        this.currentQRUrl = '';
+        
+        if (qrInput) {
+            qrInput.addEventListener('input', (e) => {
+                const url = e.target.value;
+                this.updateQRCodeWithValidation(url);
+            });
+        }
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                if (qrInput) qrInput.value = '';
+                this.updateQRCodeWithValidation('');
+            });
+        }
+        
+        // Initialize character counter
+        this.updateCharacterCounter('');
+    }
+    
+    updateQRCodeWithValidation(url) {
+        this.updateCharacterCounter(url);
+        this.updateQRCode(url.trim());
+    }
+    
+    updateCharacterCounter(url) {
+        const charCounter = document.getElementById('qr-char-counter');
+        const qrInput = document.getElementById('qr-url-input');
+        
+        if (charCounter && qrInput) {
+            const currentLength = url.length;
+            const complexityThreshold1 = 33; // QR code complexity increases
+            const complexityThreshold2 = 54; // QR code complexity increases again
+            
+            charCounter.textContent = `${currentLength}/${complexityThreshold2}`;
+            
+            // Add visual feedback based on QR code complexity thresholds
+            charCounter.classList.remove('text-muted', 'text-warning', 'text-danger');
+            
+            if (currentLength === 0) {
+                charCounter.classList.add('text-muted');
+            } else if (currentLength >= complexityThreshold2) {
+                charCounter.classList.add('text-danger');
+            } else if (currentLength >= complexityThreshold1) {
+                charCounter.classList.add('text-warning');
+            } else {
+                charCounter.classList.add('text-muted');
+            }
+            
+            // Add visual feedback to input field
+            qrInput.classList.remove('border-warning', 'border-danger');
+            if (currentLength >= complexityThreshold2) {
+                qrInput.classList.add('border-danger');
+            } else if (currentLength >= complexityThreshold1) {
+                qrInput.classList.add('border-warning');
+            }
+        }
+    }
+    
+    updateQRCode(url) {
+        this.currentQRUrl = url;
+        
+        // Update main label preview
+        this.updatePreview();
+    }
+    
     setupTextAlignmentTooltip(element) {
         const tooltip = document.getElementById('text-alignment-tooltip');
         
@@ -683,6 +757,8 @@ class LabelMaker {
         const iconContainer2 = labelPreview.querySelector('.label-icon-2 img');
         const labelIcon2 = labelPreview.querySelector('.label-icon-2');
         const labelText = labelPreview.querySelector('.label-text');
+        const labelQR = labelPreview.querySelector('.label-qr');
+        const qrCanvas = labelPreview.querySelector('.label-qr .qr-canvas');
 
         // Handle icon visibility based on icon count
         if (labelIcon) {
@@ -749,7 +825,44 @@ class LabelMaker {
             labelIcon2.style.width = `${iconSize}mm`;
             labelIcon2.style.height = `${iconSize}mm`;
         }
-
+        
+        // Handle QR code display and sizing
+        if (labelQR && qrCanvas) {
+            if (this.currentQRUrl && this.currentQRUrl.trim().length > 0) {
+                labelQR.style.display = 'flex';
+                
+                // Set QR code size based on label height (same as icon size)
+                labelQR.style.width = `${iconSize}mm`;
+                labelQR.style.height = `${iconSize}mm`;
+                
+                // Set canvas size to match container - use higher resolution
+                const qrSizePx = iconSize * 15; // Higher resolution for better quality
+                qrCanvas.width = qrSizePx;
+                qrCanvas.height = qrSizePx;
+                qrCanvas.style.width = '100%';
+                qrCanvas.style.height = '100%';
+                
+                // Generate QR code for main label
+                if (typeof QRious !== 'undefined') {
+                    try {
+                        const ctx = qrCanvas.getContext('2d');
+                        ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+                        
+                        const qr = new QRious({
+                            element: qrCanvas,
+                            value: this.currentQRUrl,
+                            size: qrSizePx,
+                            level: 'L'
+                        });
+                    } catch (error) {
+                        console.error('QR code generation error:', error);
+                    }
+                }
+            } else {
+                labelQR.style.display = 'none';
+            }
+        }
+        
         // Check if sub text has any non-empty columns
         const subTextColumns = document.querySelectorAll('.sub-text-column');
         const hasSubText = Array.from(subTextColumns).some(col => col.textContent.trim());
@@ -825,10 +938,10 @@ class LabelMaker {
             const mainFontSize = this.calculateFontSize(height);
             const subFontSize = mainFontSize * 0.75;
 
-            ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
+            ctx.font = `bold ${mainFontSize}px Arial`;
             // Center text vertically like in the preview
             const centerY = (height * mmToPx) / 2;
-            const textY = subTexts.length > 0 ? centerY - (mainFontSize * mmToPx * 0.3) : centerY;
+            const textY = subTexts.length > 0 ? centerY - (mainFontSize * 0.3) : centerY;
             
             // Handle multiple columns for main text
             if (mainTexts.length === 0) {
@@ -849,9 +962,9 @@ class LabelMaker {
             }
 
             // Handle multiple columns for sub text
-            ctx.font = `${subFontSize * mmToPx}px Arial`;
+            ctx.font = `${subFontSize}px Arial`;
             ctx.fillStyle = '#666';
-            const subTextY = centerY + (subFontSize * mmToPx * 0.6);
+            const subTextY = centerY + (subFontSize * 0.6);
             
             if (subTexts.length === 0) {
                 const defaultSubTexts = ['8 mm', '10 mm', '12 mm'];
@@ -1047,7 +1160,7 @@ class LabelMaker {
         const dpi = 96;
         const mmToPx = dpi / 25.4; // ~3.78
         const baseFontSize = this.calculateFontSize(originalHeight);
-        const mainFontSizePx = baseFontSize * mmToPx;
+        const mainFontSizePx = baseFontSize; // Already in pixels
         const subFontSizePx = mainFontSizePx * 0.75;
         
         // Convert to px-based viewBox for consistent sizing with PNG
@@ -1233,13 +1346,13 @@ class LabelMaker {
     }
 
     calculateFontSize(height) {
-        // Font sizes for export - slightly increased from original to better match preview
+        // Return exact CSS pixel values from preview (no DPI conversion needed)
         switch(height) {
-            case 9: return 3.5;  // was 3, slightly increased
-            case 12: return 5;   // was 4, slightly increased  
-            case 18: return 7.5; // was 6.5, slightly increased
-            case 24: return 9;   // was 8, slightly increased
-            default: return 5;
+            case 9: return 6;   // matches CSS: 6px
+            case 12: return 12; // matches CSS: 12px
+            case 18: return 12; // matches CSS: 12px
+            case 24: return 14; // matches CSS: 14px
+            default: return 12;
         }
     }
     
@@ -1848,10 +1961,10 @@ class LabelMaker {
         const mainFontSize = this.calculateFontSize(height);
         const subFontSize = mainFontSize * 0.75;
 
-        ctx.font = `bold ${mainFontSize * mmToPx}px Arial`;
+        ctx.font = `bold ${mainFontSize}px Arial`;
         // Center text vertically like in the preview
         const centerY = (height * mmToPx) / 2;
-        const textY = subTexts.length > 0 ? centerY - (mainFontSize * mmToPx * 0.3) : centerY;
+        const textY = subTexts.length > 0 ? centerY - (mainFontSize * 0.3) : centerY;
         
         // Handle multiple columns for main text
         if (mainTexts.length === 1) {
@@ -1869,9 +1982,9 @@ class LabelMaker {
 
         // Handle multiple columns for sub text
         if (subTexts.length > 0) {
-            ctx.font = `${subFontSize * mmToPx}px Arial`;
+            ctx.font = `${subFontSize}px Arial`;
             ctx.fillStyle = '#666';
-            const subTextY = centerY + (subFontSize * mmToPx * 0.6);
+            const subTextY = centerY + (subFontSize * 0.6);
             
             if (subTexts.length === 1) {
                 const alignment = label.sub_text_align || 'left';

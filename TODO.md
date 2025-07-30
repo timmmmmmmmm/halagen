@@ -1,134 +1,122 @@
 # Halagen Label Generator - Todo List
 
-## **CURRENT PRIORITIES** 🚀
+## **IMPLEMENTATION STATUS** ✅
 
-### ✅ 1. Copy YAML Button Feature - COMPLETED
-**Add toolbar button to export current single editor settings as YAML**
-- ✅ Add "Copy YAML" button to main toolbar
-- ✅ Extract current form values (text, dimensions, icons, alignment, etc.)
-- ✅ Convert to YAML format matching batch processor structure
-- ✅ Copy to clipboard with success notification
-- ✅ Helps users transition from single editor to batch processor
-
-### 2. Shorter Footer - COMPLETED
-**Reduce footer height by bringing attribution lines closer together**
-- Move GitHub attribution and Ko-fi link closer together
-- Reduce vertical spacing between footer elements
-- Keep functionality but make more compact
-
-### 3. Two Icons Option - COMPLETED
-**Add support for displaying two icons on labels**
-- Extend current icon count selector (0/1) to include 2 icons
-- Show two identical icon selectors when "2 icons" is selected
-- Update preview canvas to render both icons
-- Adjust text layout to accommodate two icons
-- Consider icon positioning (side-by-side or stacked)
-
-### 4. Replace Column Icon with Text
-**Change column selector icon to text labels**
-- Replace current column icon with text "Main Columns" 
-- Replace sub-column icon with text "Sub-Columns"
-- Improve clarity of what each setting controls
-
-### 5. Button Group Consistency
-**Improve visual cohesion of width/height/column controls**
-- Make width arrows visually part of input field group (Bootstrap input group)
-- Make height arrows visually grouped (vertical button group if possible)
-- Apply same grouping treatment to column number +/- buttons
-- Ensure all arrow buttons are clearly clickable (not just on hover)
+### **COMPLETED FEATURES**
+- ✅ **Bootstrap 5 Migration** - Full UI framework migration completed
+- ✅ **Copy YAML Button** - Export single editor settings as YAML for batch processing
+- ✅ **Icon Count Selection (0/1/2)** - Full support for no icons, single icon, and dual icons
+- ✅ **Text Alignment Controls** - Global and per-cell text alignment (left/center/right/justify)
+- ✅ **Column Management** - Dynamic main text and sub-text column controls
+- ✅ **Footer Optimization** - Compact footer layout with proper spacing
 
 ---
 
-## **EXISTING REDDIT REQUESTS**
+## **CURRENT PRIORITIES** 🚀
 
-**Phase 1 Status:**
-- ✅ ~~UI Framework Migration (Bootstrap 5)~~ - *Implemented*
-- 🔄 Icon Count Selection Feature (0/1/2 icons) - *Needs 2-icon support*
-- ✅ ~~Text centering~~ - *Implemented*
-- ✅ ~~Toggle second row~~ - *Implemented*
+### 1. **QR Code Integration** - PARTIALLY IMPLEMENTED
+**Status:** UI elements exist but functionality not connected
+- ✅ QR input field in advanced settings
+- ✅ QR preview canvas placeholder
+- ❌ QR generation library integration
+- ❌ QR code rendering in labels
+- ❌ Character limit validation
 
-**Phase 2 (Enhanced functionality):**
-- ⏳ Basic crimping icons
-- ⏳ Icon overlay system
-- ⏳ QR code integration
+### 2. **Button Group Visual Consistency**
+**Improve visual cohesion of dimension controls**
+- Make width/height inputs visually grouped with Bootstrap input groups
+- Ensure column +/- buttons follow same visual pattern
+- Improve button hover/click states for better UX
 
-## **Future Considerations / Maybe Later**
-- **Direct printing integration**: Enable direct printing to label printers without saving as PNG first
-  - Would require integration with browser printing APIs or label printer SDKs
-  - Complex implementation, uncertain browser support
-  - Users can continue using current PNG → label printer workflow
+### 3. **Column Label Clarity**
+**Replace icons with text labels for better UX**
+- Change column controls to show "Main Text" / "Sub Text" labels
+- Improve clarity of what each setting controls
 
-# Feature Details
+---
 
-## **UI Framework Migration**
-**Move to Bootstrap 5 for better component system and styling**
+## **PLANNED FEATURES** 📋
 
-**Implementation Plan:**
-- Add Bootstrap 5 CSS to existing HTML (CDN or local copy)
-- Migrate existing form controls to Bootstrap classes
-- Update button styling to use Bootstrap button components
-- Implement Bootstrap button groups for icon count selector
-- Use Bootstrap grid system for better layout balance
-- Update input fields to use Bootstrap form controls
-- Maintain current functionality while improving visual consistency
-- Test responsive behavior on different screen sizes
+### **Phase 2: Enhanced Icons & Functionality**
+- **Crimping/Electrical Icons** - Add ferrules, terminals, connectors
+- **Icon Overlay System** - Composite icons (tools on fastener backgrounds)
+- **Custom Icon Upload** - Better PNG handling and processing
 
-**Benefits:**
-- Professional, consistent styling out of the box
-- Ready-made components (button groups, form controls, modals)
-- No build process required - works with current static setup
-- Easier to implement future UI features
+### **Phase 3: Advanced Features**
+- **Batch YAML Templates** - Pre-built templates for common use cases
+- **Print Integration** - Direct label printer support
+- **Advanced Typography** - Font selection, weight, spacing controls
 
-## **Icon Count Selection Feature**
-**Addresses no-image mode and dual icon support requests**
+---
 
-**Implementation Plan:**
-- Add icon count selector as Bootstrap-style button group with three buttons: `[0] [1] [2]`
-- Position above height setting, left of width setting for UI balance
-- Default state: 1 icon (current behavior)
-- Button group styling: Connected buttons, active button highlighted, inactive buttons subdued
+## **IMPLEMENTATION DETAILS**
 
-**Behavior per mode:**
-- **0 Icons**: Hide all icon selectors, text area expands to full label width
-- **1 Icon**: Current behavior, single icon selector visible
-- **2 Icons**: Show two icon selectors (Icon 1, Icon 2), arrange side by side in label
+### **QR Code Integration** (Priority 1)
+**Goal:** Enable QR codes on labels for inventory/specification links
 
-**Layout adjustments:**
-- 0 icons: Text spans full width, centered or left-aligned based on text alignment setting
-- 1 icon: Current layout (icon left, text right)
-- 2 icons: Icons positioned left side (stacked or side-by-side), text area adjusted accordingly
+**Technical Plan:**
+- Integrate qrcode.js library for client-side generation
+- Add 25-character limit with live counter
+- Position QR code on right side of label
+- Adjust text layout automatically when QR is present
+- Support QR version 2-3 with error correction level L
+- Add "Clear QR" functionality
 
-**UI considerations:**
-- When switching from 2→1 icons, preserve Icon 1 selection, clear Icon 2
-- When switching from 1→0 icons, hide icon selector but preserve selection for when user switches back
-- Update preview canvas in real-time when mode changes
+**UI Requirements:**
+- Real-time preview as user types
+- Character limit validation and visual feedback
+- Helper text for URL shortening recommendations
 
-## **Text Centering/Justification**
-Add center alignment option for text
+### **Visual Consistency Improvements** (Priority 2)
+**Goal:** Professional, cohesive control styling
 
-## **Toggle Second Row**
-Option to disable subtitle/subtext completely for single-line labels
+**Changes Needed:**
+- Convert dimension controls to Bootstrap input groups
+- Standardize button group treatments
+- Improve active/hover states across all controls
+- Ensure consistent spacing and alignment
 
-## **Crimping/Electrical Icons**
-Add ferrules, terminal connections, and other electrical component icons
+### **UX Improvements** (Priority 3)
+**Goal:** Clearer interface labels and controls
 
-## **Icon Overlay System**
-Implement Cullenect-style overlays where tool interface icons are overlaid on bolt shapes
+**Changes:**
+- Replace column icons with descriptive text
+- Add tooltips for advanced features
+- Improve control grouping and visual hierarchy
 
-## **QR Code Integration**
-Add QR codes to labels for linking to specifications, inventory systems, or part databases
-   
-**Implementation Plan:**
-- Add "QR Code" section in label editor UI
-- Input field with 20-25 character limit for reliable scanning at 12mm height
-- Live character counter showing remaining characters  
-- Helper text: "Use TinyURL.com to shorten long URLs"
-- Real-time QR code preview as user types
-- Use client-side QR library (qrcode.js or qrcode-generator)
-- Position QR on right side of label, adjust text layout accordingly
-- QR version 2-3 (25x25 to 29x29 modules) with error correction level L
-- Disable QR generation if over character limit
+---
 
-## **Implementation Notes**
-- The dual icon feature would work well with the existing fastener/head icon structure you already have
-- The overlay concept could leverage your existing SVG head icons to create composite visuals
+## **ARCHIVED/COMPLETED DETAILED SPECS**
+
+<details>
+<summary>Bootstrap 5 Migration - COMPLETED</summary>
+
+**Implementation completed:**
+- Bootstrap 5 CSS integrated via CDN
+- All controls migrated to Bootstrap classes
+- Button groups implemented for icon count selection
+- Bootstrap grid system in use
+- Form controls standardized
+- Responsive behavior verified
+</details>
+
+<details>
+<summary>Icon Count Selection - COMPLETED</summary>
+
+**Full implementation completed:**
+- Three-button selector: [No icon] [One icon] [Two icons]
+- Dynamic layout adjustment for each mode
+- Icon selector visibility management
+- Canvas rendering for all icon count modes
+- State preservation when switching modes
+</details>
+
+<details>
+<summary>Text Alignment - COMPLETED</summary>
+
+**Global and per-cell alignment implemented:**
+- Global alignment controls for main and sub text
+- Per-cell custom alignment option
+- Real-time preview updates
+- Alignment state persistence
+</details>
