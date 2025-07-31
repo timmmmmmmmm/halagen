@@ -935,13 +935,19 @@ class LabelMaker {
             ctx.fillStyle = 'black';
             ctx.textBaseline = 'middle';
 
-            const mainFontSize = this.calculateFontSize(height);
+            // Calculate font sizes: Use millimeter-based font sizes
+            const baseFontSizeMm = this.calculateFontSize(height);
+            const mainFontSize = baseFontSizeMm * mmToPx;
             const subFontSize = mainFontSize * 0.75;
 
-            ctx.font = `bold ${mainFontSize}px Arial`;
-            // Center text vertically like in the preview
+            ctx.font = `bold ${mainFontSize}px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif`;
+            
+            // Calculate absolute positions based on CSS layout
+            // Main text is positioned above center, sub text below with small gap
             const centerY = (height * mmToPx) / 2;
-            const textY = subTexts.length > 0 ? centerY - (mainFontSize * 0.3) : centerY;
+            const gapMm = 0.5; // 0.5mm gap between main and sub text
+            const gapCanvas = gapMm * mmToPx;
+            const textY = subTexts.length > 0 ? centerY - (mainFontSize / 2) - (gapCanvas / 2) : centerY;
             
             // Handle multiple columns for main text
             if (mainTexts.length === 0) {
@@ -962,9 +968,9 @@ class LabelMaker {
             }
 
             // Handle multiple columns for sub text
-            ctx.font = `${subFontSize}px Arial`;
+            ctx.font = `${subFontSize}px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif`;
             ctx.fillStyle = '#666';
-            const subTextY = centerY + (subFontSize * 0.6);
+            const subTextY = centerY + (subFontSize / 2) + (gapCanvas / 2);
             
             if (subTexts.length === 0) {
                 const defaultSubTexts = ['8 mm', '10 mm', '12 mm'];
@@ -1159,8 +1165,8 @@ class LabelMaker {
         // Use 96 PPI for SVG (Inkscape standard)
         const dpi = 96;
         const mmToPx = dpi / 25.4; // ~3.78
-        const baseFontSize = this.calculateFontSize(originalHeight);
-        const mainFontSizePx = baseFontSize; // Already in pixels
+        const baseFontSizeMm = this.calculateFontSize(originalHeight);
+        const mainFontSizePx = baseFontSizeMm * mmToPx; // Convert mm to pixels
         const subFontSizePx = mainFontSizePx * 0.75;
         
         // Convert to px-based viewBox for consistent sizing with PNG
@@ -1282,18 +1288,20 @@ class LabelMaker {
             }
         }
 
-        // Add main text - position so bottom of text is on horizontal centerline
+        // Add main text - use absolute positioning consistent with PNG export
         const textXPx = textX * scale;
         const textAreaWidthPx = textAreaWidth * scale;
         const centerYPx = (originalHeight * mmToPx) / 2; // Use original height for centerline
-        const textYPx = subTexts.length > 0 ? centerYPx - (mainFontSizePx * 0.3) : centerYPx;
+        const gapMm = 0.5; // 0.5mm gap between main and sub text
+        const gapPx = gapMm * mmToPx;
+        const textYPx = subTexts.length > 0 ? centerYPx - (mainFontSizePx / 2) - (gapPx / 2) : centerYPx;
         
         if (mainTexts.length === 1) {
             // For single label export, get alignment from DOM or use batch data
             const alignment = label.main_text_align || this.getColumnAlignment('main', 0);
             const alignedX = this.getSvgAlignedX(textXPx, textAreaWidthPx, alignment);
             const textAnchor = this.getSvgTextAnchor(alignment);
-            svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(mainTexts[0])}</text>`;
+            svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(mainTexts[0])}</text>`;
         } else {
             const columnWidthPx = textAreaWidthPx / mainTexts.length;
             mainTexts.forEach((text, index) => {
@@ -1302,19 +1310,19 @@ class LabelMaker {
                 const alignment = label.main_text_align || this.getColumnAlignment('main', index);
                 const alignedX = this.getSvgAlignedX(columnXPx, columnWidthPx, alignment);
                 const textAnchor = this.getSvgTextAnchor(alignment);
-                svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Arial, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
+                svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
             });
         }
 
         // Add sub text - position below main text with same spacing
         if (subTexts.length > 0) {
-            const subTextYPx = centerYPx + (subFontSizePx * 0.6); // Position sub text below center
+            const subTextYPx = centerYPx + (subFontSizePx / 2) + (gapPx / 2); // Position sub text below center
             if (subTexts.length === 1) {
                 // For single label export, get alignment from DOM or use batch data
                 const alignment = label.sub_text_align || this.getColumnAlignment('sub', 0);
                 const alignedX = this.getSvgAlignedX(textXPx, textAreaWidthPx, alignment);
                 const textAnchor = this.getSvgTextAnchor(alignment);
-                svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(subTexts[0])}</text>`;
+                svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(subTexts[0])}</text>`;
             } else {
                 const columnWidthPx = textAreaWidthPx / subTexts.length;
                 subTexts.forEach((text, index) => {
@@ -1323,7 +1331,7 @@ class LabelMaker {
                     const alignment = label.sub_text_align || this.getColumnAlignment('sub', index);
                     const alignedX = this.getSvgAlignedX(columnXPx, columnWidthPx, alignment);
                     const textAnchor = this.getSvgTextAnchor(alignment);
-                    svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Arial, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
+                    svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
                 });
             }
         }
@@ -1346,13 +1354,13 @@ class LabelMaker {
     }
 
     calculateFontSize(height) {
-        // Return exact CSS pixel values from preview (no DPI conversion needed)
+        // Return millimeter-based font sizes for consistent scaling
         switch(height) {
-            case 9: return 6;   // matches CSS: 6px
-            case 12: return 12; // matches CSS: 12px
-            case 18: return 12; // matches CSS: 12px
-            case 24: return 14; // matches CSS: 14px
-            default: return 12;
+            case 9: return 1.6;   // ~1.6mm font height
+            case 12: return 3.2;  // ~3.2mm font height  
+            case 18: return 3.2;  // ~3.2mm font height
+            case 24: return 3.7;  // ~3.7mm font height
+            default: return 3.2;
         }
     }
     
@@ -1958,13 +1966,19 @@ class LabelMaker {
         ctx.fillStyle = 'black';
         ctx.textBaseline = 'middle';
 
-        const mainFontSize = this.calculateFontSize(height);
+        // Calculate font sizes: Use millimeter-based font sizes
+        const baseFontSizeMm = this.calculateFontSize(height);
+        const mainFontSize = baseFontSizeMm * mmToPx;
         const subFontSize = mainFontSize * 0.75;
 
-        ctx.font = `bold ${mainFontSize}px Arial`;
-        // Center text vertically like in the preview
+        ctx.font = `bold ${mainFontSize}px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif`;
+        
+        // Calculate absolute positions based on CSS layout
+        // Main text is positioned above center, sub text below with small gap
         const centerY = (height * mmToPx) / 2;
-        const textY = subTexts.length > 0 ? centerY - (mainFontSize * 0.3) : centerY;
+        const gapMm = 0.5; // 0.5mm gap between main and sub text
+        const gapCanvas = gapMm * mmToPx;
+        const textY = subTexts.length > 0 ? centerY - (mainFontSize / 2) - (gapCanvas / 2) : centerY;
         
         // Handle multiple columns for main text
         if (mainTexts.length === 1) {
@@ -1982,9 +1996,9 @@ class LabelMaker {
 
         // Handle multiple columns for sub text
         if (subTexts.length > 0) {
-            ctx.font = `${subFontSize}px Arial`;
+            ctx.font = `${subFontSize}px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif`;
             ctx.fillStyle = '#666';
-            const subTextY = centerY + (subFontSize * 0.6);
+            const subTextY = centerY + (subFontSize / 2) + (gapCanvas / 2);
             
             if (subTexts.length === 1) {
                 const alignment = label.sub_text_align || 'left';
