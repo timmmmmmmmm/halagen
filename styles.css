@@ -5,7 +5,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: #f5f5f5;
     color: #333;
     line-height: 1.6;
@@ -1350,7 +1350,7 @@ footer {
     border: 2px solid #e0e0e0;
     border-radius: 6px;
     font-size: 14px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', sans-serif;
     background: white;
     transition: border-color 0.3s;
 }

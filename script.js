@@ -940,7 +940,7 @@ class LabelMaker {
             const mainFontSize = baseFontSizeMm * mmToPx;
             const subFontSize = mainFontSize * 0.75;
 
-            ctx.font = `bold ${mainFontSize}px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif`;
+            ctx.font = `bold ${mainFontSize}px "Inter", sans-serif`;
             
             // Calculate absolute positions based on CSS layout
             // Main text is positioned above center, sub text below with small gap
@@ -968,7 +968,7 @@ class LabelMaker {
             }
 
             // Handle multiple columns for sub text
-            ctx.font = `${subFontSize}px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif`;
+            ctx.font = `${subFontSize}px "Inter", sans-serif`;
             ctx.fillStyle = '#666';
             const subTextY = centerY + (subFontSize / 2) + (gapCanvas / 2);
             
@@ -1182,7 +1182,23 @@ class LabelMaker {
         <print-dpi>${svgDpi}</print-dpi>
       </rdf:Description>
     </rdf:RDF>
-  </metadata>`;
+  </metadata>
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400;
+        src: url('https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 700;
+        src: url('https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiA.woff2') format('woff2');
+      }
+    </style>
+  </defs>`;
 
         // Add rotation group if needed
         if (shouldRotate) {
@@ -1301,7 +1317,7 @@ class LabelMaker {
             const alignment = label.main_text_align || this.getColumnAlignment('main', 0);
             const alignedX = this.getSvgAlignedX(textXPx, textAreaWidthPx, alignment);
             const textAnchor = this.getSvgTextAnchor(alignment);
-            svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(mainTexts[0])}</text>`;
+            svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Inter, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(mainTexts[0])}</text>`;
         } else {
             const columnWidthPx = textAreaWidthPx / mainTexts.length;
             mainTexts.forEach((text, index) => {
@@ -1310,7 +1326,7 @@ class LabelMaker {
                 const alignment = label.main_text_align || this.getColumnAlignment('main', index);
                 const alignedX = this.getSvgAlignedX(columnXPx, columnWidthPx, alignment);
                 const textAnchor = this.getSvgTextAnchor(alignment);
-                svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
+                svgContent += `<text x="${alignedX}" y="${textYPx}" font-family="Inter, sans-serif" font-size="${mainFontSizePx}px" font-weight="bold" fill="black" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
             });
         }
 
@@ -1322,7 +1338,7 @@ class LabelMaker {
                 const alignment = label.sub_text_align || this.getColumnAlignment('sub', 0);
                 const alignedX = this.getSvgAlignedX(textXPx, textAreaWidthPx, alignment);
                 const textAnchor = this.getSvgTextAnchor(alignment);
-                svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(subTexts[0])}</text>`;
+                svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Inter, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(subTexts[0])}</text>`;
             } else {
                 const columnWidthPx = textAreaWidthPx / subTexts.length;
                 subTexts.forEach((text, index) => {
@@ -1331,7 +1347,7 @@ class LabelMaker {
                     const alignment = label.sub_text_align || this.getColumnAlignment('sub', index);
                     const alignedX = this.getSvgAlignedX(columnXPx, columnWidthPx, alignment);
                     const textAnchor = this.getSvgTextAnchor(alignment);
-                    svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
+                    svgContent += `<text x="${alignedX}" y="${subTextYPx}" font-family="Inter, sans-serif" font-size="${subFontSizePx}px" fill="#666" text-anchor="${textAnchor}" dominant-baseline="middle">${this.escapeXml(text)}</text>`;
                 });
             }
         }
@@ -1971,7 +1987,7 @@ class LabelMaker {
         const mainFontSize = baseFontSizeMm * mmToPx;
         const subFontSize = mainFontSize * 0.75;
 
-        ctx.font = `bold ${mainFontSize}px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif`;
+        ctx.font = `bold ${mainFontSize}px "Inter", sans-serif`;
         
         // Calculate absolute positions based on CSS layout
         // Main text is positioned above center, sub text below with small gap
@@ -1996,7 +2012,7 @@ class LabelMaker {
 
         // Handle multiple columns for sub text
         if (subTexts.length > 0) {
-            ctx.font = `${subFontSize}px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif`;
+            ctx.font = `${subFontSize}px "Inter", sans-serif`;
             ctx.fillStyle = '#666';
             const subTextY = centerY + (subFontSize / 2) + (gapCanvas / 2);
             
