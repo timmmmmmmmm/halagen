@@ -1368,23 +1368,14 @@ labels:
     }
     
     drawCutMarks(ctx, x, labelHeight) {
-        const cutMarkLength = labelHeight * 0.1; // 10% of label height
         const cutMarkThickness = 1;
-        
+
         ctx.strokeStyle = '#666';
         ctx.lineWidth = cutMarkThickness;
-        
-        // Draw cut mark at the exact boundary between labels
-        
-        // Top cut mark
+
+        // Draw full-height cut mark at the exact boundary between labels
         ctx.beginPath();
         ctx.moveTo(x, 0);
-        ctx.lineTo(x, cutMarkLength);
-        ctx.stroke();
-        
-        // Bottom cut mark
-        ctx.beginPath();
-        ctx.moveTo(x, labelHeight - cutMarkLength);
         ctx.lineTo(x, labelHeight);
         ctx.stroke();
     }
